@@ -5,6 +5,21 @@
   box-sizing: border-box;
 }
 
+#menuitems ul {
+  padding-left: 0;
+  font-size: 16px;
+}
+
+svg:hover, td:hover {
+  cursor: pointer;
+}
+#logo-img {
+ width: 35%;
+}
+#acc-img {
+  width: 60%;
+}
+
 #content {
   display: flex;
   flex-direction: row;
@@ -18,6 +33,7 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 5px;
+  border-right: 3px solid rgb(229, 229, 229);
 }
 #main {
   flex: 6;
@@ -25,22 +41,35 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 5px;
-  margin: 5px;
+  margin: 0;
 }
 
-#logo, #accpic, #menuitems {
-  flex: 2;
+#accpic, #menuitems {
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: rgb(222, 222, 222);
   border-radius: 15px;
   margin: 5px;
-  padding: 3px;
+  padding: 5px;
   margin-top: 7px;
 }
+#logo {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px;
+  padding: 5px;
+  margin-top: 7px;
+}
+#accpic {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+}
 #menuitems {
-  flex: 7;
+  flex: 10;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -48,16 +77,15 @@
   margin: 0;
 }
 #menuitems li {
-  margin-top: 13px;
+  margin-top: 17px;
   list-style-type: none;
 }
 #menuitems li:hover {
-  margin-top: 13px;
   list-style-type: none;
   font-weight: bold;
   cursor: pointer;
 }
-#menuitems div {
+#menuitems {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -66,9 +94,7 @@
   border-radius: 15px;
   margin: 5px;
   padding: 3px;
-  margin-top: 7px;
-  width: 100%;
-  height: 100%;
+  margin-top: 10px;
 }
 #logout {
   flex: 1;
@@ -86,6 +112,18 @@
   background-color: rgb(222, 222, 222);
   border-radius: 15px;
 }
+.tab-content {
+  flex: 15;
+  display: flex;
+  flex-direction: column;
+  margin: 5px;
+}
+#dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+} 
+
 #header div {
   display: flex;
   justify-content: center;
@@ -100,6 +138,9 @@
   flex: 10;
   display: grid;
   grid-template-columns: 1fr 1fr;
+}
+.details-item h5 {
+  margin: 10px;
 }
 .card-item {
   background-color: rgb(222, 222, 222);
@@ -123,23 +164,34 @@
   background-color: rgb(235, 235, 235);
   border-radius: 20px;
   box-shadow: inset 0px 0px 10px rgb(230, 230, 230);
-  width: 98%;
 }
 #logout {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 10px;
 }
 #logout button {
   border: 1px solid transparent;
   border-radius: 10px;
-  height: 70%;
-  width: 60%;
-  margin-top: 8px;
+  height: 80%;
+  width: 70%;
   margin-bottom: 12px;
+  background-color: rgb(228, 228, 228);
 }
 #logout button:hover {
   box-shadow: 0px 0px 10px rgb(235, 235, 235);
-  height: 52%;
-  width: 52%;
+  background-color: rgb(235, 235, 235);
+  font-weight: bold;
+}
+
+.active li {
+  font-weight: bold;
+}
+.active div{
+  display: flex;
+}
+.inactive {
+  display: none;
 }
