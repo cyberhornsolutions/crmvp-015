@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./main.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-  <title>Document</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <title>CRM</title>
 </head>
 <body>
   <div id="content">
@@ -15,19 +18,19 @@
       </div>
       <div id="accpic">
         <img src="acc-img-placeholder.png" id="acc-img">
-        <h5>Super Admin</h5>
-        <h6>Name Surname</h6>
+        <h5 style="font-size: 16px; font-weight: bold;">Super Admin</h5>
+        <h6 style="color: gray; border-top: 1px solid whitesmoke; margin-top: 10px; margin-bottom: 10px; padding-top: 12px; font-size: 14px;">Test Name</h6>
       </div>
       <div id="menuitems">
         <ul id="tab-list">
-          <li class="active">Дэшборд</li>
-          <li id="menu-leads">Лиды</li>
-          <li>Транзакции</li>
-          <li>Сотрудники</li>
-          <li>Календарь</li>
-          <li style="margin-top: 20px; border-top: 1px solid gray; padding-top: 15px;">Аффилиаты</li>
-          <li>Платформа</li>
-          <li>Новости</li>
+          <li id="menu-dash">Dashboard</li>
+          <li id="menu-leads">Leads</li>
+          <li id="menu-transactions">Transactions</li>
+          <li id="menu-users">Users</li>
+          <li id="menu-calendar">Calendar</li>
+          <li id="menu-affiliates" style="margin-top: 30px; border-top: 1px solid whitesmoke; padding-top: 25px;">Affiliates</li>
+          <li id="menu-platform">Platform</li>
+          <li id="menu-news">News</li>
         </ul>
       </div>
       <div id="logout">
@@ -37,8 +40,8 @@
     <div id="main">
       <div id="header">
         <div>
-          <h4>Dashboard</h4>
-        </div>
+          <h5 id="tab-title">Dashboard</h5>
+        </div>          
         <div>
           <h1>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
@@ -48,7 +51,53 @@
         </div>
       </div>
       <div class="tab-content">
-        <div id="dashboard">
+        <div id="mainboard">
+          <div id="profile">
+            <img id="profile-pic" src="acc-img-placeholder.png" alt="">
+            <div>
+              <h5>#11202</h5>
+              <h4>Test Lead</h4>
+            </div>
+            <div>
+              <div>sdelki</div>
+              <div>
+                <div>4</div>
+                <div>0</div>
+                <div>5</div>
+              </div>
+            </div>
+            <div id="profile-balance">
+              <div>balance</div>
+              <div>zalog</div>
+            </div>
+          </div>
+          <div id="board">
+            <ul class="nav nav-tabs">
+              <li class="active"><a data-toggle="tab" href="#home">Info</a></li>
+              <li><a data-toggle="tab" href="#menu1">Verification</a></li>
+              <li><a data-toggle="tab" href="#menu2">Transaction</a></li>
+              <li><a data-toggle="tab" href="#menu2">Open orders</a></li>
+              <li><a data-toggle="tab" href="#menu2">Trade history</a></li>
+              <li><a data-toggle="tab" href="#menu2">Notifications</a></li>
+              <li><a data-toggle="tab" href="#menu2">News</a></li>
+            </ul>
+            <div class="tab-content">
+              <div id="home" class="tab-pane fade in active">
+                <h3>Info</h3>
+                <p>Some content.</p>
+              </div>
+              <div id="menu1" class="tab-pane fade">
+                <h3>Menu 1</h3>
+                <p>Some content in menu 1.</p>
+              </div>
+              <div id="menu2" class="tab-pane fade">
+                <h3>Menu 2</h3>
+                <p>Some content in menu 2.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="dashboard" class="inactive">
           <div id="cards">
             <div class="card-item">
               <h5>Today</h5>
@@ -132,40 +181,716 @@
             </div>
           </div>
         </div>
-        <div id="calendar" class="inactive">calendar</div>
         <div id="leads" class="inactive">
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
-                <th scope="col">Handle</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td colspan="2">Larry the Bird</td>
-                <td>@twitter</td>
-              </tr>
-            </tbody>
-          </table>
+          <div id="leads-div">
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dropdown button
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+              </div>
+              <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names..">
+            </div>
+            <table id="myTable" class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Joined</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Sale</th>
+                  <th scope="col">Reten</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Balance</th>
+                  <th scope="col">Deposited</th>
+                  <th scope="col">Manager</th>
+                  <th scope="col">Affiliate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>21/08/2023</td>
+                  <td>Mark Otto</td>
+                  <td>New</td>
+                  <td>New</td>
+                  <td>+12312312314</td>
+                  <td>testmail@gmail.com</td>
+                  <td>100</td>
+                  <td>0</td>
+                  <td>None</td>
+                  <td>None</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>22/08/2023</td>
+                  <td>Jane Doe</td>
+                  <td>Active</td>
+                  <td>New</td>
+                  <td>+9876543210</td>
+                  <td>jane.doe@email.com</td>
+                  <td>250</td>
+                  <td>50</td>
+                  <td>John Smith</td>
+                  <td>Company XYZ</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>23/08/2023</td>
+                  <td>Alice Johnson</td>
+                  <td>Inactive</td>
+                  <td>Churned</td>
+                  <td>+1112223333</td>
+                  <td>alice.johnson@email.com</td>
+                  <td>75</td>
+                  <td>10</td>
+                  <td>Sarah Adams</td>
+                  <td>Partner ABC</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>24/08/2023</td>
+                  <td>Michael Smith</td>
+                  <td>New</td>
+                  <td>Active</td>
+                  <td>+4445556666</td>
+                  <td>michael.smith@email.com</td>
+                  <td>300</td>
+                  <td>100</td>
+                  <td>David Wilson</td>
+                  <td>Agency XYZ</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>25/08/2023</td>
+                  <td>Susan Lee</td>
+                  <td>Suspended</td>
+                  <td>Churned</td>
+                  <td>+7778889999</td>
+                  <td>susan.lee@email.com</td>
+                  <td>50</td>
+                  <td>25</td>
+                  <td>None</td>
+                  <td>None</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>26/08/2023</td>
+                  <td>David Brown</td>
+                  <td>New</td>
+                  <td>Active</td>
+                  <td>+1212121212</td>
+                  <td>david.brown@email.com</td>
+                  <td>150</td>
+                  <td>75</td>
+                  <td>Emily Davis</td>
+                  <td>Partner ABC</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>27/08/2023</td>
+                  <td>Lisa Johnson</td>
+                  <td>Active</td>
+                  <td>New</td>
+                  <td>+3334445555</td>
+                  <td>lisa.johnson@email.com</td>
+                  <td>200</td>
+                  <td>50</td>
+                  <td>None</td>
+                  <td>None</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>28/08/2023</td>
+                  <td>John Smith</td>
+                  <td>Inactive</td>
+                  <td>Churned</td>
+                  <td>+5556667777</td>
+                  <td>john.smith@email.com</td>
+                  <td>90</td>
+                  <td>10</td>
+                  <td>None</td>
+                  <td>None</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>29/08/2023</td>
+                  <td>Mary Taylor</td>
+                  <td>New</td>
+                  <td>Active</td>
+                  <td>+6667778888</td>
+                  <td>mary.taylor@email.com</td>
+                  <td>120</td>
+                  <td>30</td>
+                  <td>James Wilson</td>
+                  <td>Company XYZ</td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>30/08/2023</td>
+                  <td>Robert Anderson</td>
+                  <td>Active</td>
+                  <td>New</td>
+                  <td>+9990001111</td>
+                  <td>robert.anderson@email.com</td>
+                  <td>180</td>
+                  <td>60</td>
+                  <td>Emily Davis</td>
+                  <td>Agency ABC</td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td>31/08/2023</td>
+                  <td>Emily Davis</td>
+                  <td>New</td>
+                  <td>Active</td>
+                  <td>+1239874561</td>
+                  <td>emily.davis@email.com</td>
+                  <td>300</td>
+                  <td>100</td>
+                  <td>John Smith</td>
+                  <td>Partner XYZ</td>
+                </tr>                                                                                                                                                
+              </tbody>
+            </table>
+            <script>
+              function myFunction() {
+                var input, filter, table, tr, td, i, txtValue;
+                input = document.getElementById("myInput");
+                filter = input.value.toUpperCase();
+                table = document.getElementById("myTable");
+                tr = table.getElementsByTagName("tr");
+                for (i = 0; i < tr.length; i++) {
+                  td = tr[i].getElementsByTagName("td")[0];
+                  if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                      tr[i].style.display = "";
+                    } else {
+                      tr[i].style.display = "none";
+                    }
+                  }       
+                }
+              }
+              </script>
+          </div>
         </div>
-        <div></div>
-        <div></div>
+        <div id="transactions" class="inactive">
+          <div id="transactions-div">
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">Sum</th>
+                  <th scope="col">Method</th>
+                  <th scope="col">Card</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Manager</th>
+                  <th scope="col">Desk</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">FTD</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Mark Otto</td>
+                  <td>Deposit</td>
+                  <td>100</td>
+                  <td>VISA</td>
+                  <td>0000111100001111</td>
+                  <td>Success</td>
+                  <td>Manager #1</td>
+                  <td>Desk #1</td>
+                  <td>21/08/2023</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>John Doe</td>
+                  <td>Withdrawal</td>
+                  <td>200</td>
+                  <td>Mastercard</td>
+                  <td>1111000011110000</td>
+                  <td>Pending</td>
+                  <td>Manager #2</td>
+                  <td>Desk #2</td>
+                  <td>22/08/2023</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Jane Smith</td>
+                  <td>Deposit</td>
+                  <td>150</td>
+                  <td>PayPal</td>
+                  <td>0011001100110011</td>
+                  <td>Success</td>
+                  <td>Manager #3</td>
+                  <td>Desk #3</td>
+                  <td>23/08/2023</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Susan Johnson</td>
+                  <td>Withdrawal</td>
+                  <td>300</td>
+                  <td>Bitcoin</td>
+                  <td>0101010101010101</td>
+                  <td>Failed</td>
+                  <td>Manager #4</td>
+                  <td>Desk #4</td>
+                  <td>24/08/2023</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>Michael Brown</td>
+                  <td>Deposit</td>
+                  <td>75</td>
+                  <td>Bank Transfer</td>
+                  <td>1001100010011000</td>
+                  <td>Success</td>
+                  <td>Manager #5</td>
+                  <td>Desk #5</td>
+                  <td>25/08/2023</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>Laura Williams</td>
+                  <td>Withdrawal</td>
+                  <td>250</td>
+                  <td>Visa Electron</td>
+                  <td>1110000011111110</td>
+                  <td>Pending</td>
+                  <td>Manager #6</td>
+                  <td>Desk #6</td>
+                  <td>26/08/2023</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>David Lee</td>
+                  <td>Deposit</td>
+                  <td>120</td>
+                  <td>Mastercard</td>
+                  <td>0000111111110000</td>
+                  <td>Success</td>
+                  <td>Manager #7</td>
+                  <td>Desk #7</td>
+                  <td>27/08/2023</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>Emily Clark</td>
+                  <td>Withdrawal</td>
+                  <td>180</td>
+                  <td>PayPal</td>
+                  <td>1100110011001100</td>
+                  <td>Failed</td>
+                  <td>Manager #8</td>
+                  <td>Desk #8</td>
+                  <td>28/08/2023</td>
+                  <td>No</td>
+                </tr><tr>
+                  <td>9</td>
+                  <td>Robert Taylor</td>
+                  <td>Deposit</td>
+                  <td>95</td>
+                  <td>Bitcoin</td>
+                  <td>1010101010101010</td>
+                  <td>Success</td>
+                  <td>Manager #9</td>
+                  <td>Desk #9</td>
+                  <td>29/08/2023</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>Sarah Hall</td>
+                  <td>Withdrawal</td>
+                  <td>280</td>
+                  <td>Bank Transfer</td>
+                  <td>0110010011000110</td>
+                  <td>Pending</td>
+                  <td>Manager #10</td>
+                  <td>Desk #10</td>
+                  <td>30/08/2023</td>
+                  <td>No</td>
+                </tr>                
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="users" class="inactive">
+          <div id="users-div">
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Joined</th>
+                  <th scope="col">First</th>
+                  <th scope="col">Last</th>
+                  <th scope="col">Balance</th>
+                  <th scope="col">Deposited</th>
+                  <th scope="col">Withdrawn</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>21/08/2023</td>
+                  <td>Mark</td>
+                  <td>Otto</td>
+                  <td>100</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>VIP</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>22/08/2023</td>
+                  <td>Antony</td>
+                  <td>Cooper</td>
+                  <td>100</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>PRO</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>22/08/2023</td>
+                  <td>Andy</td>
+                  <td>Snipes</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>Regular</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>22/08/2023</td>
+                  <td>Keira</td>
+                  <td>Walsh</td>
+                  <td>100</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>Regular</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>25/08/2023</td>
+                  <td>Danny</td>
+                  <td>Welps</td>
+                  <td>150</td>
+                  <td>50</td>
+                  <td>0</td>
+                  <td>VIP</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="calendar" class="inactive">
+          <!-- This is an example component -->
+          <div>
+
+	<link rel="dns-prefetch" href="//unpkg.com" />
+	<link rel="dns-prefetch" href="//cdn.jsdelivr.net" />
+	<link rel="stylesheet" href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css">
+	<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
+
+	<style>
+		[x-cloak] {
+			display: none;
+		}
+	</style>
+
+<div class="antialiased sans-serif bg-gray-100 h-screen">
+	<div x-data="app()" x-init="[initDate(), getNoOfDays()]" x-cloak>
+		<div class="container mx-auto px-4 py-2 md:py-24">
+			  
+			<!-- <div class="font-bold text-gray-800 text-xl mb-4">
+				Schedule Tasks
+			</div> -->
+
+			<div class="bg-white rounded-lg shadow overflow-hidden">
+
+				<div class="flex items-center justify-between py-2 px-6">
+					<div>
+						<span x-text="MONTH_NAMES[month]" class="text-lg font-bold text-gray-800"></span>
+						<span x-text="year" class="ml-1 text-lg text-gray-600 font-normal"></span>
+					</div>
+					<div class="border rounded-lg px-1" style="padding-top: 2px;">
+						<button 
+							type="button"
+							class="leading-none rounded-lg transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 items-center" 
+							:class="{'cursor-not-allowed opacity-25': month == 0 }"
+							:disabled="month == 0 ? true : false"
+							@click="month--; getNoOfDays()">
+							<svg class="h-6 w-6 text-gray-500 inline-flex leading-none"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+							</svg>  
+						</button>
+						<div class="border-r inline-flex h-6"></div>		
+						<button 
+							type="button"
+							class="leading-none rounded-lg transition ease-in-out duration-100 inline-flex items-center cursor-pointer hover:bg-gray-200 p-1" 
+							:class="{'cursor-not-allowed opacity-25': month == 11 }"
+							:disabled="month == 11 ? true : false"
+							@click="month++; getNoOfDays()">
+							<svg class="h-6 w-6 text-gray-500 inline-flex leading-none"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+							</svg>									  
+						</button>
+					</div>
+				</div>	
+
+				<div class="-mx-1 -mb-1">
+					<div class="flex flex-wrap" style="margin-bottom: -40px;">
+						<template x-for="(day, index) in DAYS" :key="index">	
+							<div style="width: 14.26%" class="px-2 py-2">
+								<div
+									x-text="day" 
+									class="text-gray-600 text-sm uppercase tracking-wide font-bold text-center"></div>
+							</div>
+						</template>
+					</div>
+
+					<div class="flex flex-wrap border-t border-l">
+						<template x-for="blankday in blankdays">
+							<div 
+								style="width: 14.28%; height: 120px"
+								class="text-center border-r border-b px-4 pt-2"	
+							></div>
+						</template>	
+						<template x-for="(date, dateIndex) in no_of_days" :key="dateIndex">	
+							<div style="width: 14.28%; height: 120px" class="px-4 pt-2 border-r border-b relative">
+								<div
+									@click="showEventModal(date)"
+									x-text="date"
+									class="inline-flex w-6 h-6 items-center justify-center cursor-pointer text-center leading-none rounded-full transition ease-in-out duration-100"
+									:class="{'bg-blue-500 text-white': isToday(date) == true, 'text-gray-700 hover:bg-blue-200': isToday(date) == false }"	
+								></div>
+								<div style="height: 80px;" class="overflow-y-auto mt-1">
+									<!-- <div 
+										class="absolute top-0 right-0 mt-2 mr-2 inline-flex items-center justify-center rounded-full text-sm w-6 h-6 bg-gray-700 text-white leading-none"
+										x-show="events.filter(e => e.event_date === new Date(year, month, date).toDateString()).length"
+										x-text="events.filter(e => e.event_date === new Date(year, month, date).toDateString()).length"></div> -->
+
+									<template x-for="event in events.filter(e => new Date(e.event_date).toDateString() ===  new Date(year, month, date).toDateString() )">	
+										<div
+											class="px-2 py-1 rounded-lg mt-1 overflow-hidden border"
+											:class="{
+												'border-blue-200 text-blue-800 bg-blue-100': event.event_theme === 'blue',
+												'border-red-200 text-red-800 bg-red-100': event.event_theme === 'red',
+												'border-yellow-200 text-yellow-800 bg-yellow-100': event.event_theme === 'yellow',
+												'border-green-200 text-green-800 bg-green-100': event.event_theme === 'green',
+												'border-purple-200 text-purple-800 bg-purple-100': event.event_theme === 'purple'
+											}"
+										>
+											<p x-text="event.event_title" class="text-sm truncate leading-tight"></p>
+										</div>
+									</template>
+								</div>
+							</div>
+						</template>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal -->
+		<div style=" background-color: rgba(0, 0, 0, 0.8)" class="fixed z-40 top-0 right-0 left-0 bottom-0 h-full w-full" x-show.transition.opacity="openEventModal">
+			<div class="p-4 max-w-xl mx-auto relative absolute left-0 right-0 overflow-hidden mt-24">
+				<div class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
+					x-on:click="openEventModal = !openEventModal">
+					<svg class="fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+						<path
+							d="M16.192 6.344L11.949 10.586 7.707 6.344 6.293 7.758 10.535 12 6.293 16.242 7.707 17.656 11.949 13.414 16.192 17.656 17.606 16.242 13.364 12 17.606 7.758z" />
+					</svg>
+				</div>
+
+				<div class="shadow w-full rounded-lg bg-white overflow-hidden w-full block p-8">
+					
+					<h2 class="font-bold text-2xl mb-6 text-gray-800 border-b pb-2">Add Event Details</h2>
+				 
+					<div class="mb-4">
+						<label class="text-gray-800 block mb-1 font-bold text-sm tracking-wide">Event title</label>
+						<input class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500" type="text" x-model="event_title">
+					</div>
+
+					<div class="mb-4">
+						<label class="text-gray-800 block mb-1 font-bold text-sm tracking-wide">Event date</label>
+						<input class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500" type="text" x-model="event_date" readonly>
+					</div>
+
+					<div class="inline-block w-64 mb-4">
+						<label class="text-gray-800 block mb-1 font-bold text-sm tracking-wide">Select a theme</label>
+						<div class="relative">
+							<select @change="event_theme = $event.target.value;" x-model="event_theme" class="block appearance-none w-full bg-gray-200 border-2 border-gray-200 hover:border-gray-500 px-4 py-2 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 text-gray-700">
+									<template x-for="(theme, index) in themes">
+										<option :value="theme.value" x-text="theme.label"></option>
+									</template>
+								
+							</select>
+							<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+							<svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+							</div>
+						</div>
+					</div>
+ 
+					<div class="mt-8 text-right">
+						<button type="button" class="bg-white hover:bg-gray-100 text-gray-700 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm mr-2" @click="openEventModal = !openEventModal">
+							Cancel
+						</button>	
+						<button type="button" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 border border-gray-700 rounded-lg shadow-sm" @click="addEvent()">
+							Save Event
+						</button>	
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Modal -->
+	</div>
+
+	<script>
+		const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+		function app() {
+			return {
+				month: '',
+				year: '',
+				no_of_days: [],
+				blankdays: [],
+				days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+
+				events: [
+					{
+						event_date: new Date(2020, 3, 1),
+						event_title: "April Fool's Day",
+						event_theme: 'blue'
+					},
+
+					{
+						event_date: new Date(2020, 3, 10),
+						event_title: "Birthday",
+						event_theme: 'red'
+					},
+
+					{
+						event_date: new Date(2020, 3, 16),
+						event_title: "Upcoming Event",
+						event_theme: 'green'
+					}
+				],
+				event_title: '',
+				event_date: '',
+				event_theme: 'blue',
+
+				themes: [
+					{
+						value: "blue",
+						label: "Blue Theme"
+					},
+					{
+						value: "red",
+						label: "Red Theme"
+					},
+					{
+						value: "yellow",
+						label: "Yellow Theme"
+					},
+					{
+						value: "green",
+						label: "Green Theme"
+					},
+					{
+						value: "purple",
+						label: "Purple Theme"
+					}
+				],
+
+				openEventModal: false,
+
+				initDate() {
+					let today = new Date();
+					this.month = today.getMonth();
+					this.year = today.getFullYear();
+					this.datepickerValue = new Date(this.year, this.month, today.getDate()).toDateString();
+				},
+
+				isToday(date) {
+					const today = new Date();
+					const d = new Date(this.year, this.month, date);
+
+					return today.toDateString() === d.toDateString() ? true : false;
+				},
+
+				showEventModal(date) {
+					// open the modal
+					this.openEventModal = true;
+					this.event_date = new Date(this.year, this.month, date).toDateString();
+				},
+
+				addEvent() {
+					if (this.event_title == '') {
+						return;
+					}
+
+					this.events.push({
+						event_date: this.event_date,
+						event_title: this.event_title,
+						event_theme: this.event_theme
+					});
+
+					console.log(this.events);
+
+					// clear the form data
+					this.event_title = '';
+					this.event_date = '';
+					this.event_theme = 'blue';
+
+					//close the modal
+					this.openEventModal = false;
+				},
+
+				getNoOfDays() {
+					let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
+
+					// find where to start calendar day of week
+					let dayOfWeek = new Date(this.year, this.month).getDay();
+					let blankdaysArray = [];
+					for ( var i=1; i <= dayOfWeek; i++) {
+						blankdaysArray.push(i);
+					}
+
+					let daysArray = [];
+					for ( var i=1; i <= daysInMonth; i++) {
+						daysArray.push(i);
+					}
+					
+					this.blankdays = blankdaysArray;
+					this.no_of_days = daysArray;
+				}
+			}
+		}
+	</script>
+  </div>
+          </div>
+        </div>
+        <div id="affiliates" class="inactive"></div>
+        <div id="news" class="inactive"></div>
       </div>
     </div>
   </div>
