@@ -120,15 +120,21 @@
                 </div>
               </div>
             </div>
+            <div id="profile-referral-code">
+              <h5>Реферальный код</h5>
+              <input type="text" disabled="true">
+            </div>
+            <script src="referral-codes.js"></script>
           </div>
           <div id="board">
             <ul class="nav nav-tabs">
               <li class="active"><a data-toggle="tab" href="#menu0" onclick="showTab('menu0')">Информация</a></li>
               <li><a data-toggle="tab" href="#menu1" onclick="showTab('menu1')">Верификация</a></li>
-              <li><a data-toggle="tab" href="#menu2" onclick="showTab('menu2')">Транзакции</a></li>
+              <li><a data-toggle="tab" href="#menu2" onclick="showTab('menu2')">Общий отчёт</a></li>
               <li><a data-toggle="tab" href="#menu3" onclick="showTab('menu3')">Сделки</a></li>
               <li><a data-toggle="tab" href="#menu4" onclick="showTab('menu4')">История</a></li>
               <li><a data-toggle="tab" href="#menu5" onclick="showTab('menu5')">Новости</a></li>
+              <li><a data-toggle="tab" href="#menu6" onclick="showTab('menu6')">Рефераллы</a></li>
             </ul>
             <div class="tab-content">
               <div id="menu0" class="tab-pane fade in active">
@@ -218,7 +224,7 @@
               <div id="menu1" class="tab-pane fade">
                 <div id="menu1-main">
                   <div id="menu1-main-titles">
-                    <h4>Documents</h4>
+                    <h4>Документы</h4>
                     <button>Сохранить</button>
                   </div>
                   <div>
@@ -276,6 +282,27 @@
                 </div>
               </div>
               <div id="menu2" class="tab-pane fade">
+                <div id="menu2-filter" class="dropdown">
+                  <button class="btn dropdown-toggle" type="button" id="menu2Dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Фильтр
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="menu2Dropdown">
+                      <a class="dropdown-item text-center" href="#" data-option="Все операции">Все операции</a>
+                      <a class="dropdown-item text-center" href="#" data-option="Допольнительные">Допольнительные</a>
+                      <a class="dropdown-item text-center" href="#" data-option="Торговые">Торговые</a>
+                  </div>
+                  <input type="text" id="leadsSearchInput" onkeyup="leadsSearch()" placeholder="Поиск..">
+                </div>
+                <script>
+                    // Add an event listener to the dropdown items
+                    $('.dropdown-item').on('click', function() {
+                        // Get the text of the selected option
+                        var selectedOption = $(this).data('option');
+                        
+                        // Set the button text to the selected option
+                        $('#menu2Dropdown').text(selectedOption);
+                    });
+                </script>
                 <table id="lead-transactions-table" class="table table-hover table-striped">
                   <thead>
                     <tr>
@@ -345,7 +372,11 @@
                 </table>
               </div>
               <div id="menu3" class="tab-pane fade">
-                <table class="table table-hover table-striped">
+                <div id="menu3-buttons">
+                  <button id="menu3-edit" class="btn btn-secondary">Редактировать</button>
+                  <button id="menu3-save" class="btn btn-secondary">Сохранить</button>
+                </div>
+                <table id="menu3-table" class="table table-hover table-striped">
                   <thead>
                     <tr>
                       <th class="text-center" scope="col">ID</th>
@@ -359,7 +390,7 @@
                   </thead>
                   <tbody>
                     <tr>
-                      <td>ID123</th>
+                      <td>ID01</th>
                       <td>05-05-2023</td>
                       <td>Bitcoin</td>
                       <td>0.2</td>
@@ -378,8 +409,37 @@
                     </tr>
                   </tbody>
                 </table>
+                
               </div>
+              <script src="menu3-edit.js"></script>
               <div id="menu4" class="tab-pane fade">
+                <table class="table table-hover table-striped">
+                  <thead>
+                    <tr>
+                      <th class="text-center" scope="col">Лид</th>
+                      <th class="text-center" scope="col">Дата</th>
+                      <th class="text-center" scope="col">Сумма</th>
+                      <th class="text-center" scope="col">ID Транзакции</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Тест</th>
+                      <td>05-05-2023</td>
+                      <td>$100</td>
+                      <td>ID001</td>
+                    </tr>
+                    <tr>
+                      <td>Тест</th>
+                      <td>01-12-2023</td>
+                      <td>$50</td>
+                      <td>ID002</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="menu5" class="tab-pane fade"></div>
+              <div id="menu6" class="tab-pane fade">
                 <table class="table table-hover table-striped">
                   <thead>
                     <tr>
@@ -464,8 +524,8 @@
                     </div>
                     <!-- Button to delete selected rows -->
                     <div id="new-row-buttons">
-                      <button id="new-row-del" type="button" onclick="deleteSelectedRows()">Удалить</button>
-                      <button id="new-row-add" type="button" onclick="addRow()">Добавить</button>
+                      <button class="btn btn-secondary" id="new-row-del" type="button" onclick="deleteSelectedRows()">Удалить</button>
+                      <button class="btn btn-secondary" id="new-row-add" type="button" onclick="addRow()">Добавить</button>
                     </div>
                   </form>
                 </div>
@@ -575,7 +635,7 @@
           </div>
         </div>
         <div id="leads" class="inactive">
-          <div id="leads-div">
+          <div id="leads-div" class="hidden">
             <div class="dropdown">
               <button class="btn dropdown-toggle" type="button" id="leadsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Поиск
@@ -930,6 +990,48 @@
               }
               </script>
           </div>
+          <div id="lead-transactions" class="hidden">
+            <div id="lead-transactions-header">
+              <h2>Сделки</h2>
+              <h2 id="lead-transactions-name"></h2>
+              <button id="lead-card-button" type="button" class="btn btn-secondary">Карточка лида</button>
+            </div>
+            <div id="lead-transactions-bottom-table">
+              <table class="table table-hover table-striped">
+                <thead>
+                  <tr>
+                    <th class="text-center" scope="col">ID</th>
+                    <th class="text-center" scope="col">Тип сделки</th>
+                    <th class="text-center" scope="col">Символ</th>
+                    <th class="text-center" scope="col">Сумма</th>
+                    <th class="text-center" scope="col">Цена открытия</th>
+                    <th class="text-center" scope="col">Профит</th>
+                    <th class="text-center" scope="col">Дата</th>
+                  </tr>
+                </thead>
+                <tbody class="hidden">
+                  <tr>
+                    <td>ID123</th>
+                    <td>05-05-2023</td>
+                    <td>Bitcoin</td>
+                    <td>0.2</td>
+                    <td>25630.22</td>
+                    <td>+120</td>
+                    <td>05-05-2023</td>
+                  </tr>
+                  <tr>
+                    <td>ID11</th>
+                    <td>02-05-2023</td>
+                    <td>Ethereum</td>
+                    <td>0.5</td>
+                    <td>1590.22</td>
+                    <td>-24.22</td>
+                    <td>06-05-2023</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
         <div id="transactions" class="inactive">
           <div id="transactions-div">
@@ -937,12 +1039,17 @@
               <button class="btn dropdown-toggle" type="button" id="transactionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Поиск
               </button>
-              <button id="editTransactions">Изменить</button>
-              <button id="saveTransactions">Сохранить</button>
+              <button class="btn btn-secondary" id="editTransactions">Изменить</button>
+              <button class="btn btn-secondary" id="saveTransactions">Сохранить</button>
               <div class="dropdown-menu" aria-labelledby="transactionsDropdown">
-                  <a class="dropdown-item text-center" href="#" data-option="По лиду">По лиду</a>
-                  <a class="dropdown-item text-center" href="#" data-option="По типу">По типу</a>
                   <a class="dropdown-item text-center" href="#" data-option="По менеджеру">По менеджеру</a>
+                  <a class="dropdown-item text-center" href="#" data-option="По дате">По дате</a>
+                  <a class="dropdown-item text-center" href="#" data-option="По клиенту">По клиенту</a>
+                  <a class="dropdown-item text-center" href="#" data-option="По статусу">По статусу</a>
+                  <a class="dropdown-item text-center" href="#" data-option="По деску">По деску</a>
+                  <a class="dropdown-item text-center" href="#" data-option="По сумме">По сумме</a>
+                  <a class="dropdown-item text-center" href="#" data-option="По типу">По типу</a>
+                  <a class="dropdown-item text-center" href="#" data-option="По ID">По ID</a>
                   <a class="dropdown-item text-center" href="#" data-option="По методу">По методу</a>
                   <a class="dropdown-item text-center" href="#" data-option="По карте">По карте</a>
               </div>
@@ -1245,16 +1352,26 @@
                 table = document.getElementById("transactions-table");
                 tr = table.getElementsByTagName("tr");
                 for (i = 0; i < tr.length; i++) {
-                  if (searchBy == 'По лиду') {
+                  if (searchBy == 'По клиенту') {
                     td = tr[i].getElementsByTagName("td")[1];
+                  } else if (searchBy == 'По ID') {
+                    td = tr[i].getElementsByTagName("td")[0];
                   } else if (searchBy == 'По типу') {
                     td = tr[i].getElementsByTagName("td")[2];
+                  } else if (searchBy == 'По сумме') {
+                    td = tr[i].getElementsByTagName("td")[3];
                   } else if (searchBy == 'По методу') {
                     td = tr[i].getElementsByTagName("td")[4];
                   } else if (searchBy == 'По карте') {
                     td = tr[i].getElementsByTagName("td")[5];
+                  } else if (searchBy == 'По статусу') {
+                    td = tr[i].getElementsByTagName("td")[6];
                   } else if (searchBy == 'По менеджеру') {
                     td = tr[i].getElementsByTagName("td")[7];
+                  } else if (searchBy == 'По деску') {
+                    td = tr[i].getElementsByTagName("td")[8];
+                  } else if (searchBy == 'По дате') {
+                    td = tr[i].getElementsByTagName("td")[9];
                   }
                   if (td) {
                     txtValue = td.textContent || td.innerText;
@@ -1270,19 +1387,7 @@
           </div>
         </div>
         <div id="users" class="inactive">
-          <div id="users-div">
-            <div id="newUser-form">
-              <form id="addNewUser">
-                <div id="new-user-fields">
-                  <button id="new-user-del" type="button" onclick="deleteUser()">Удалить</button>
-                  <input type="text" placeholder="Имя" id="newUserName">
-                  <input type="email" placeholder="Email" id="newUserEmail">
-                  <input type="text" placeholder="Позиция" id="newUserPosition">
-                  <input type="text" placeholder="Деск" id="newUserDesk">
-                  <button id="new-user-add" type="button" onclick="addUser()">Добавить</button>
-                </div>
-              </form>
-            </div>
+          <div id="users-div" class="hidden">
             <div class="dropdown" style="display: flex; justify-content: space-between; margin: 10px; height: 25px;">
               <button class="btn dropdown-toggle" type="button" id="usersDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Поиск
@@ -1372,7 +1477,7 @@
                   <td>testmail@gmail.com</td>
                   <td>Сейл</td>
                   <td>Демо</td>
-                  <td>21-08-2023</td>
+                  <td>2023-09-03</td>
                 </tr>
                 <tr>
                   <td><input type="checkbox"></td>
@@ -1381,10 +1486,25 @@
                   <td>testmail2@gmail.com</td>
                   <td>Админ</td>
                   <td>Демо</td>
-                  <td>20-08-2023</td>
+                  <td>2023-08-13</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div id="newUser-form" class="hidden">
+            <h5>Управление сотрудниками</h5>
+            <form id="addNewUser">
+              <div id="new-user-fields">
+                <input type="text" placeholder="Имя" id="newUserName">
+                <input type="email" placeholder="Email" id="newUserEmail">
+                <input type="text" placeholder="Позиция" id="newUserPosition">
+                <input type="text" placeholder="Деск" id="newUserDesk">
+              </div>
+            </form>
+            <div>
+              <button class="btn btn-secondary" id="new-user-del" type="button" onclick="deleteUser()">Удалить</button>
+              <button class="btn btn-secondary" id="new-user-add" type="button" onclick="addUser()">Добавить</button>
+            </div>
           </div>
         </div>
         <div id="calendar" class="inactive">

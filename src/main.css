@@ -168,7 +168,7 @@ svg:hover, td:hover {
   flex: 1;
   border: 3px solid whitesmoke;
   justify-content: center;
-  height: 85%;
+  height: 93%;
   border-radius: 5px;
   margin-right: 10px;
 }
@@ -193,6 +193,17 @@ svg:hover, td:hover {
 #profile-balance h4 {
   font-size: 12px;
   padding: 3px;
+}
+#profile-referral-code h5 {
+  border: none;
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 3px;
+}
+#profile-referral-code {
+  border-top: 1px solid lightgray;
+  margin-top: 5px;
+  padding: 10px;
 }
 #board {
   background-color: whitesmoke;
@@ -298,12 +309,70 @@ svg:hover, td:hover {
 }
 
 /* LEADS TAB */
-#leads-div, #transactions-div, #users-div {
+#leads {
+  display: flex;
+  flex-direction: column;
+}
+#transactions-div {
   width: 98%;
   margin: 10px;
   background-color: whitesmoke;
   border-radius: 5px;
-  max-height: 650px; overflow-y: auto;
+  max-height: 700px; overflow-y: auto;
+  min-height: 700px; overflow-y: auto;
+}
+#users {
+  display: flex;
+  flex-direction: column;
+}
+#users-div {
+  width: 98%;
+  margin: 10px;
+  background-color: whitesmoke;
+  border-radius: 5px;
+  max-height: 500px; overflow-y: auto;
+  min-height: 500px; overflow-y: auto;
+  box-shadow: 0px 0px 1px var(--main-elc2);
+  border: 2px solid white;
+}
+#leads-div {
+  flex: 2;
+  width: 98%;
+  margin: 10px;
+  background-color: whitesmoke;
+  border-radius: 5px;
+  max-height: 420px; overflow-y: auto;
+  min-height: 420px; overflow-y: auto;
+}
+#lead-transactions {
+  flex: 1;
+  width: 98%;
+  margin: 10px;
+  margin-top: 5px;
+  background-color: whitesmoke;
+  border-radius: 5px;
+  max-height: 275px; overflow-y: auto;
+  min-height: 275px; overflow-y: auto;
+}
+#lead-transactions-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 10px;
+}
+#lead-transactions-header h2 {
+  font-weight: 500;
+  color: var(--main-elc2);
+  margin-top: 7px;
+  margin-left: 10px;
+  font-size: 14px;
+}
+#lead-transactions-header button {
+  font-size: 14px;
+  font-weight: 500;
+  width: 150px;
+  border: 1px solid lightgray;
+  font-weight: 500;
 }
 
 #leads-div table, #transactions-div table, #users-div table {
@@ -312,9 +381,6 @@ svg:hover, td:hover {
   border-radius: 5px;
   margin-top: 3px;
   max-height: 60vh;
-}
-#leads-div input {
-  margin: 5px;
 }
 
 th, td {
@@ -440,21 +506,11 @@ td.editing {
   border-radius: 5px;
   width: 100px;
 }
-#new-row-del {
-  border: inset 2px solid var(--main-reds);
-  background-color: lightpink;
-}
 #new-row-del:hover {
-  box-shadow: 0px 0px 5px var(--main-reds);
   cursor: pointer;
   font-weight: bold;
-} 
-#new-row-add {
-  border: inset 2px solid var(--main-numbersc);
-  background-color: var(--main-lightgreen);
 }
 #new-row-add:hover {
-  box-shadow: 0px 0px 5px var(--main-numbersc);
   cursor: pointer;
   font-weight: bold;
 } 
@@ -472,18 +528,17 @@ td.editing {
   margin-top: 3px;
 }
 #editButton, #saveButton, #editTransactions, #saveTransactions {
-  border: inset 1px solid var(--main-numbersc);
-  background-color:  var(--main-lightgreen);
+  border: inset 1px solid var(--main-textc);
 }
 #editButton:hover, #saveButton:hover, #editTransactions:hover, #saveTransactions:hover {
-  box-shadow: 0px 0px 10px  var(--main-lightgreen);
+  box-shadow: 0px 0px 10px  var(--main-textc);
   font-weight: bold;
 }
 #editTransactions, #saveTransactions {
   width: 100px;
   height: 30px;
   border-radius: 3px;
-  margin-top: 4px;
+  margin-top: 5px;
 }
 
 /* SIMPLE TOOLTIP RING */
@@ -516,23 +571,33 @@ td.editing {
 }
 
 #newUser-form {
-  margin-top: 10px;
+  margin: 10px;
+  margin-left: 150px;
+  margin-right: 150px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 180px;
+  background-color: whitesmoke;
+  padding: 10px;
+  box-shadow: 0px 0px 1px var(--main-elc2);
+  border: 2px solid white;
+}
+#newUser-form h5 {
+  font-weight: 500;
 }
 #new-user-del {
-  margin-right: 70px;
   border-radius: 3px;
   width: 100px;
-  height: 25px;
-  border: inset 2px solid var(--main-reds);
-  background-color: lightpink;
 }
 #new-user-add {
-  margin-left: 70px;
   border-radius: 3px;
   width: 100px;
-  height: 25px;
-  border: inset 2px solid var(--main-numbersc);
-  background-color: var(--main-lightgreen);
+}
+#new-user-fields input {
+  font-size: 15px;
 }
 
 /* CHECK */
@@ -614,4 +679,23 @@ td.editing {
 #menu1 button:hover {
   font-weight: bold;
   box-shadow: 0px 0px 5px var(--main-numbersc);
+}
+#leadsSearchInput {
+  margin: 2px;
+}
+.hidden {
+  display: none;
+}
+#menu2-filter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px;
+}
+#menu3-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px;
+  margin-bottom: 5px;
 }

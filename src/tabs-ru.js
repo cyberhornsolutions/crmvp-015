@@ -45,6 +45,8 @@ const tabtitle = document.getElementById('tab-title')
 const leadnameEl = document.getElementById('lead-name')
 const profilename = document.getElementById('profile-name')
 
+const leadTransactionsName = document.getElementById('lead-transactions-name')
+
 function showMain() {
   menuIDs.forEach(id => {
     const element = document.getElementById(id);
@@ -88,6 +90,9 @@ function showDashboard() {
 
 // Function to hide the dashboard and show the leads table
 function showLeads() {
+  const leadsDiv = document.getElementById('leads-div')
+  const leadTransactionsDiv = document.getElementById('lead-transactions')
+
   menuIDs.forEach(id => {
     const element = document.getElementById(id);
     if (element.classList.contains('active')) {
@@ -104,6 +109,8 @@ function showLeads() {
 
   tableads.style.display = 'flex'
   menuleads.classList.add('active')
+  leadsDiv.classList.remove('hidden')
+  leadTransactionsDiv.classList.remove('hidden')
   tabtitle.textContent = 'Лиды'
 }
 
@@ -128,6 +135,9 @@ function showTransactions() {
 }
 
 function showUsers() {
+  const usersDiv = document.getElementById('users-div')
+  const newUserForm = document.getElementById('newUser-form')
+
   menuIDs.forEach(id => {
     const element = document.getElementById(id);
     if (element.classList.contains('active')) {
@@ -141,7 +151,8 @@ function showUsers() {
       element.style.display = 'none'
     }
   });
-
+  usersDiv.classList.remove('hidden')
+  newUserForm.classList.remove('hidden')
   tabusers.style.display = 'flex';
   menuusers.classList.add('active')
   tabtitle.textContent = 'Сотрудники'
@@ -168,35 +179,40 @@ function showCalendar() {
 }
 
 const leadsTableRows = document.querySelectorAll("#leadsTable tbody tr");
+const leadCardButton = document.getElementById('lead-card-button')
+const leadTransactionsBody = document.querySelector('#lead-transactions-bottom-table tbody')
 
-  // Loop through each row and add a click event listener
-  leadsTableRows.forEach((row) => {
-    row.addEventListener("click", function () {
-      // Get the name from the clicked row
-      const leadName = row.querySelector("td:nth-child(3)").textContent;
-
-      
-      menuIDs.forEach(id => {
-        const element = document.getElementById(id);
-        if (element.classList.contains('active')) {
-          element.classList.remove('active');
-        }
-      });
-    
-      tabIDs.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-          element.style.display = 'none'
-        }
-      });
-      
-      tabmain.style.display = 'flex';
-      menumain.classList.add('active')
-      tabtitle.textContent = 'Карточка лида';
-      leadnameEl.textContent = leadName;
-      profilename.placeholder = leadName;
-    });
+// Loop through each row and add a click event listener
+leadsTableRows.forEach((row) => {
+  row.addEventListener("click", function () {
+    // Get the name from the clicked row
+    const leadName = row.querySelector("td:nth-child(3)").textContent;
+    leadTransactionsName.textContent = leadName;
+    leadTransactionsBody.classList.remove('hidden');
   });
+});
+
+leadCardButton.addEventListener('click', function() {
+  menuIDs.forEach(id => {
+    const element = document.getElementById(id);
+    if (element.classList.contains('active')) {
+      element.classList.remove('active');
+    }
+  });
+  
+  tabIDs.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.style.display = 'none'
+    }
+  });
+    
+  tabmain.style.display = 'flex';
+  menumain.classList.add('active')
+  tabtitle.textContent = 'Карточка лида';
+  leadnameEl.textContent = leadTransactionsName.textContent;
+  profilename.placeholder = leadTransactionsName.textContent;
+})
 
 // Add click event listeners to the menu items
 menumain.addEventListener('click', showMain)
