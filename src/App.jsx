@@ -1,17 +1,33 @@
-import { useState } from 'react'
-import './App.css'
-import Home from './pages/Home.jsx'
-import Header from './components/Header'
+import React from "react";
+// import "./App.css";
+import Login from "./pages/Login.jsx";
+import "./style-crm.css";
+import "./main.css";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
-function App() {
-  const [count, setCount] = useState(0)
+// import "./index.css";
 
-  return (
-    <>
-    <Header />
-    <Home />
-    </>
-  )
-}
+import {
+  Route,
+  BrowserRouter as Router,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from "react-router-dom";
+import Home from "./pages/Home.jsx";
 
-export default App
+const App = () => {
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <>
+        <Route path="/" Component={Login} index />
+        <Route path="/home" Component={Home} />
+      </>
+    )
+  );
+
+  return <RouterProvider router={router} />;
+};
+
+export default App;

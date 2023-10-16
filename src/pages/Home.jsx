@@ -1,12 +1,29 @@
-import React from 'react'
+import React, { useState } from "react";
+import Sidebar from "../components/Sidebar";
+import Dashboard from "../components/Dashboard";
+import Header from "../components/Header";
+import Leads from "../components/Leads";
+import Transactions from "../components/Transactions";
+import Users from "../components/Users";
+import Calendar from "../components/Calendar";
+import MainBoard from "../components/MainBoard";
 
-function Home() {
+export default function Home() {
+  const [tab, setTab] = useState("Dashboard");
   return (
-    <div>
-      <button>xdemi-011</button>
-      <a href="./Leads"> lin k</a>
+    <div id="content">
+      <Sidebar tab={tab} setTab={setTab} />
+      <div id="main">
+        <Header title={tab} />
+        <div className="tab-content">
+          {tab === "Dashboard" && <Dashboard />}
+          {tab === "Players" && <Leads setTab={setTab} />}
+          {tab === "Transactions" && <Transactions />}
+          {tab === "Managers" && <Users />}
+          {tab === "Calendar" && <Calendar />}
+          {tab === "MainBoard" && <MainBoard />}
+        </div>
+      </div>
     </div>
-  )
+  );
 }
-
-export default Home

@@ -1,3 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 :root {
   --main-textc: rgb(166, 166, 166);
   --main-numbersc: rgb(50, 232, 129);
@@ -5,18 +8,23 @@
   --main-bgc: #11131a;
   --main-elc: #1e222dfa;
   --main-elc2: #1e222dec;
-  --main-bluec:rgba(30, 34, 45, 0.87);
+  --main-bluec: rgba(30, 34, 45, 0.87);
   --seco-grayc: rgb(175, 175, 175);
   --main-reds: rgb(244, 154, 167);
 }
 
+@font-face {
+  font-family: "Roboto";
+  src: url(https://fonts.googleapis.com/css?family=Roboto);
+}
+
 * {
   margin: 0;
-  padding: 0;  
+  padding: 0;
   text-align: center;
   box-sizing: border-box;
   font-size: 16px;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif !important;
   font-weight: 300;
 }
 
@@ -27,7 +35,8 @@
   height: 100%;
 }
 
-svg:hover, td:hover {
+svg:hover,
+td:hover {
   cursor: pointer;
 }
 #logo {
@@ -37,8 +46,8 @@ svg:hover, td:hover {
   box-shadow: 0px 0px 5px whitesmoke;
 }
 #logo-img {
- width: 35%;
- border-radius: 15px;
+  width: 35%;
+  border-radius: 15px;
 }
 #acc-img {
   width: 70%;
@@ -49,6 +58,7 @@ svg:hover, td:hover {
   flex-direction: row;
   height: 100vh;
   color: var(--main-elc2);
+  background-color: white;
 }
 
 #sidebar {
@@ -57,10 +67,30 @@ svg:hover, td:hover {
   flex-direction: column;
   justify-content: space-between;
   padding: 5px;
-  background-color:  var(--main-elc);
+  background-color: var(--main-elc);
   color: rgba(255, 255, 255, 0.854);
   border-right: 2px solid white;
   box-shadow: 0px 0px 3px var(--main-elc);
+  overflow-y: scroll;
+}
+/* width */
+::-webkit-scrollbar {
+  width: 1px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 #main {
   flex: 6;
@@ -72,7 +102,8 @@ svg:hover, td:hover {
   background-color: var(--main-light-blue);
 }
 
-#accpic, #menuitems {
+#accpic,
+#menuitems {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -142,13 +173,29 @@ svg:hover, td:hover {
   color: var(--main-elc);
   border: 2px solid white;
   box-shadow: 0px 0px 3px var(--main-elc);
+  height: 50px;
+}
+
+.nav-tabs .nav-link {
+  padding: 10px 15px !important;
+  text-decoration: none;
+}
+.nav-tabs .nav-link:hover {
+  color: #23527c;
+  background-color: #eee;
+}
+.nav-tabs .active {
+  color: #555;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px 4px 0 0 !important;
 }
 .tab-content {
   flex: 15;
   display: flex;
   flex-direction: column;
   margin: 5px;
-  height: 90%;
+  /* height: 90%; */
 }
 .tab-content input {
   border: 1px solid lightgray;
@@ -159,10 +206,24 @@ svg:hover, td:hover {
   padding-bottom: 3px;
 }
 #mainboard {
+  display: flex;
   flex-direction: row;
   height: 100%;
   color: var(--main-elc2);
 }
+
+#mainboard .f-w-inherit {
+  font-weight: inherit !important;
+}
+
+#mainboard .f-w-700 {
+  font-weight: 700 !important;
+}
+
+#mainboard .f-s-inherit {
+  font-size: inherit !important;
+}
+
 #profile {
   background-color: whitesmoke;
   flex: 1;
@@ -176,6 +237,7 @@ svg:hover, td:hover {
   flex: 1;
   padding: 20px;
   padding-bottom: 5px;
+  max-width: 100%;
 }
 #profile-deals {
   flex: 1;
@@ -216,7 +278,7 @@ svg:hover, td:hover {
   display: flex;
   flex-direction: column;
   height: 100%;
-} 
+}
 
 #header div {
   display: flex;
@@ -256,7 +318,8 @@ svg:hover, td:hover {
   font-weight: bold;
   color: var(--main-elc2);
 }
-.card-item h5, .card-item h6 {
+.card-item h5,
+.card-item h6 {
   margin: 10px;
 }
 .card-item:hover {
@@ -268,7 +331,7 @@ svg:hover, td:hover {
 .details-item {
   margin: 10px;
   border-radius: 3px;
-  max-height: 420px; 
+  max-height: 420px;
   overflow-y: auto;
   border: 2px solid white;
   box-shadow: 0px 0px 5px lightgray;
@@ -296,7 +359,7 @@ svg:hover, td:hover {
   margin-bottom: 12px;
 }
 #logout button:hover {
-  box-shadow: 0px 0px 10px var(--main-numbersc);  
+  box-shadow: 0px 0px 10px var(--main-numbersc);
   border: 2px solid var(--main-numbersc);
   font-weight: bold;
 }
@@ -318,8 +381,10 @@ svg:hover, td:hover {
   margin: 10px;
   background-color: whitesmoke;
   border-radius: 5px;
-  max-height: 700px; overflow-y: auto;
-  min-height: 700px; overflow-y: auto;
+  max-height: 700px;
+  overflow-y: auto;
+  min-height: 700px;
+  overflow-y: auto;
 }
 #users {
   display: flex;
@@ -330,8 +395,10 @@ svg:hover, td:hover {
   margin: 10px;
   background-color: whitesmoke;
   border-radius: 5px;
-  max-height: 500px; overflow-y: auto;
-  min-height: 500px; overflow-y: auto;
+  max-height: 500px;
+  overflow-y: auto;
+  min-height: 500px;
+  overflow-y: auto;
   box-shadow: 0px 0px 1px var(--main-elc2);
   border: 2px solid white;
 }
@@ -341,8 +408,10 @@ svg:hover, td:hover {
   margin: 10px;
   background-color: whitesmoke;
   border-radius: 5px;
-  max-height: 420px; overflow-y: auto;
-  min-height: 420px; overflow-y: auto;
+  max-height: 420px;
+  overflow-y: auto;
+  min-height: 420px;
+  overflow-y: auto;
 }
 #lead-transactions {
   flex: 1;
@@ -351,8 +420,10 @@ svg:hover, td:hover {
   margin-top: 5px;
   background-color: whitesmoke;
   border-radius: 5px;
-  max-height: 275px; overflow-y: auto;
-  min-height: 275px; overflow-y: auto;
+  max-height: 275px;
+  overflow-y: auto;
+  min-height: 275px;
+  overflow-y: auto;
 }
 #lead-transactions-header {
   display: flex;
@@ -375,7 +446,9 @@ svg:hover, td:hover {
   font-weight: 500;
 }
 
-#leads-div table, #transactions-div table, #users-div table {
+#leads-div table,
+#transactions-div table,
+#users-div table {
   width: 100%;
   border: 5px solid whitesmoke;
   border-radius: 5px;
@@ -383,14 +456,15 @@ svg:hover, td:hover {
   max-height: 60vh;
 }
 
-th, td {
+th,
+td {
   font-size: 14px;
 }
 .text-center {
   text-align: center;
 }
 .text-left {
-  text-align: left;
+  text-align: left !important;
 }
 
 #profile-deals {
@@ -425,7 +499,7 @@ th, td {
 }
 #profile-balance {
   display: flex;
-  justify-content: space-around;;
+  justify-content: space-around;
 }
 #profile-info-titles1 {
   display: flex;
@@ -448,7 +522,7 @@ th, td {
 #profile-info-inputs2 {
   display: flex;
   flex-direction: column;
-  justify-content: space-between; 
+  justify-content: space-between;
   padding: 10px;
 }
 #profile-info-titles1 button {
@@ -470,7 +544,7 @@ td.editing {
 }
 #addRowForm {
   border: 1px solid whitesmoke;
-  padding: 5px
+  padding: 5px;
 }
 #new-row-form-inputs1 {
   display: flex;
@@ -487,7 +561,8 @@ td.editing {
   border-radius: 3px;
   margin-top: 3px;
 }
-#new-row-form-inputs1 input, #new-row-form-inputs2 input {
+#new-row-form-inputs1 input,
+#new-row-form-inputs2 input {
   margin: 5px;
   border: 1px solid whitesmoke;
   font-size: 15px;
@@ -513,8 +588,9 @@ td.editing {
 #new-row-add:hover {
   cursor: pointer;
   font-weight: bold;
-} 
-#leads-div .dropdown, #transactions-div .dropdown {
+}
+#leads-div .dropdown,
+#transactions-div .dropdown {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -527,14 +603,21 @@ td.editing {
   max-height: 85vh;
   margin-top: 3px;
 }
-#editButton, #saveButton, #editTransactions, #saveTransactions {
+#editButton,
+#saveButton,
+#editTransactions,
+#saveTransactions {
   border: inset 1px solid var(--main-textc);
 }
-#editButton:hover, #saveButton:hover, #editTransactions:hover, #saveTransactions:hover {
-  box-shadow: 0px 0px 10px  var(--main-textc);
+#editButton:hover,
+#saveButton:hover,
+#editTransactions:hover,
+#saveTransactions:hover {
+  box-shadow: 0px 0px 10px var(--main-textc);
   font-weight: bold;
 }
-#editTransactions, #saveTransactions {
+#editTransactions,
+#saveTransactions {
   width: 100px;
   height: 30px;
   border-radius: 3px;
@@ -603,12 +686,17 @@ td.editing {
 /* CHECK */
 .form-check-input:checked {
   background-color: var(--main-lightgreen);
-  border-color:var(--main-numbersc);
+  border-color: var(--main-numbersc);
 }
 
 /* MENUS */
 
-#menu0, #menu1, #menu2, #menu3, #menu4, #menu5 {
+#menu0,
+#menu1,
+#menu2,
+#menu3,
+#menu4,
+#menu5 {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -638,7 +726,8 @@ td.editing {
   overflow-y: auto;
 }
 
-#menu1-main, #menu1-extra {
+#menu1-main,
+#menu1-extra {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -646,7 +735,8 @@ td.editing {
   margin: 5px;
   border-bottom: 1px solid lightgray;
 }
-#menu1-extra div, #menu1-main div {
+#menu1-extra div,
+#menu1-main div {
   margin: 10px;
 }
 #menu1-main-titles {
@@ -663,11 +753,13 @@ td.editing {
   margin: 5px;
   padding: 5px;
 }
-#menu1-main-titles h4, #menu1-extra-titles h4 {
+#menu1-main-titles h4,
+#menu1-extra-titles h4 {
   margin-left: 10px;
   font-weight: bold;
 }
-#menu1-main-titles button, #menu1-extra-titles button {
+#menu1-main-titles button,
+#menu1-extra-titles button {
   margin-right: 10px;
 }
 #menu1 button {
@@ -698,4 +790,110 @@ td.editing {
   justify-content: space-between;
   padding: 5px;
   margin-bottom: 5px;
+}
+.pb-0 {
+  padding-bottom: 0px !important;
+}
+.transparent-background {
+  background: transparent !important;
+}
+.lead-transactions-header-height {
+  height: 35px;
+}
+.lead-transactions-header-height h2 {
+  border: 0px;
+  font-weight: bold !important;
+}
+.rs-calendar-panel
+  .rs-calendar-table-cell-is-today
+  .rs-calendar-table-cell-day {
+  width: 50px !important;
+  border-radius: 10px !important;
+  color: white !important;
+}
+.rs-calendar-panel .rs-calendar-table-cell-day {
+  color: rgba(74, 85, 104, 1) !important;
+}
+.rs-calendar-bordered
+  .rs-calendar-table-header-row
+  .rs-calendar-table-header-cell,
+.rs-calendar-bordered
+  .rs-calendar-table-row:not(:last-child)
+  .rs-calendar-table-cell {
+  border: 0.5px solid #e2e8f0;
+}
+
+.event-calendar {
+  color: rgba(44, 82, 130, 1);
+  text-overflow: ellipsis;
+  line-height: 1.25px;
+  font-size: 10px;
+  border: 1px solid #dee2e6;
+  background-color: rgba(235, 248, 255, 1);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 5px;
+}
+
+.calendar-modal {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+  top: 20px;
+  z-index: 2;
+  width: 340px;
+  height: 340px;
+  max-height: 85vh;
+  background-color: white;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  color: rgba(45, 55, 72, 1);
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: column;
+  padding: 0px 20px;
+}
+.calendar-modal .cross {
+  right: -25px !important;
+}
+.calendar-modal .title {
+  border-bottom: 1px solid #edebeb;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  padding-bottom: 5px !important;
+}
+.calendar-modal .subtitle {
+  font-weight: 700 !important;
+  font-size: 0.6rem !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.025em;
+  margin-bottom: 3px;
+}
+.calendar-modal input {
+  width: 100%;
+}
+.calendar-modal select {
+  width: 200px;
+}
+.subtitle {
+  font-weight: 900 !important;
+  font-size: 12px !important;
+}
+.calendar-modal .save {
+  background-color: #2d3748 !important;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+.calendar-modal .cancel {
+  color: #2d3748 !important;
+  background-color: white;
+  padding: 5px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  border: 1px solid #e2e8f0;
+  margin-right: 20px;
 }
