@@ -343,7 +343,7 @@ export default function Leads({ setTab }) {
                     <td>{i + 1}</td>
                     <td>{order?.type}</td>
                     <td>{order?.symbol}</td>
-                    <td>{}</td>
+                    <td>{order?.volume}</td>
                     <td>{order?.symbolValue}</td>
                     <td>{order?.profit}</td>
                     <td>{order?.createdAt}</td>
