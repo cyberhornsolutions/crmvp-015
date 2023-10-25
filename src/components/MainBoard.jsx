@@ -742,13 +742,13 @@ export default function MainBoard() {
                       ID
                     </th>
                     <th className="text-center" scope="col">
-                      Deal Type
+                      Transaction Type
                     </th>
                     <th className="text-center" scope="col">
                       Symbol
                     </th>
                     <th className="text-center" scope="col">
-                      Amount
+                      Sum
                     </th>
                     <th className="text-center" scope="col">
                       Opening Price
@@ -769,7 +769,7 @@ export default function MainBoard() {
                       <td>{order?.symbol}</td>
                       <td>{order?.volume}</td>
                       <td>{order?.symbolValue}</td>
-                      <td>{}</td>
+                      <td>{order?.profit}</td>
                       <td>{order?.createdAt}</td>
                     </tr>
                   ))}
