@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import placeholder from "../acc-img-placeholder.png";
 import { Nav, NavItem, Navbar } from "react-bootstrap";
+import { useLocation } from "react-router-dom";
 
 export default function MainBoard() {
   const [tab, setTab] = useState(0);
+  const { state } = useLocation();
+
+  console.log("state", state);
 
   const save = () => {
     const tableCells = document.querySelectorAll("#menu3-table tbody td");
@@ -208,7 +212,7 @@ export default function MainBoard() {
             </a>
           </li>
         </ul> */}
-        <Navbar expand="lg" className="nav nav-tabs p-0">
+        <Navbar className="nav nav-tabs p-0">
           <Nav className="me-auto" style={{ gap: "2px" }}>
             <Nav.Link
               className={tab === 0 && "active"}
@@ -434,40 +438,29 @@ export default function MainBoard() {
               </div>
             </div>
           )}
+
           {tab === 1 && (
             <div id="menu1">
               <div id="menu1-main">
                 <div id="menu1-main-titles">
                   <h4 className="f-s-inherit" style={{ lineHeight: 1.1 }}>
-                    Документы
+                    Documentation
                   </h4>
-                  <button>Сохранить</button>
+                  <button>Save</button>
                 </div>
                 <div>
                   <div
                     className="form-check form-switch"
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                      marginLeft: 320,
-                      marginTop: 30,
-                      marginRight: 210,
-                    }}
+                    // style={{
+                    //   display: "flex",
+                    //   flexDirection: "row",
+                    // }}
                   >
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="mySwitch"
-                      name="darkmode"
-                      defaultValue="yes"
-                    />
-                    <label
-                      className="form-check-label f-s-inherit f-w-700"
-                      htmlFor="mySwitch"
-                    >
-                      Подтверждение личности
+                    <label className="form-check-label f-s-inherit f-w-700">
+                      ID Confirmation
                     </label>
+                    <input className="form-check-input" type="checkbox" />
+
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width={16}
@@ -487,30 +480,11 @@ export default function MainBoard() {
                       />
                     </svg>
                   </div>
-                  <div
-                    className="form-check form-switch"
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                      marginLeft: 320,
-                      marginTop: 30,
-                      marginRight: 210,
-                    }}
-                  >
-                    <label
-                      className="form-check-label f-s-inherit f-w-700"
-                      htmlFor="mySwitch"
-                    >
-                      Место жительства
+                  <div className="form-check form-switch">
+                    <label className="form-check-label f-s-inherit f-w-700">
+                      Location
                     </label>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="mySwitch"
-                      name="darkmode"
-                      defaultValue="yes"
-                    />
+                    <input className="form-check-input" type="checkbox" />
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width={16}
@@ -530,30 +504,11 @@ export default function MainBoard() {
                       />
                     </svg>
                   </div>
-                  <div
-                    className="form-check form-switch"
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                      marginLeft: 320,
-                      marginTop: 30,
-                      marginRight: 210,
-                    }}
-                  >
-                    <label
-                      className="form-check-label f-s-inherit f-w-700"
-                      htmlFor="mySwitch"
-                    >
-                      Карта
+                  <div className="form-check form-switch">
+                    <label className="form-check-label f-s-inherit f-w-700">
+                      Map
                     </label>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="mySwitch"
-                      name="darkmode"
-                      defaultValue="yes"
-                    />
+                    <input className="form-check-input" type="checkbox" />
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width={16}
@@ -573,30 +528,11 @@ export default function MainBoard() {
                       />
                     </svg>
                   </div>
-                  <div
-                    className="form-check form-switch"
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                      marginLeft: 320,
-                      marginTop: 30,
-                      marginRight: 210,
-                    }}
-                  >
-                    <label
-                      className="form-check-label f-s-inherit f-w-700"
-                      htmlFor="mySwitch"
-                    >
-                      Место работы
+                  <div className="form-check form-switch">
+                    <label className="form-check-label f-s-inherit f-w-700">
+                      Place of Work
                     </label>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="mySwitch"
-                      name="darkmode"
-                      defaultValue="yes"
-                    />
+                    <input className="form-check-input" type="checkbox" />
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width={16}
@@ -621,66 +557,27 @@ export default function MainBoard() {
               <div id="menu1-extra">
                 <div id="menu1-extra-titles">
                   <h4 className="f-s-inherit" style={{ lineHeight: 1.1 }}>
-                    Права
+                    Rights
                   </h4>
-                  <button>Сохранить</button>
+                  <button>Save</button>
                 </div>
-                <div
-                  className="form-check form-switch"
-                  style={{ marginLeft: 320, marginTop: 50, marginRight: 210 }}
-                >
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="mySwitch"
-                    name="darkmode"
-                    defaultValue="yes"
-                    defaultChecked=""
-                  />
-                  <label
-                    className="form-check-label f-s-inherit f-w-700"
-                    htmlFor="mySwitch"
-                  >
-                    Разрешить торговлю
+                <div className="form-check form-switch">
+                  <label className="form-check-label f-s-inherit f-w-700">
+                    Allow Trading
                   </label>
+                  <input className="form-check-input" type="checkbox" />
                 </div>
-                <div
-                  className="form-check form-switch"
-                  style={{ marginLeft: 320, marginRight: 210 }}
-                >
-                  <label
-                    className="form-check-label  f-s-inherit f-w-700"
-                    htmlFor="mySwitch"
-                  >
-                    Разрешить смену данных
+                <div className="form-check form-switch">
+                  <label className="form-check-label  f-s-inherit f-w-700">
+                    Allow data change
                   </label>
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="mySwitch"
-                    name="darkmode"
-                    defaultValue="yes"
-                    defaultChecked=""
-                  />
+                  <input className="form-check-input" type="checkbox" />
                 </div>
-                <div
-                  className="form-check form-switch"
-                  style={{ marginLeft: 320, marginRight: 210 }}
-                >
-                  <label
-                    className="form-check-label f-s-inherit f-w-700"
-                    htmlFor="mySwitch"
-                  >
-                    Разрешить вывод
+                <div className="form-check form-switch">
+                  <label className="form-check-label f-s-inherit f-w-700">
+                    Allow withdrawl
                   </label>
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="mySwitch"
-                    name="darkmode"
-                    defaultValue="yes"
-                    defaultChecked=""
-                  />
+                  <input className="form-check-input" type="checkbox" />
                 </div>
               </div>
             </div>
@@ -845,44 +742,37 @@ export default function MainBoard() {
                       ID
                     </th>
                     <th className="text-center" scope="col">
-                      Тип сделки
+                      Deal Type
                     </th>
                     <th className="text-center" scope="col">
-                      Символ
+                      Symbol
                     </th>
                     <th className="text-center" scope="col">
-                      Сумма
+                      Amount
                     </th>
                     <th className="text-center" scope="col">
-                      Цена открытия
+                      Opening Price
                     </th>
                     <th className="text-center" scope="col">
-                      Профит
+                      Profit
                     </th>
                     <th className="text-center" scope="col">
-                      Дата
+                      Date
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>ID01</td>
-                    <td>05-05-2023</td>
-                    <td>Bitcoin</td>
-                    <td>0.2</td>
-                    <td>25630.22</td>
-                    <td>+120</td>
-                    <td>05-05-2023</td>
-                  </tr>
-                  <tr>
-                    <td>ID11</td>
-                    <td>02-05-2023</td>
-                    <td>Ethereum</td>
-                    <td>0.5</td>
-                    <td>1590.22</td>
-                    <td>-24.22</td>
-                    <td>06-05-2023</td>
-                  </tr>
+                  {state?.map((order, i) => (
+                    <tr>
+                      <td>{i + 1}</td>
+                      <td>{order?.type}</td>
+                      <td>{order?.symbol}</td>
+                      <td>{order?.volume}</td>
+                      <td>{order?.symbolValue}</td>
+                      <td>{}</td>
+                      <td>{order?.createdAt}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

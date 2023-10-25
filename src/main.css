@@ -72,6 +72,9 @@ td:hover {
   border-right: 2px solid white;
   box-shadow: 0px 0px 3px var(--main-elc);
   overflow-y: scroll;
+  width: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
 }
 /* width */
 ::-webkit-scrollbar {
@@ -195,7 +198,7 @@ td:hover {
   display: flex;
   flex-direction: column;
   margin: 5px;
-  /* height: 90%; */
+  height: 100%;
 }
 .tab-content input {
   border: 1px solid lightgray;
@@ -208,8 +211,9 @@ td:hover {
 #mainboard {
   display: flex;
   flex-direction: row;
-  height: 100%;
+  /* height: 100%; */
   color: var(--main-elc2);
+  /* overflow-y: scroll; */
 }
 
 #mainboard .f-w-inherit {
@@ -229,9 +233,12 @@ td:hover {
   flex: 1;
   border: 3px solid whitesmoke;
   justify-content: center;
-  height: 93%;
+  height: 100%;
   border-radius: 5px;
   margin-right: 10px;
+  /* overflow-y: scroll; */
+  /* width: 230px; */
+  /* min-width: 230px; */
 }
 #profile-pic {
   flex: 1;
@@ -278,6 +285,7 @@ td:hover {
   display: flex;
   flex-direction: column;
   height: 100%;
+  /* overflow-y: auto; */
 }
 
 #header div {
@@ -375,6 +383,7 @@ td:hover {
 #leads {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 #transactions-div {
   width: 98%;
@@ -389,6 +398,7 @@ td:hover {
 #users {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 #users-div {
   width: 98%;
@@ -688,6 +698,20 @@ td.editing {
   background-color: var(--main-lightgreen);
   border-color: var(--main-numbersc);
 }
+.form-check {
+  display: flex !important;
+  margin: 0px;
+  justify-content: flex-start;
+  margin-bottom: 30px;
+}
+.form-check-label {
+  width: 300px;
+  text-align: left;
+  margin-left: 20px;
+}
+.form-check-input {
+  margin-right: 50px;
+}
 
 /* MENUS */
 
@@ -734,6 +758,7 @@ td.editing {
   padding: 5px;
   margin: 5px;
   border-bottom: 1px solid lightgray;
+  justify-content: space-evenly;
 }
 #menu1-extra div,
 #menu1-main div {

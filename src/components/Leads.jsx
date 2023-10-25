@@ -1,130 +1,189 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { db } from "../firebase";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
+import moment from "moment";
+import { useNavigate } from "react-router-dom";
 
 export default function Leads({ setTab }) {
   const [selected, setSelected] = useState();
   const [popup, setPopup] = useState(false);
-  const [users, setUsers] = useState([
-    {
-      registered: new Date(),
-      name: "Mark Otto	",
-      sale: "New",
-      reten: "New",
-      phone: "12312321",
-      email: "test@gmail.com",
-      balance: 100,
-      deposit: 50,
-      manager: "John",
-      affiliates: "Candy Land",
-    },
-    {
-      registered: new Date(),
-      name: "Jane Doe	",
-      sale: "New",
-      reten: "New",
-      phone: "12312321",
-      email: "test@gmail.com",
-      balance: 100,
-      deposit: 50,
-      manager: "John",
-      affiliates: "Candy Land",
-    },
-    {
-      registered: new Date(),
-      name: "Alice Johnson	",
-      sale: "New",
-      reten: "New",
-      phone: "12312321",
-      email: "test@gmail.com",
-      balance: 100,
-      deposit: 50,
-      manager: "John",
-      affiliates: "Candy Land",
-    },
-    {
-      registered: new Date(),
-      name: "Michael Smith	",
-      sale: "New",
-      reten: "New",
-      phone: "12312321",
-      email: "test@gmail.com",
-      balance: 100,
-      deposit: 50,
-      manager: "John",
-      affiliates: "Candy Land",
-    },
-    {
-      registered: new Date(),
-      name: "Susan Lee	",
-      sale: "New",
-      reten: "New",
-      phone: "12312321",
-      email: "test@gmail.com",
-      balance: 100,
-      deposit: 50,
-      manager: "John",
-      affiliates: "Candy Land",
-    },
-    {
-      registered: new Date(),
-      name: "David Brown	",
-      sale: "New",
-      reten: "New",
-      phone: "12312321",
-      email: "test@gmail.com",
-      balance: 100,
-      deposit: 50,
-      manager: "John",
-      affiliates: "Candy Land",
-    },
-    {
-      registered: new Date(),
-      name: "Lisa Johnson	",
-      sale: "New",
-      reten: "New",
-      phone: "12312321",
-      email: "test@gmail.com",
-      balance: 100,
-      deposit: 50,
-      manager: "John",
-      affiliates: "Candy Land",
-    },
-    {
-      registered: new Date(),
-      name: "John Smith	",
-      sale: "New",
-      reten: "New",
-      phone: "12312321",
-      email: "test@gmail.com",
-      balance: 100,
-      deposit: 50,
-      manager: "John",
-      affiliates: "Candy Land",
-    },
-    {
-      registered: new Date(),
-      name: "Mary Taylor	",
-      sale: "New",
-      reten: "New",
-      phone: "12312321",
-      email: "test@gmail.com",
-      balance: 100,
-      deposit: 50,
-      manager: "John",
-      affiliates: "Candy Land",
-    },
-    {
-      registered: new Date(),
-      name: "Robert Anderson	",
-      sale: "New",
-      reten: "New",
-      phone: "12312321",
-      email: "test@gmail.com",
-      balance: 100,
-      deposit: 50,
-      manager: "John",
-      affiliates: "Candy Land",
-    },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [ordersData, setOrdersData] = useState([]);
+  const navigate = useNavigate();
+
+  console.log("OrdersData", ordersData);
+
+  console.log("Users:", users);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        const userData = [];
+
+        querySnapshot.forEach((doc) => {
+          userData.push({ id: doc.id, ...doc.data() });
+        });
+
+        setUsers(userData);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  const fetchOrders = async (userId) => {
+    console.log("UserId", userId);
+    try {
+      const q = query(collection(db, "orders"), where("userId", "==", userId));
+
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const orders = [];
+        querySnapshot.forEach((doc) => {
+          orders.push({ id: doc.id, ...doc.data() });
+        });
+        setOrdersData(orders);
+      });
+
+      // Return a cleanup function to unsubscribe when the component unmounts
+      return () => {
+        unsubscribe();
+      };
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  // const [users, setUsers] = useState([
+  //   {
+  //     registered: new Date(),
+  //     name: "Mark Otto	",
+  //     sale: "New",
+  //     reten: "New",
+  //     phone: "12312321",
+  //     email: "test@gmail.com",
+  //     balance: 100,
+  //     deposit: 50,
+  //     manager: "John",
+  //     affiliates: "Candy Land",
+  //   },
+  //   {
+  //     registered: new Date(),
+  //     name: "Jane Doe	",
+  //     sale: "New",
+  //     reten: "New",
+  //     phone: "12312321",
+  //     email: "test@gmail.com",
+  //     balance: 100,
+  //     deposit: 50,
+  //     manager: "John",
+  //     affiliates: "Candy Land",
+  //   },
+  //   {
+  //     registered: new Date(),
+  //     name: "Alice Johnson	",
+  //     sale: "New",
+  //     reten: "New",
+  //     phone: "12312321",
+  //     email: "test@gmail.com",
+  //     balance: 100,
+  //     deposit: 50,
+  //     manager: "John",
+  //     affiliates: "Candy Land",
+  //   },
+  //   {
+  //     registered: new Date(),
+  //     name: "Michael Smith	",
+  //     sale: "New",
+  //     reten: "New",
+  //     phone: "12312321",
+  //     email: "test@gmail.com",
+  //     balance: 100,
+  //     deposit: 50,
+  //     manager: "John",
+  //     affiliates: "Candy Land",
+  //   },
+  //   {
+  //     registered: new Date(),
+  //     name: "Susan Lee	",
+  //     sale: "New",
+  //     reten: "New",
+  //     phone: "12312321",
+  //     email: "test@gmail.com",
+  //     balance: 100,
+  //     deposit: 50,
+  //     manager: "John",
+  //     affiliates: "Candy Land",
+  //   },
+  //   {
+  //     registered: new Date(),
+  //     name: "David Brown	",
+  //     sale: "New",
+  //     reten: "New",
+  //     phone: "12312321",
+  //     email: "test@gmail.com",
+  //     balance: 100,
+  //     deposit: 50,
+  //     manager: "John",
+  //     affiliates: "Candy Land",
+  //   },
+  //   {
+  //     registered: new Date(),
+  //     name: "Lisa Johnson	",
+  //     sale: "New",
+  //     reten: "New",
+  //     phone: "12312321",
+  //     email: "test@gmail.com",
+  //     balance: 100,
+  //     deposit: 50,
+  //     manager: "John",
+  //     affiliates: "Candy Land",
+  //   },
+  //   {
+  //     registered: new Date(),
+  //     name: "John Smith	",
+  //     sale: "New",
+  //     reten: "New",
+  //     phone: "12312321",
+  //     email: "test@gmail.com",
+  //     balance: 100,
+  //     deposit: 50,
+  //     manager: "John",
+  //     affiliates: "Candy Land",
+  //   },
+  //   {
+  //     registered: new Date(),
+  //     name: "Mary Taylor	",
+  //     sale: "New",
+  //     reten: "New",
+  //     phone: "12312321",
+  //     email: "test@gmail.com",
+  //     balance: 100,
+  //     deposit: 50,
+  //     manager: "John",
+  //     affiliates: "Candy Land",
+  //   },
+  //   {
+  //     registered: new Date(),
+  //     name: "Robert Anderson	",
+  //     sale: "New",
+  //     reten: "New",
+  //     phone: "12312321",
+  //     email: "test@gmail.com",
+  //     balance: 100,
+  //     deposit: 50,
+  //     manager: "John",
+  //     affiliates: "Candy Land",
+  //   },
+  // ]);
   return (
     <div id="leads" className="active">
       <div id="leads-div">
@@ -206,18 +265,23 @@ export default function Leads({ setTab }) {
           </thead>
           <tbody>
             {users?.map((e, i) => (
-              <tr onClick={() => setSelected(e.name)}>
+              <tr onClick={() => fetchOrders(e?.id)}>
                 <td>{i + 1}</td>
-                <td>{new Date(e.registered).toLocaleDateString()}</td>
-                <td>{e.name}</td>
-                <td>{e.sale}</td>
-                <td>{e.reten}</td>
-                <td>{e.phone}</td>
-                <td>{e.email}</td>
-                <td>{e.balance}</td>
-                <td>{e.deposit}</td>
-                <td>{e.manager}</td>
-                <td>{e.affiliates}</td>
+                <td>{e?.createdAt}</td>
+                <td>
+                  {e?.surname === undefined
+                    ? e?.name
+                    : e?.name + " " + e?.surname}
+                </td>
+
+                <td>{e?.sale}</td>
+                <td>{e?.reten}</td>
+                <td>{e?.phone}</td>
+                <td>{e?.email}</td>
+                <td>{e?.balance}</td>
+                <td>{e?.deposit}</td>
+                <td>{e?.manager}</td>
+                <td>{e?.affiliates}</td>
               </tr>
             ))}
           </tbody>
@@ -238,7 +302,7 @@ export default function Leads({ setTab }) {
             id="lead-card-button"
             type="button"
             className="btn btn-secondary"
-            onClick={() => setTab("MainBoard")}
+            onClick={() => navigate("/home/mainBoard", { state: ordersData })}
           >
             Player card
           </button>
@@ -270,28 +334,21 @@ export default function Leads({ setTab }) {
                 </th>
               </tr>
             </thead>
-            {selected && (
+            {ordersData && (
               <tbody
               // className="hidden"
               >
-                <tr>
-                  <td>ID123</td>
-                  <td>05-05-2023</td>
-                  <td>Bitcoin</td>
-                  <td>0.2</td>
-                  <td>25630.22</td>
-                  <td>+120</td>
-                  <td>05-05-2023</td>
-                </tr>
-                <tr>
-                  <td>ID11</td>
-                  <td>02-05-2023</td>
-                  <td>Ethereum</td>
-                  <td>0.5</td>
-                  <td>1590.22</td>
-                  <td>-24.22</td>
-                  <td>06-05-2023</td>
-                </tr>
+                {ordersData?.map((order, i) => (
+                  <tr>
+                    <td>{i + 1}</td>
+                    <td>{order?.type}</td>
+                    <td>{order?.symbol}</td>
+                    <td>{}</td>
+                    <td>{order?.symbolValue}</td>
+                    <td>{}</td>
+                    <td>{order?.createdAt}</td>
+                  </tr>
+                ))}
               </tbody>
             )}
           </table>
