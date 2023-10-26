@@ -663,6 +663,20 @@ td.editing {
   opacity: 1;
 }
 
+.ref-table {
+  background-color: whitesmoke;
+  box-shadow: 0px 0px 1px var(--main-elc2);
+  border: 2px solid whitesmoke;
+  border-radius: 5px;
+}
+#refsTable {
+  border: 2px solid white;
+}
+.refInput {
+  background: whitesmoke;
+  margin: 0px 3px;
+}
+
 #newUser-form {
   margin: 10px;
   margin-left: 150px;
@@ -921,4 +935,16 @@ td.editing {
   font-weight: bold;
   border: 1px solid #e2e8f0;
   margin-right: 20px;
+}
+#dropdown-basic.dropdown-toggle {
+  border: none;
+}
+.progressbar {
+  width: 100px;
+}
+.custom-dropdown-menu.dropdown-menu.show {
+  padding-left: 16px;
+}
+.active-status.dropdown-item {
+  padding: 0px;
 }

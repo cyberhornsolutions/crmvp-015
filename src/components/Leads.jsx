@@ -6,16 +6,27 @@ import {
   query,
   where,
   onSnapshot,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
+import { Dropdown, ProgressBar } from "react-bootstrap";
 
 export default function Leads({ setTab }) {
   const [selected, setSelected] = useState();
   const [popup, setPopup] = useState(false);
   const [users, setUsers] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
+  const [statusUpdate, setStatusUpdate] = useState(false);
   const navigate = useNavigate();
+
+  const progressBarConfig = {
+    New: { variant: "success", now: 25 },
+    InProgress: { variant: "info", now: 50 },
+    Confirmed: { variant: "warning", now: 75 },
+    Closed: { variant: "danger", now: 100 },
+  };
 
   console.log("OrdersData", ordersData);
 
@@ -32,13 +43,14 @@ export default function Leads({ setTab }) {
         });
 
         setUsers(userData);
+        setStatusUpdate(false);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
     };
 
     fetchUsers();
-  }, []);
+  }, [statusUpdate]);
 
   const fetchOrders = async (userId) => {
     console.log("UserId", userId);
@@ -60,6 +72,14 @@ export default function Leads({ setTab }) {
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
+  };
+
+  const handleDropdownItemClick = async (val, userId) => {
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      status: val,
+    });
+    setStatusUpdate(true);
   };
 
   // const [users, setUsers] = useState([
@@ -238,6 +258,9 @@ export default function Leads({ setTab }) {
                 Name
               </th>
               <th scope="col" className="text-center">
+                Status
+              </th>
+              <th scope="col" className="text-center">
                 Sale
               </th>
               <th scope="col" className="text-center">
@@ -252,7 +275,7 @@ export default function Leads({ setTab }) {
               <th scope="col" className="text-center">
                 Balance
               </th>
-              <th scope="col" className="text-center">
+              <th scope="col" clatab-contentssName="text-center">
                 Deposit
               </th>
               <th scope="col" className="text-center">
@@ -272,6 +295,36 @@ export default function Leads({ setTab }) {
                   {e?.surname === undefined
                     ? e?.name
                     : e?.name + " " + e?.surname}
+                </td>
+                <td>
+                  <Dropdown data-bs-theme="light" className="custom-dropdown">
+                    <Dropdown.Toggle variant="none" id="dropdown-basic">
+                      {e?.status && progressBarConfig[e.status] && (
+                        <ProgressBar
+                          variant={progressBarConfig[e.status].variant}
+                          now={progressBarConfig[e.status].now}
+                          className="progressbar"
+                        />
+                      )}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu
+                      className="custom-dropdown-menu"
+                      data-bs-theme="dark"
+                    >
+                      {Object.keys(progressBarConfig).map((status) => (
+                        <Dropdown.Item
+                          key={status}
+                          onClick={() => handleDropdownItemClick(status, e?.id)}
+                          className={
+                            e?.status === status ? "active-status" : ""
+                          }
+                        >
+                          {e?.status === status ? <span>&#10004;</span> : " "}{" "}
+                          {status}
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Menu>
+                  </Dropdown>
                 </td>
 
                 <td>{e?.sale}</td>

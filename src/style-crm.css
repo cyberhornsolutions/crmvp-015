@@ -172,3 +172,6 @@ body {
   padding-bottom: 5px;
   border-bottom: 1px ridge var(--main-bgc);
 }
+.dropdown-toggle {
+  border: none;
+}
