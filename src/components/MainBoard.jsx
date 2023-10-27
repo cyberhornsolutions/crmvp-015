@@ -12,6 +12,8 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
+import ImageModal from "./ImageModal";
+import DataTable from "react-data-table-component";
 
 export default function MainBoard() {
   const [tab, setTab] = useState(0);
@@ -26,6 +28,17 @@ export default function MainBoard() {
   const [locationFiles, setLocationFiles] = useState([]);
   const [mapFiles, setMapFiles] = useState([]);
   const [placeFiles, setPlaceFiles] = useState([]);
+  const [modalShow, setModalShow] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  console.log("Selected image", selectedImage);
+  console.log("show modal", modalShow);
+
+  const handleImageClick = (image) => {
+    console.log("Image", image);
+    setSelectedImage(URL.createObjectURL(image));
+    setModalShow(true);
+  };
 
   const handleUploadClick = (inputRef) => {
     inputRef.current.click();
@@ -88,6 +101,148 @@ export default function MainBoard() {
     });
     // s;
   };
+
+  const dealsColumns = [
+    {
+      name: "ID",
+      selector: (row) => row.id,
+      sortable: true,
+    },
+    {
+      name: "Transaction Type",
+      selector: (row) => row.type,
+      sortable: true,
+    },
+    {
+      name: "Symbol",
+      selector: (row) => row.symbol,
+      sortable: true,
+    },
+    {
+      name: "Sum",
+      selector: (row) => row.sum,
+      sortable: true,
+    },
+    {
+      name: "Price",
+      selector: (row) => row.price,
+      sortable: true,
+    },
+    {
+      name: "Status",
+      selector: (row) => row.status,
+      sortable: true,
+    },
+    {
+      name: "Profit",
+      selector: (row) => row.profit,
+      sortable: true,
+    },
+    {
+      name: "Date",
+      selector: (row) => row.createdAt,
+      sortable: true,
+    },
+  ];
+
+  const dealsData = state?.map((order, i) => ({
+    id: i + 1,
+    type: order?.type,
+    symbol: order?.symbol,
+    sum: order?.volume,
+    price: order?.symbolValue,
+    status: order?.status,
+    profit: order?.profit,
+    createdAt: order?.createdAt,
+  }));
+
+  const userColumns = [
+    {
+      name: "ID",
+      selector: (row) => row.id,
+      sortable: true,
+      width: "6%",
+    },
+    {
+      name: "Registered",
+      selector: (row) => row.createdAt,
+      sortable: true,
+      width: "10%",
+    },
+    {
+      name: "Name",
+      cell: (row) =>
+        row.surname === undefined ? row.name : row.name + " " + row.surname,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Status",
+      cell: (row) => (
+        <ProgressBar
+          variant={progressBarConfig[row.status].variant}
+          now={progressBarConfig[row.status].now}
+          className="progressbar"
+        />
+      ),
+      sortable: false,
+      width: "8%",
+    },
+    {
+      name: "Sale",
+      selector: (row) => row.sale,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Reten",
+      selector: (row) => row.reten,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Phone",
+      selector: (row) => row.phone,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Email",
+      selector: (row) => row.email,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Balance",
+      selector: (row) => row.balance,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Deposit",
+      selector: (row) => row.deposit,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Manager",
+      selector: (row) => row.manager,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Affiliates",
+      selector: (row) => row.affiliates,
+      sortable: true,
+      width: "8%",
+    },
+  ];
+
+  const mappedData = users?.map((user, i) => ({
+    ...user,
+    status: user?.status,
+    id: i + 1,
+  }));
 
   return (
     <div id="mainboard">
@@ -512,38 +667,40 @@ export default function MainBoard() {
                     //   flexDirection: "row",
                     // }}
                   >
-                    <label className="form-check-label f-s-inherit f-w-700">
+                    <label className="form-check-label f-s-inherit f-w-700 mt-1">
                       ID Confirmation
                     </label>
-                    <input className="form-check-input" type="checkbox" />
-                    <div>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width={16}
-                        height={16}
-                        fill="currentColor"
-                        className="bi bi-cloud-upload"
-                        viewBox="0 0 16 16"
-                        style={{ marginRight: 5, cursor: "pointer" }}
-                        onClick={() => handleUploadClick(idInputRef)}
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                    <input className="form-check-input mt-2" type="checkbox" />
+                    {idFiles?.length < 4 && (
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={16}
+                          height={16}
+                          fill="currentColor"
+                          className="bi bi-cloud-upload"
+                          viewBox="0 0 16 16"
+                          style={{ marginRight: 5, cursor: "pointer" }}
+                          onClick={() => handleUploadClick(idInputRef)}
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                          />
+                          <path
+                            fillRule="evenodd"
+                            d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
+                          />
+                        </svg>
+                        <input
+                          type="file"
+                          multiple
+                          ref={idInputRef}
+                          style={{ display: "none" }}
+                          onChange={(e) => handleFileChange(e, setIdFiles)}
                         />
-                        <path
-                          fillRule="evenodd"
-                          d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
-                        />
-                      </svg>
-                      <input
-                        type="file"
-                        multiple
-                        ref={idInputRef}
-                        style={{ display: "none" }}
-                        onChange={(e) => handleFileChange(e, setIdFiles)}
-                      />
-                    </div>
+                      </div>
+                    )}
                     <div className="d-flex align-items-center justify-content-between">
                       {idFiles.map((file, index) => (
                         <img
@@ -551,47 +708,60 @@ export default function MainBoard() {
                           src={URL.createObjectURL(file)}
                           alt={`Selected Image ${index + 1}`}
                           style={{
-                            maxWidth: "100px",
-                            maxHeight: "100px",
-                            margin: "5px",
+                            width: "100px",
+                            height: "50px",
+                            margin: "0px 5px",
+                            objectFit: "cover",
+                            cursor: "pointer",
                           }}
+                          onClick={() => handleImageClick(file)}
                         />
                       ))}
+
+                      <ImageModal
+                        show={modalShow}
+                        onHide={() => setModalShow(false)}
+                        image={selectedImage}
+                      />
                     </div>
                   </div>
                   <div className="form-check form-switch">
-                    <label className="form-check-label f-s-inherit f-w-700">
+                    <label className="form-check-label f-s-inherit f-w-700 mt-1">
                       Location
                     </label>
-                    <input className="form-check-input" type="checkbox" />
-                    <div>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width={16}
-                        height={16}
-                        fill="currentColor"
-                        className="bi bi-cloud-upload"
-                        viewBox="0 0 16 16"
-                        style={{ marginRight: 5, cursor: "pointer" }}
-                        onClick={() => handleUploadClick(locationInputRef)}
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                    <input className="form-check-input mt-2" type="checkbox" />
+                    {locationFiles?.length < 4 && (
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={16}
+                          height={16}
+                          fill="currentColor"
+                          className="bi bi-cloud-upload"
+                          viewBox="0 0 16 16"
+                          style={{ marginRight: 5, cursor: "pointer" }}
+                          onClick={() => handleUploadClick(locationInputRef)}
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                          />
+                          <path
+                            fillRule="evenodd"
+                            d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
+                          />
+                        </svg>
+                        <input
+                          type="file"
+                          multiple
+                          ref={locationInputRef}
+                          style={{ display: "none" }}
+                          onChange={(e) =>
+                            handleFileChange(e, setLocationFiles)
+                          }
                         />
-                        <path
-                          fillRule="evenodd"
-                          d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
-                        />
-                      </svg>
-                      <input
-                        type="file"
-                        multiple
-                        ref={locationInputRef}
-                        style={{ display: "none" }}
-                        onChange={(e) => handleFileChange(e, setLocationFiles)}
-                      />
-                    </div>
+                      </div>
+                    )}
                     <div className="d-flex align-items-center justify-content-between">
                       {locationFiles.map((file, index) => (
                         <img
@@ -599,47 +769,52 @@ export default function MainBoard() {
                           src={URL.createObjectURL(file)}
                           alt={`Selected Image ${index + 1}`}
                           style={{
-                            maxWidth: "100px",
-                            maxHeight: "100px",
-                            margin: "5px",
+                            width: "100px",
+                            height: "50px",
+                            margin: "0px 5px",
+                            objectFit: "cover",
+                            cursor: "pointer",
                           }}
+                          onClick={() => handleImageClick(file)}
                         />
                       ))}
                     </div>
                   </div>
                   <div className="form-check form-switch">
-                    <label className="form-check-label f-s-inherit f-w-700">
+                    <label className="form-check-label f-s-inherit f-w-700 mt-1">
                       Map
                     </label>
-                    <input className="form-check-input" type="checkbox" />
-                    <div>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width={16}
-                        height={16}
-                        fill="currentColor"
-                        className="bi bi-cloud-upload"
-                        viewBox="0 0 16 16"
-                        style={{ marginRight: 5, cursor: "pointer" }}
-                        onClick={() => handleUploadClick(mapInputRef)}
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                    <input className="form-check-input mt-2" type="checkbox" />
+                    {mapFiles?.length < 4 && (
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={16}
+                          height={16}
+                          fill="currentColor"
+                          className="bi bi-cloud-upload"
+                          viewBox="0 0 16 16"
+                          style={{ marginRight: 5, cursor: "pointer" }}
+                          onClick={() => handleUploadClick(mapInputRef)}
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                          />
+                          <path
+                            fillRule="evenodd"
+                            d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
+                          />
+                        </svg>
+                        <input
+                          type="file"
+                          multiple
+                          ref={mapInputRef}
+                          style={{ display: "none" }}
+                          onChange={(e) => handleFileChange(e, setMapFiles)}
                         />
-                        <path
-                          fillRule="evenodd"
-                          d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
-                        />
-                      </svg>
-                      <input
-                        type="file"
-                        multiple
-                        ref={mapInputRef}
-                        style={{ display: "none" }}
-                        onChange={(e) => handleFileChange(e, setMapFiles)}
-                      />
-                    </div>
+                      </div>
+                    )}
                     <div className="d-flex align-items-center justify-content-between">
                       {mapFiles.map((file, index) => (
                         <img
@@ -647,58 +822,66 @@ export default function MainBoard() {
                           src={URL.createObjectURL(file)}
                           alt={`Selected Image ${index + 1}`}
                           style={{
-                            maxWidth: "100px",
-                            maxHeight: "100px",
-                            margin: "5px",
+                            width: "100px",
+                            height: "50px",
+                            margin: "0px 5px",
+                            objectFit: "cover",
+                            cursor: "pointer",
                           }}
+                          onClick={() => handleImageClick(file)}
                         />
                       ))}
                     </div>
                   </div>
                   <div className="form-check form-switch">
-                    <label className="form-check-label f-s-inherit f-w-700">
+                    <label className="form-check-label f-s-inherit f-w-700 mt-1">
                       Place of Work
                     </label>
-                    <input className="form-check-input" type="checkbox" />
-                    <div>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width={16}
-                        height={16}
-                        fill="currentColor"
-                        className="bi bi-cloud-upload"
-                        viewBox="0 0 16 16"
-                        style={{ marginRight: 5, cursor: "pointer" }}
-                        onClick={() => handleUploadClick(placeInputRef)}
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                    <input className="form-check-input mt-2" type="checkbox" />
+                    {placeFiles?.length < 4 && (
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={16}
+                          height={16}
+                          fill="currentColor"
+                          className="bi bi-cloud-upload"
+                          viewBox="0 0 16 16"
+                          style={{ marginRight: 5, cursor: "pointer" }}
+                          onClick={() => handleUploadClick(placeInputRef)}
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                          />
+                          <path
+                            fillRule="evenodd"
+                            d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
+                          />
+                        </svg>
+                        <input
+                          type="file"
+                          multiple
+                          ref={placeInputRef}
+                          style={{ display: "none" }}
+                          onChange={(e) => handleFileChange(e, setPlaceFiles)}
                         />
-                        <path
-                          fillRule="evenodd"
-                          d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
-                        />
-                      </svg>
-                      <input
-                        type="file"
-                        multiple
-                        ref={placeInputRef}
-                        style={{ display: "none" }}
-                        onChange={(e) => handleFileChange(e, setPlaceFiles)}
-                      />
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between">
+                      </div>
+                    )}
+                    <div className="d-flex align-items-center justify-content-between px-3">
                       {placeFiles.map((file, index) => (
                         <img
                           key={index}
                           src={URL.createObjectURL(file)}
                           alt={`Selected Image ${index + 1}`}
                           style={{
-                            maxWidth: "100px",
-                            maxHeight: "100px",
-                            margin: "5px",
+                            width: "100px",
+                            height: "50px",
+                            margin: "0px 5px",
+                            objectFit: "cover",
+                            cursor: "pointer",
                           }}
+                          onClick={() => handleImageClick(file)}
                         />
                       ))}
                     </div>
@@ -883,7 +1066,17 @@ export default function MainBoard() {
                   Save
                 </button>
               </div>
-              <table
+              <DataTable
+                columns={dealsColumns}
+                data={dealsData}
+                highlightOnHover
+                pointerOnHover
+                pagination
+                paginationPerPage={5}
+                paginationRowsPerPageOptions={[5, 10]}
+                // responsive
+              />
+              {/* <table
                 id="menu3-table"
                 className="table table-hover table-striped"
               >
@@ -929,7 +1122,7 @@ export default function MainBoard() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table> */}
             </div>
           )}
 
@@ -993,8 +1186,17 @@ export default function MainBoard() {
               </div>
               <div className="ref-table">
                 <p className="text-center my-3">Referred</p>
-
-                <table
+                <DataTable
+                  columns={userColumns}
+                  data={mappedData}
+                  highlightOnHover
+                  pointerOnHover
+                  pagination
+                  paginationPerPage={5}
+                  paginationRowsPerPageOptions={[5, 10]}
+                  responsive
+                />
+                {/* <table
                   id="refsTable"
                   className="table table-hover table-striped w-100"
                 >
@@ -1067,7 +1269,7 @@ export default function MainBoard() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </table> */}
               </div>
             </div>
           )}

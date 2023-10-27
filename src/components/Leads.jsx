@@ -12,6 +12,7 @@ import {
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { Dropdown, ProgressBar } from "react-bootstrap";
+import DataTable from "react-data-table-component";
 
 export default function Leads({ setTab }) {
   const [selected, setSelected] = useState();
@@ -75,12 +76,157 @@ export default function Leads({ setTab }) {
   };
 
   const handleDropdownItemClick = async (val, userId) => {
+    console.log("Dropdown", val, userId);
     const userRef = doc(db, "users", userId);
     await updateDoc(userRef, {
       status: val,
     });
     setStatusUpdate(true);
   };
+
+  const columns = [
+    {
+      name: "ID",
+      selector: (row) => row.id,
+      sortable: true,
+    },
+    {
+      name: "Type",
+      selector: (row) => row.type,
+      sortable: true,
+    },
+    {
+      name: "Symbol",
+      selector: (row) => row.symbol,
+      sortable: true,
+    },
+    {
+      name: "Sum",
+      selector: (row) => row.sum,
+      sortable: true,
+    },
+    {
+      name: "Price",
+      selector: (row) => row.price,
+      sortable: true,
+    },
+    {
+      name: "Profit",
+      selector: (row) => row.profit,
+      sortable: true,
+    },
+    {
+      name: "Date",
+      selector: (row) => row.createdAt,
+      sortable: true,
+    },
+  ];
+
+  const data = ordersData?.map((order, i) => ({
+    id: i + 1,
+    type: order?.type,
+    symbol: order?.symbol,
+    sum: order?.volume,
+    price: order?.symbolValue,
+    profit: order?.profit,
+    createdAt: order?.createdAt,
+  }));
+
+  const userColumns = [
+    {
+      name: "ID",
+      selector: (row) => row.id,
+      sortable: true,
+    },
+    {
+      name: "Registered",
+      selector: (row) => row.createdAt,
+      sortable: true,
+    },
+    {
+      name: "Name",
+      cell: (row) => (
+        <div onClick={() => fetchOrders(row.id)}>
+          {row.surname === undefined ? row.name : row.name + " " + row.surname}
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      name: "Status",
+      cell: (row) => (
+        <Dropdown data-bs-theme="light" className="custom-dropdown">
+          <Dropdown.Toggle variant="none" id="dropdown-basic">
+            {row.status && progressBarConfig[row.status] && (
+              <ProgressBar
+                variant={progressBarConfig[row.status].variant}
+                now={progressBarConfig[row.status].now}
+                className="progressbar"
+              />
+            )}
+          </Dropdown.Toggle>
+          <Dropdown.Menu className="custom-dropdown-menu" data-bs-theme="dark">
+            {Object.keys(progressBarConfig).map((status) => (
+              <Dropdown.Item
+                key={status}
+                onClick={() => handleDropdownItemClick(status, row.id)}
+                className={row.status === status ? "active-status" : ""}
+              >
+                {row.status === status ? <span>&#10004;</span> : " "} {status}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
+      ),
+      sortable: false,
+    },
+    {
+      name: "Sale",
+      selector: (row) => row.sale,
+      sortable: true,
+    },
+    {
+      name: "Reten",
+      selector: (row) => row.reten,
+      sortable: true,
+    },
+    {
+      name: "Phone",
+      selector: (row) => row.phone,
+      sortable: true,
+    },
+    {
+      name: "Email",
+      selector: (row) => row.email,
+      sortable: true,
+    },
+    {
+      name: "Balance",
+      selector: (row) => row.balance,
+      sortable: true,
+    },
+    {
+      name: "Deposit",
+      selector: (row) => row.deposit,
+      sortable: true,
+    },
+    {
+      name: "Manager",
+      selector: (row) => row.manager,
+      sortable: true,
+    },
+    {
+      name: "Affiliates",
+      selector: (row) => row.affiliates,
+      sortable: true,
+    },
+  ];
+
+  const mappedData = users?.map((user, i) => ({
+    ...user,
+    status: user?.status,
+    id: user?.id,
+  }));
 
   // const [users, setUsers] = useState([
   //   {
@@ -245,7 +391,20 @@ export default function Leads({ setTab }) {
             placeholder="Search.."
           />
         </div>
-        <table id="leadsTable" className="table table-hover table-striped">
+        <div className="">
+          <DataTable
+            // title="User Data"
+            columns={userColumns}
+            data={mappedData}
+            highlightOnHover
+            pointerOnHover
+            pagination
+            paginationPerPage={5}
+            paginationRowsPerPageOptions={[5, 10]}
+            // responsive
+          />
+        </div>
+        {/* <table id="leadsTable" className="table table-hover table-striped">
           <thead>
             <tr>
               <th scope="col" className="text-center">
@@ -338,7 +497,7 @@ export default function Leads({ setTab }) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table> */}
       </div>
       <div
         id="lead-transactions"
@@ -360,8 +519,18 @@ export default function Leads({ setTab }) {
             Player card
           </button>
         </div>
-        <div id="">
-          <table className="table table-hover table-striped">
+        <div>
+          <DataTable
+            columns={columns}
+            data={data}
+            pagination
+            paginationPerPage={5}
+            paginationRowsPerPageOptions={[5, 10]}
+            highlightOnHover
+            pointerOnHover
+            // responsive
+          />
+          {/* <table className="table table-hover table-striped">
             <thead>
               <tr>
                 <th className="text-center" scope="col">
@@ -404,7 +573,7 @@ export default function Leads({ setTab }) {
                 ))}
               </tbody>
             )}
-          </table>
+          </table> */}
         </div>
       </div>
     </div>

@@ -103,6 +103,7 @@ td:hover {
   padding: 5px;
   margin: 0;
   background-color: var(--main-light-blue);
+  width: calc(100% - 150px);
 }
 
 #accpic,
@@ -280,6 +281,7 @@ td:hover {
   border: 3px solid whitesmoke;
   border-radius: 5px;
   padding: 7px;
+  width: calc(100% - 237px);
 }
 #dashboard {
   display: flex;
@@ -465,7 +467,10 @@ td:hover {
   margin-top: 3px;
   max-height: 60vh;
 }
-
+.rdt_TableRow,
+.rdt_TableHeadRow {
+  justify-content: space-between;
+}
 th,
 td {
   font-size: 14px;
