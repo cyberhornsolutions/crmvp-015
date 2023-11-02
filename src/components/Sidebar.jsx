@@ -78,7 +78,9 @@ export default function Sidebar({ setTab, tab }) {
             Affiliates
           </li>
           <li id="menu-news">News</li>
-          <li id="menu-platform">Game platform</li>
+          <li id="menu-platform">
+            <a href="https://crm-015.vercel.app/">Game platform</a>
+          </li>
         </ul>
       </div>
       <div id="logout">

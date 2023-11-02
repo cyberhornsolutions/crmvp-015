@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
+import Sidebar from "./Sidebar";
 
 export default function MainBoard() {
   const [tab, setTab] = useState(0);
@@ -30,6 +31,7 @@ export default function MainBoard() {
   const [placeFiles, setPlaceFiles] = useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isEdit, setIsEdit] = useState(false);
 
   console.log("Selected image", selectedImage);
   console.log("show modal", modalShow);
@@ -58,7 +60,6 @@ export default function MainBoard() {
     Confirmed: { variant: "warning", now: 75 },
     Closed: { variant: "danger", now: 100 },
   };
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -76,8 +77,13 @@ export default function MainBoard() {
     };
 
     fetchUsers();
+    setIsEdit(false);
   }, []);
-
+  useEffect(() => {
+    if (isEdit) {
+      edit();
+    }
+  }, [isEdit]);
   const save = () => {
     const tableCells = document.querySelectorAll("#menu3-table tbody td");
     tableCells.forEach((cell) => {
@@ -86,20 +92,28 @@ export default function MainBoard() {
         cell.textContent = input.value;
       }
     });
+    setIsEdit(false);
   };
 
   const edit = () => {
-    const tableCells = document.querySelectorAll("#menu3-table tbody td");
-    tableCells.forEach((cell) => {
-      const text = cell.textContent;
-      const inputElement = document.createElement("input");
-      inputElement.type = "text";
-      inputElement.value = text;
-      inputElement.style.width = "80px"; // Adjust the width as needed
-      cell.innerHTML = "";
-      cell.appendChild(inputElement);
+    setIsEdit(true);
+    const tableRows = document.querySelectorAll("#menu3-table tbody tr");
+    tableRows.forEach((row) => {
+      const cellsToSkip = [0, 7];
+      const cells = row.querySelectorAll("td");
+      cells.forEach((cell, index) => {
+        if (cellsToSkip.includes(index)) {
+          return;
+        }
+        const text = cell.textContent;
+        const inputElement = document.createElement("input");
+        inputElement.type = "text";
+        inputElement.value = text;
+        inputElement.style.width = "80px";
+        cell.innerHTML = "";
+        cell.appendChild(inputElement);
+      });
     });
-    // s;
   };
 
   const dealsColumns = [
@@ -246,6 +260,7 @@ export default function MainBoard() {
 
   return (
     <div id="mainboard">
+      <Sidebar tab={tab} setTab={setTab} />
       <div id="profile">
         <img id="profile-pic" src={placeholder} alt="" />
         <div id="profile-i">
@@ -1066,63 +1081,66 @@ export default function MainBoard() {
                   Save
                 </button>
               </div>
-              <DataTable
-                columns={dealsColumns}
-                data={dealsData}
-                highlightOnHover
-                pointerOnHover
-                pagination
-                paginationPerPage={5}
-                paginationRowsPerPageOptions={[5, 10]}
-                // responsive
-              />
-              {/* <table
-                id="menu3-table"
-                className="table table-hover table-striped"
-              >
-                <thead>
-                  <tr>
-                    <th className="text-center" scope="col">
-                      ID
-                    </th>
-                    <th className="text-center" scope="col">
-                      Transaction Type
-                    </th>
-                    <th className="text-center" scope="col">
-                      Symbol
-                    </th>
-                    <th className="text-center" scope="col">
-                      Sum
-                    </th>
-                    <th className="text-center" scope="col">
-                      Opening Price
-                    </th>
-                    <th className="text-center" scope="col">
-                      Status
-                    </th>
-                    <th className="text-center" scope="col">
-                      Profit
-                    </th>
-                    <th className="text-center" scope="col">
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {state?.map((order, i) => (
+              {!isEdit ? (
+                <DataTable
+                  columns={dealsColumns}
+                  data={dealsData}
+                  highlightOnHover
+                  pointerOnHover
+                  pagination
+                  paginationPerPage={5}
+                  paginationRowsPerPageOptions={[5, 10]}
+                  // responsive
+                />
+              ) : (
+                <table
+                  id="menu3-table"
+                  className="table table-hover table-striped"
+                >
+                  <thead>
                     <tr>
-                      <td>{i + 1}</td>
-                      <td>{order?.type}</td>
-                      <td>{order?.symbol}</td>
-                      <td>{order?.volume}</td>
-                      <td>{order?.symbolValue}</td>
-                      <td>{order?.status}</td>
-                      <td>{order?.profit}</td>
-                      <td>{order?.createdAt}</td>
+                      <th className="text-center" scope="col">
+                        ID
+                      </th>
+                      <th className="text-center" scope="col">
+                        Transaction Type
+                      </th>
+                      <th className="text-center" scope="col">
+                        Symbol
+                      </th>
+                      <th className="text-center" scope="col">
+                        Sum
+                      </th>
+                      <th className="text-center" scope="col">
+                        Opening Price
+                      </th>
+                      <th className="text-center" scope="col">
+                        Status
+                      </th>
+                      <th className="text-center" scope="col">
+                        Profit
+                      </th>
+                      <th className="text-center" scope="col">
+                        Date
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table> */}
+                  </thead>
+                  <tbody>
+                    {state?.map((order, i) => (
+                      <tr>
+                        <td>{i + 1}</td>
+                        <td>{order?.type}</td>
+                        <td>{order?.symbol}</td>
+                        <td>{order?.volume}</td>
+                        <td>{order?.symbolValue}</td>
+                        <td>{order?.status}</td>
+                        <td>{order?.profit}</td>
+                        <td>{order?.createdAt}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           )}
 

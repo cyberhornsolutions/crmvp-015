@@ -182,17 +182,17 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Sale",
-      selector: (row) => row.sale,
+      selector: (row) => (row.sale ? row.sale : "New"),
       sortable: true,
     },
     {
       name: "Reten",
-      selector: (row) => row.reten,
+      selector: (row) => (row.reten ? row.reten : "New"),
       sortable: true,
     },
     {
       name: "Phone",
-      selector: (row) => row.phone,
+      selector: (row) => (row.phone ? row.phone : "12312321"),
       sortable: true,
     },
     {
@@ -202,22 +202,22 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Balance",
-      selector: (row) => row.balance,
+      selector: (row) => row.totalBalance,
       sortable: true,
     },
     {
       name: "Deposit",
-      selector: (row) => row.deposit,
+      selector: (row) => (row.deposit ? row.deposit : "50"),
       sortable: true,
     },
     {
       name: "Manager",
-      selector: (row) => row.manager,
+      selector: (row) => (row.manager ? row.manager : "Jhon"),
       sortable: true,
     },
     {
       name: "Affiliates",
-      selector: (row) => row.affiliates,
+      selector: (row) => (row.affiliates ? row.affiliates : "Candy Land"),
       sortable: true,
     },
   ];
