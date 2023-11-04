@@ -72,6 +72,9 @@ td:hover {
   border-right: 2px solid white;
   box-shadow: 0px 0px 3px var(--main-elc);
   overflow-y: scroll;
+  width: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
 }
 /* width */
 ::-webkit-scrollbar {
@@ -100,6 +103,7 @@ td:hover {
   padding: 5px;
   margin: 0;
   background-color: var(--main-light-blue);
+  width: calc(100% - 150px);
 }
 
 #accpic,
@@ -195,7 +199,7 @@ td:hover {
   display: flex;
   flex-direction: column;
   margin: 5px;
-  /* height: 90%; */
+  height: 100%;
 }
 .tab-content input {
   border: 1px solid lightgray;
@@ -208,8 +212,9 @@ td:hover {
 #mainboard {
   display: flex;
   flex-direction: row;
-  height: 100%;
+  /* height: 100%; */
   color: var(--main-elc2);
+  /* overflow-y: scroll; */
 }
 
 #mainboard .f-w-inherit {
@@ -229,9 +234,12 @@ td:hover {
   flex: 1;
   border: 3px solid whitesmoke;
   justify-content: center;
-  height: 93%;
+  height: 100%;
   border-radius: 5px;
   margin-right: 10px;
+  /* overflow-y: scroll; */
+  /* width: 230px; */
+  /* min-width: 230px; */
 }
 #profile-pic {
   flex: 1;
@@ -273,11 +281,13 @@ td:hover {
   border: 3px solid whitesmoke;
   border-radius: 5px;
   padding: 7px;
+  width: calc(100% - 237px);
 }
 #dashboard {
   display: flex;
   flex-direction: column;
   height: 100%;
+  /* overflow-y: auto; */
 }
 
 #header div {
@@ -375,6 +385,7 @@ td:hover {
 #leads {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 #transactions-div {
   width: 98%;
@@ -389,6 +400,7 @@ td:hover {
 #users {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 #users-div {
   width: 98%;
@@ -455,7 +467,10 @@ td:hover {
   margin-top: 3px;
   max-height: 60vh;
 }
-
+.rdt_TableRow,
+.rdt_TableHeadRow {
+  justify-content: space-between;
+}
 th,
 td {
   font-size: 14px;
@@ -653,6 +668,20 @@ td.editing {
   opacity: 1;
 }
 
+.ref-table {
+  background-color: whitesmoke;
+  box-shadow: 0px 0px 1px var(--main-elc2);
+  border: 2px solid whitesmoke;
+  border-radius: 5px;
+}
+#refsTable {
+  border: 2px solid white;
+}
+.refInput {
+  background: whitesmoke;
+  margin: 0px 3px;
+}
+
 #newUser-form {
   margin: 10px;
   margin-left: 150px;
@@ -687,6 +716,20 @@ td.editing {
 .form-check-input:checked {
   background-color: var(--main-lightgreen);
   border-color: var(--main-numbersc);
+}
+.form-check {
+  display: flex !important;
+  margin: 0px;
+  justify-content: flex-start;
+  margin-bottom: 30px;
+}
+.form-check-label {
+  width: 300px;
+  text-align: left;
+  margin-left: 20px;
+}
+.form-check-input {
+  margin-right: 50px;
 }
 
 /* MENUS */
@@ -734,6 +777,7 @@ td.editing {
   padding: 5px;
   margin: 5px;
   border-bottom: 1px solid lightgray;
+  justify-content: space-evenly;
 }
 #menu1-extra div,
 #menu1-main div {
@@ -896,4 +940,16 @@ td.editing {
   font-weight: bold;
   border: 1px solid #e2e8f0;
   margin-right: 20px;
+}
+#dropdown-basic.dropdown-toggle {
+  border: none;
+}
+.progressbar {
+  width: 100px;
+}
+.custom-dropdown-menu.dropdown-menu.show {
+  padding-left: 16px;
+}
+.active-status.dropdown-item {
+  padding: 0px;
 }

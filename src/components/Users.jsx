@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
+import { Nav, Navbar } from "react-bootstrap";
 
 export default function Users() {
+  const [tab, setTab] = useState(0);
+
   const addUser = () => {
     var name = document.getElementById("newUserName").value;
     var email = document.getElementById("newUserEmail").value;
@@ -61,6 +64,34 @@ export default function Users() {
         id="users-div"
         // className="hidden"
       >
+        <Navbar className="nav nav-tabs p-0">
+          <Nav className="me-auto" style={{ gap: "2px" }}>
+            <Nav.Link
+              className={tab === 0 && "active"}
+              onClick={() => setTab(0)}
+            >
+              All
+            </Nav.Link>
+            <Nav.Link
+              className={tab === 1 && "active"}
+              onClick={() => setTab(1)}
+            >
+              Sale
+            </Nav.Link>
+            <Nav.Link
+              className={tab === 2 && "active"}
+              onClick={() => setTab(2)}
+            >
+              Reten
+            </Nav.Link>
+            <Nav.Link
+              className={tab === 3 && "active"}
+              onClick={() => setTab(3)}
+            >
+              Teams
+            </Nav.Link>
+          </Nav>
+        </Navbar>
         <div
           className="dropdown"
           style={{
@@ -129,72 +160,252 @@ export default function Users() {
             placeholder="Поиск.."
           />
         </div>
-        <table id="users-table" className="table table-hover table-striped">
-          <thead>
-            <tr>
-              <th className="text-center" scope="col"></th>
-              <th className="text-center" scope="col">
-                ID
-              </th>
-              <th className="text-center" scope="col">
-                Name
-              </th>
-              <th className="text-center" scope="col">
-                Email
-              </th>
-              <th className="text-center" scope="col">
-                Position
-              </th>
-              <th className="text-center" scope="col">
-                Desk
-              </th>
-              <th className="text-center" scope="col">
-                Date
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <input type="checkbox" />
-              </td>
-              <td>1</td>
-              <td>Jason Bandera</td>
-              <td>testmail@gmail.com</td>
-              <td>Sale</td>
-              <td>Demo</td>
-              <td>2023-09-03</td>
-            </tr>
-            <tr>
-              <td>
-                <input type="checkbox" />
-              </td>
-              <td>2</td>
-              <td>Antony Obama</td>
-              <td>testmail2@gmail.com</td>
-              <td>Admin</td>
-              <td>Demo</td>
-              <td>2023-08-13</td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="tab-content">
+          {tab === 0 && (
+            <div>
+              <table
+                id="users-table"
+                className="table table-hover table-striped"
+              >
+                <thead>
+                  <tr>
+                    <th className="text-center" scope="col"></th>
+                    <th className="text-center" scope="col">
+                      ID
+                    </th>
+                    <th className="text-center" scope="col">
+                      Name
+                    </th>
+                    <th className="text-center" scope="col">
+                      Email
+                    </th>
+                    <th className="text-center" scope="col">
+                      Position
+                    </th>
+                    <th className="text-center" scope="col">
+                      Desk
+                    </th>
+                    <th className="text-center" scope="col">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input type="checkbox" />
+                    </td>
+                    <td>1</td>
+                    <td>Jason Bandera</td>
+                    <td>testmail@gmail.com</td>
+                    <td>Sale</td>
+                    <td>Demo</td>
+                    <td>2023-09-03</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="checkbox" />
+                    </td>
+                    <td>2</td>
+                    <td>Antony Obama</td>
+                    <td>testmail2@gmail.com</td>
+                    <td>Admin</td>
+                    <td>Demo</td>
+                    <td>2023-08-13</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {tab === 1 && (
+            <div>
+              <table
+                id="users-table"
+                className="table table-hover table-striped"
+              >
+                <thead>
+                  <tr>
+                    <th className="text-center" scope="col"></th>
+                    <th className="text-center" scope="col">
+                      ID
+                    </th>
+                    <th className="text-center" scope="col">
+                      Name
+                    </th>
+                    <th className="text-center" scope="col">
+                      Email
+                    </th>
+                    <th className="text-center" scope="col">
+                      Position
+                    </th>
+                    <th className="text-center" scope="col">
+                      Desk
+                    </th>
+                    <th className="text-center" scope="col">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input type="checkbox" />
+                    </td>
+                    <td>3</td>
+                    <td>Jason Bandera</td>
+                    <td>testmail@gmail.com</td>
+                    <td>Sale</td>
+                    <td>Demo</td>
+                    <td>2023-09-03</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="checkbox" />
+                    </td>
+                    <td>4</td>
+                    <td>Antony Obama</td>
+                    <td>testmail2@gmail.com</td>
+                    <td>Admin</td>
+                    <td>Demo</td>
+                    <td>2023-08-13</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {tab === 2 && (
+            <div>
+              <table
+                id="users-table"
+                className="table table-hover table-striped"
+              >
+                <thead>
+                  <tr>
+                    <th className="text-center" scope="col"></th>
+                    <th className="text-center" scope="col">
+                      ID
+                    </th>
+                    <th className="text-center" scope="col">
+                      Name
+                    </th>
+                    <th className="text-center" scope="col">
+                      Email
+                    </th>
+                    <th className="text-center" scope="col">
+                      Position
+                    </th>
+                    <th className="text-center" scope="col">
+                      Desk
+                    </th>
+                    <th className="text-center" scope="col">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input type="checkbox" />
+                    </td>
+                    <td>5</td>
+                    <td>Jason Bandera</td>
+                    <td>testmail@gmail.com</td>
+                    <td>Sale</td>
+                    <td>Demo</td>
+                    <td>2023-09-03</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="checkbox" />
+                    </td>
+                    <td>6</td>
+                    <td>Antony Obama</td>
+                    <td>testmail2@gmail.com</td>
+                    <td>Admin</td>
+                    <td>Demo</td>
+                    <td>2023-08-13</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {tab === 3 && (
+            <div>
+              <table
+                id="users-table"
+                className="table table-hover table-striped"
+              >
+                <thead>
+                  <tr>
+                    <th className="text-center" scope="col"></th>
+                    <th className="text-center" scope="col">
+                      ID
+                    </th>
+                    <th className="text-center" scope="col">
+                      Name
+                    </th>
+                    <th className="text-center" scope="col">
+                      Email
+                    </th>
+                    <th className="text-center" scope="col">
+                      Position
+                    </th>
+                    <th className="text-center" scope="col">
+                      Desk
+                    </th>
+                    <th className="text-center" scope="col">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input type="checkbox" />
+                    </td>
+                    <td>7</td>
+                    <td>Jason Bandera</td>
+                    <td>testmail@gmail.com</td>
+                    <td>Sale</td>
+                    <td>Demo</td>
+                    <td>2023-09-03</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="checkbox" />
+                    </td>
+                    <td>8</td>
+                    <td>Antony Obama</td>
+                    <td>testmail2@gmail.com</td>
+                    <td>Admin</td>
+                    <td>Demo</td>
+                    <td>2023-08-13</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
       <div
         id="newUser-form"
         // className="hidden"
       >
-        <h5>Managers</h5>
+        <h5>Manage</h5>
         <form id="addNewUser">
-          <div id="new-user-fields">
+          <div id="new-user-fields" className="px-2">
             <input type="text" placeholder="Name" id="newUserName" />
             <input type="email" placeholder="Email" id="newUserEmail" />
             <input type="text" placeholder="Position" id="newUserPosition" />
             <input type="text" placeholder="Desk" id="newUserDesk" />
           </div>
         </form>
-        <div>
+        <div className="mt-3">
           <button
-            className="btn btn-secondary"
+            className="btn btn-secondary me-2"
             id="new-user-del"
             type="button"
             onClick={deleteUser}

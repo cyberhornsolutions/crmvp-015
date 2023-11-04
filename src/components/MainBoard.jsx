@@ -1,36 +1,347 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import placeholder from "../acc-img-placeholder.png";
-import { Nav, NavItem, Navbar } from "react-bootstrap";
+import { Dropdown, Nav, NavItem, Navbar, ProgressBar } from "react-bootstrap";
+import { useLocation } from "react-router-dom";
+import { db } from "../firebase";
+import { collection } from "firebase/firestore";
+import {
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
+import ImageModal from "./ImageModal";
+import DataTable from "react-data-table-component";
+import Sidebar from "./Sidebar";
 
 export default function MainBoard() {
   const [tab, setTab] = useState(0);
+  const [users, setUsers] = useState([]);
+  const { state } = useLocation();
+  const idInputRef = useRef(null);
+  const locationInputRef = useRef(null);
+  const mapInputRef = useRef(null);
+  const placeInputRef = useRef(null);
 
-  const save = () => {
-    const tableCells = document.querySelectorAll("#menu3-table tbody td");
-    tableCells.forEach((cell) => {
-      const input = cell.querySelector("input");
-      if (input) {
-        cell.textContent = input.value;
+  const [idFiles, setIdFiles] = useState([]);
+  const [locationFiles, setLocationFiles] = useState([]);
+  const [mapFiles, setMapFiles] = useState([]);
+  const [placeFiles, setPlaceFiles] = useState([]);
+  const [modalShow, setModalShow] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isEdit, setIsEdit] = useState(false);
+  const [userOrderData, setUserOrderData] = useState(
+    state?.map((order, i) => ({
+      index: i + 1,
+      id: order?.id,
+      type: order?.type,
+      symbol: order?.symbol,
+      sl: order?.sl,
+      volumn: order?.volume,
+      symbolValue: order?.symbolValue,
+      tp: order?.tp,
+      status: order?.status,
+      profit: order?.profit,
+      userId: order?.userId,
+      createdAt: order?.createdAt,
+    }))
+  );
+
+  console.log("Selected image", selectedImage);
+  console.log("show modal", modalShow);
+
+  const handleImageClick = (image) => {
+    console.log("Image", image);
+    setSelectedImage(URL.createObjectURL(image));
+    setModalShow(true);
+  };
+
+  const handleUploadClick = (inputRef) => {
+    inputRef.current.click();
+  };
+
+  const handleFileChange = (e, fileStateSetter) => {
+    const files = e.target.files;
+    const fileArray = Array.from(files);
+    fileStateSetter((prevFiles) => [...prevFiles, ...fileArray]);
+  };
+
+  console.log("state", state);
+
+  const progressBarConfig = {
+    New: { variant: "success", now: 25 },
+    InProgress: { variant: "info", now: 50 },
+    Confirmed: { variant: "warning", now: 75 },
+    Closed: { variant: "danger", now: 100 },
+  };
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        const userData = [];
+
+        querySnapshot.forEach((doc) => {
+          userData.push({ id: doc.id, ...doc.data() });
+        });
+
+        setUsers(userData);
+      } catch (error) {
+        console.error("Error fetching users:", error);
       }
-    });
+    };
+
+    fetchUsers();
+    setIsEdit(false);
+  }, []);
+  const save = async () => {
+    // console.log("updated data", userOrderData);
+    // const docRef = firestore.collection("your-collection");
+
+    // userOrderData.forEach((object) => {
+    //   const { id, index, ...rest } = object;
+    //   console.log("rest------>", rest);
+    //   Update the Firestore document with the given ID and fields in the 'rest' object
+    //   docRef
+    //     .doc(id)
+    //     .update(rest)
+    //     .then(() => {
+    //       console.log(`Document with ID ${id} updated successfully`);
+    //     })
+    //     .catch((error) => {
+    //       console.error(`Error updating document with ID ${id}:`, error);
+    //     });
+    // });
+
+    // const tableCells = document.querySelectorAll("#menu3-table tbody td");
+    // tableCells.forEach((cell) => {
+    //   const input = cell.querySelector("input");
+    //   if (input) {
+    //     cell.textContent = input.value;
+    //   }
+    // });
+    setIsEdit(false);
   };
 
-  const edit = () => {
-    const tableCells = document.querySelectorAll("#menu3-table tbody td");
-    tableCells.forEach((cell) => {
-      const text = cell.textContent;
-      const inputElement = document.createElement("input");
-      inputElement.type = "text";
-      inputElement.value = text;
-      inputElement.style.width = "80px"; // Adjust the width as needed
-      cell.innerHTML = "";
-      cell.appendChild(inputElement);
-    });
-    // s;
+  const handleEdit = (id, field, value) => {
+    const updatedData = userOrderData.map((item) =>
+      item.id === id ? { ...item, [field]: value } : item
+    );
+    setUserOrderData(updatedData);
   };
+  const dealsColumns = [
+    {
+      name: "ID",
+      selector: (row) => row.index,
+      sortable: true,
+    },
+    {
+      name: "Transaction Type",
+      selector: (row) => row.type,
+      sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.type}
+            onChange={(e) => {
+              handleEdit(row.id, "type", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.type
+        ),
+    },
+    {
+      name: "Symbol",
+      selector: (row) => row.symbol,
+      sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.symbol}
+            onChange={(e) => {
+              handleEdit(row.id, "symbol", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.symbol
+        ),
+    },
+    {
+      name: "Sum",
+      selector: (row) => row.volumn,
+      sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.volumn}
+            onChange={(e) => {
+              handleEdit(row.id, "volumn", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.volumn
+        ),
+    },
+    {
+      name: "Price",
+      selector: (row) => row.symbolValue,
+      sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.symbolValue}
+            onChange={(e) => {
+              handleEdit(row.id, "symbolValue", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.symbolValue
+        ),
+    },
+    {
+      name: "Status",
+      selector: (row) => row.status,
+      sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.status}
+            onChange={(e) => {
+              handleEdit(row.id, "status", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.status
+        ),
+    },
+    {
+      name: "Profit",
+      selector: (row) => row.profit,
+      sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.profit}
+            onChange={(e) => {
+              handleEdit(row.id, "profit", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.profit
+        ),
+    },
+    {
+      name: "Date",
+      selector: (row) => row.createdAt,
+      sortable: true,
+    },
+  ];
+
+  const userColumns = [
+    {
+      name: "ID",
+      selector: (row) => row.id,
+      sortable: true,
+      width: "6%",
+    },
+    {
+      name: "Registered",
+      selector: (row) => row.createdAt,
+      sortable: true,
+      width: "10%",
+    },
+    {
+      name: "Name",
+      cell: (row) =>
+        row.surname === undefined ? row.name : row.name + " " + row.surname,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Status",
+      cell: (row) => (
+        <ProgressBar
+          variant={progressBarConfig[row.status].variant}
+          now={progressBarConfig[row.status].now}
+          className="progressbar"
+        />
+      ),
+      sortable: false,
+      width: "8%",
+    },
+    {
+      name: "Sale",
+      selector: (row) => row.sale,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Reten",
+      selector: (row) => row.reten,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Phone",
+      selector: (row) => row.phone,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Email",
+      selector: (row) => row.email,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Balance",
+      selector: (row) => row.balance,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Deposit",
+      selector: (row) => row.deposit,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Manager",
+      selector: (row) => row.manager,
+      sortable: true,
+      width: "8%",
+    },
+    {
+      name: "Affiliates",
+      selector: (row) => row.affiliates,
+      sortable: true,
+      width: "8%",
+    },
+  ];
+
+  const mappedData = users?.map((user, i) => ({
+    ...user,
+    status: user?.status,
+    id: i + 1,
+  }));
 
   return (
     <div id="mainboard">
+      <Sidebar tab={tab} setTab={setTab} />
       <div id="profile">
         <img id="profile-pic" src={placeholder} alt="" />
         <div id="profile-i">
@@ -208,7 +519,7 @@ export default function MainBoard() {
             </a>
           </li>
         </ul> */}
-        <Navbar expand="lg" className="nav nav-tabs p-0">
+        <Navbar className="nav nav-tabs p-0">
           <Nav className="me-auto" style={{ gap: "2px" }}>
             <Nav.Link
               className={tab === 0 && "active"}
@@ -434,253 +745,269 @@ export default function MainBoard() {
               </div>
             </div>
           )}
+
           {tab === 1 && (
             <div id="menu1">
               <div id="menu1-main">
                 <div id="menu1-main-titles">
                   <h4 className="f-s-inherit" style={{ lineHeight: 1.1 }}>
-                    Документы
+                    Documentation
                   </h4>
-                  <button>Сохранить</button>
+                  <button>Save</button>
                 </div>
                 <div>
                   <div
                     className="form-check form-switch"
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                      marginLeft: 320,
-                      marginTop: 30,
-                      marginRight: 210,
-                    }}
+                    // style={{
+                    //   display: "flex",
+                    //   flexDirection: "row",
+                    // }}
                   >
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="mySwitch"
-                      name="darkmode"
-                      defaultValue="yes"
-                    />
-                    <label
-                      className="form-check-label f-s-inherit f-w-700"
-                      htmlFor="mySwitch"
-                    >
-                      Подтверждение личности
+                    <label className="form-check-label f-s-inherit f-w-700 mt-1">
+                      ID Confirmation
                     </label>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width={16}
-                      height={16}
-                      fill="currentColor"
-                      className="bi bi-cloud-upload"
-                      viewBox="0 0 16 16"
-                      style={{ marginTop: 5 }}
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                    <input className="form-check-input mt-2" type="checkbox" />
+                    {idFiles?.length < 4 && (
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={16}
+                          height={16}
+                          fill="currentColor"
+                          className="bi bi-cloud-upload"
+                          viewBox="0 0 16 16"
+                          style={{ marginRight: 5, cursor: "pointer" }}
+                          onClick={() => handleUploadClick(idInputRef)}
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                          />
+                          <path
+                            fillRule="evenodd"
+                            d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
+                          />
+                        </svg>
+                        <input
+                          type="file"
+                          multiple
+                          ref={idInputRef}
+                          style={{ display: "none" }}
+                          onChange={(e) => handleFileChange(e, setIdFiles)}
+                        />
+                      </div>
+                    )}
+                    <div className="d-flex align-items-center justify-content-between">
+                      {idFiles.map((file, index) => (
+                        <img
+                          key={index}
+                          src={URL.createObjectURL(file)}
+                          alt={`Selected Image ${index + 1}`}
+                          style={{
+                            width: "100px",
+                            height: "50px",
+                            margin: "0px 5px",
+                            objectFit: "cover",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleImageClick(file)}
+                        />
+                      ))}
+
+                      <ImageModal
+                        show={modalShow}
+                        onHide={() => setModalShow(false)}
+                        image={selectedImage}
                       />
-                      <path
-                        fillRule="evenodd"
-                        d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
-                      />
-                    </svg>
+                    </div>
                   </div>
-                  <div
-                    className="form-check form-switch"
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                      marginLeft: 320,
-                      marginTop: 30,
-                      marginRight: 210,
-                    }}
-                  >
-                    <label
-                      className="form-check-label f-s-inherit f-w-700"
-                      htmlFor="mySwitch"
-                    >
-                      Место жительства
+                  <div className="form-check form-switch">
+                    <label className="form-check-label f-s-inherit f-w-700 mt-1">
+                      Location
                     </label>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="mySwitch"
-                      name="darkmode"
-                      defaultValue="yes"
-                    />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width={16}
-                      height={16}
-                      fill="currentColor"
-                      className="bi bi-cloud-upload"
-                      viewBox="0 0 16 16"
-                      style={{ marginTop: 5 }}
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
-                      />
-                      <path
-                        fillRule="evenodd"
-                        d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
-                      />
-                    </svg>
+                    <input className="form-check-input mt-2" type="checkbox" />
+                    {locationFiles?.length < 4 && (
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={16}
+                          height={16}
+                          fill="currentColor"
+                          className="bi bi-cloud-upload"
+                          viewBox="0 0 16 16"
+                          style={{ marginRight: 5, cursor: "pointer" }}
+                          onClick={() => handleUploadClick(locationInputRef)}
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                          />
+                          <path
+                            fillRule="evenodd"
+                            d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
+                          />
+                        </svg>
+                        <input
+                          type="file"
+                          multiple
+                          ref={locationInputRef}
+                          style={{ display: "none" }}
+                          onChange={(e) =>
+                            handleFileChange(e, setLocationFiles)
+                          }
+                        />
+                      </div>
+                    )}
+                    <div className="d-flex align-items-center justify-content-between">
+                      {locationFiles.map((file, index) => (
+                        <img
+                          key={index}
+                          src={URL.createObjectURL(file)}
+                          alt={`Selected Image ${index + 1}`}
+                          style={{
+                            width: "100px",
+                            height: "50px",
+                            margin: "0px 5px",
+                            objectFit: "cover",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleImageClick(file)}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <div
-                    className="form-check form-switch"
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                      marginLeft: 320,
-                      marginTop: 30,
-                      marginRight: 210,
-                    }}
-                  >
-                    <label
-                      className="form-check-label f-s-inherit f-w-700"
-                      htmlFor="mySwitch"
-                    >
-                      Карта
+                  <div className="form-check form-switch">
+                    <label className="form-check-label f-s-inherit f-w-700 mt-1">
+                      Map
                     </label>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="mySwitch"
-                      name="darkmode"
-                      defaultValue="yes"
-                    />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width={16}
-                      height={16}
-                      fill="currentColor"
-                      className="bi bi-cloud-upload"
-                      viewBox="0 0 16 16"
-                      style={{ marginTop: 5 }}
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
-                      />
-                      <path
-                        fillRule="evenodd"
-                        d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
-                      />
-                    </svg>
+                    <input className="form-check-input mt-2" type="checkbox" />
+                    {mapFiles?.length < 4 && (
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={16}
+                          height={16}
+                          fill="currentColor"
+                          className="bi bi-cloud-upload"
+                          viewBox="0 0 16 16"
+                          style={{ marginRight: 5, cursor: "pointer" }}
+                          onClick={() => handleUploadClick(mapInputRef)}
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                          />
+                          <path
+                            fillRule="evenodd"
+                            d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
+                          />
+                        </svg>
+                        <input
+                          type="file"
+                          multiple
+                          ref={mapInputRef}
+                          style={{ display: "none" }}
+                          onChange={(e) => handleFileChange(e, setMapFiles)}
+                        />
+                      </div>
+                    )}
+                    <div className="d-flex align-items-center justify-content-between">
+                      {mapFiles.map((file, index) => (
+                        <img
+                          key={index}
+                          src={URL.createObjectURL(file)}
+                          alt={`Selected Image ${index + 1}`}
+                          style={{
+                            width: "100px",
+                            height: "50px",
+                            margin: "0px 5px",
+                            objectFit: "cover",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleImageClick(file)}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <div
-                    className="form-check form-switch"
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                      marginLeft: 320,
-                      marginTop: 30,
-                      marginRight: 210,
-                    }}
-                  >
-                    <label
-                      className="form-check-label f-s-inherit f-w-700"
-                      htmlFor="mySwitch"
-                    >
-                      Место работы
+                  <div className="form-check form-switch">
+                    <label className="form-check-label f-s-inherit f-w-700 mt-1">
+                      Place of Work
                     </label>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="mySwitch"
-                      name="darkmode"
-                      defaultValue="yes"
-                    />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width={16}
-                      height={16}
-                      fill="currentColor"
-                      className="bi bi-cloud-upload"
-                      viewBox="0 0 16 16"
-                      style={{ marginTop: 5 }}
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
-                      />
-                      <path
-                        fillRule="evenodd"
-                        d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
-                      />
-                    </svg>
+                    <input className="form-check-input mt-2" type="checkbox" />
+                    {placeFiles?.length < 4 && (
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={16}
+                          height={16}
+                          fill="currentColor"
+                          className="bi bi-cloud-upload"
+                          viewBox="0 0 16 16"
+                          style={{ marginRight: 5, cursor: "pointer" }}
+                          onClick={() => handleUploadClick(placeInputRef)}
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"
+                          />
+                          <path
+                            fillRule="evenodd"
+                            d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"
+                          />
+                        </svg>
+                        <input
+                          type="file"
+                          multiple
+                          ref={placeInputRef}
+                          style={{ display: "none" }}
+                          onChange={(e) => handleFileChange(e, setPlaceFiles)}
+                        />
+                      </div>
+                    )}
+                    <div className="d-flex align-items-center justify-content-between px-3">
+                      {placeFiles.map((file, index) => (
+                        <img
+                          key={index}
+                          src={URL.createObjectURL(file)}
+                          alt={`Selected Image ${index + 1}`}
+                          style={{
+                            width: "100px",
+                            height: "50px",
+                            margin: "0px 5px",
+                            objectFit: "cover",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleImageClick(file)}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
               <div id="menu1-extra">
                 <div id="menu1-extra-titles">
                   <h4 className="f-s-inherit" style={{ lineHeight: 1.1 }}>
-                    Права
+                    Rights
                   </h4>
-                  <button>Сохранить</button>
+                  <button>Save</button>
                 </div>
-                <div
-                  className="form-check form-switch"
-                  style={{ marginLeft: 320, marginTop: 50, marginRight: 210 }}
-                >
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="mySwitch"
-                    name="darkmode"
-                    defaultValue="yes"
-                    defaultChecked=""
-                  />
-                  <label
-                    className="form-check-label f-s-inherit f-w-700"
-                    htmlFor="mySwitch"
-                  >
-                    Разрешить торговлю
+                <div className="form-check form-switch">
+                  <label className="form-check-label f-s-inherit f-w-700">
+                    Allow Trading
                   </label>
+                  <input className="form-check-input" type="checkbox" />
                 </div>
-                <div
-                  className="form-check form-switch"
-                  style={{ marginLeft: 320, marginRight: 210 }}
-                >
-                  <label
-                    className="form-check-label  f-s-inherit f-w-700"
-                    htmlFor="mySwitch"
-                  >
-                    Разрешить смену данных
+                <div className="form-check form-switch">
+                  <label className="form-check-label  f-s-inherit f-w-700">
+                    Allow data change
                   </label>
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="mySwitch"
-                    name="darkmode"
-                    defaultValue="yes"
-                    defaultChecked=""
-                  />
+                  <input className="form-check-input" type="checkbox" />
                 </div>
-                <div
-                  className="form-check form-switch"
-                  style={{ marginLeft: 320, marginRight: 210 }}
-                >
-                  <label
-                    className="form-check-label f-s-inherit f-w-700"
-                    htmlFor="mySwitch"
-                  >
-                    Разрешить вывод
+                <div className="form-check form-switch">
+                  <label className="form-check-label f-s-inherit f-w-700">
+                    Allow withdrawl
                   </label>
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="mySwitch"
-                    name="darkmode"
-                    defaultValue="yes"
-                    defaultChecked=""
-                  />
+                  <input className="form-check-input" type="checkbox" />
                 </div>
               </div>
             </div>
@@ -823,7 +1150,7 @@ export default function MainBoard() {
                 <button
                   id="menu3-edit"
                   className="btn btn-secondary"
-                  onClick={edit}
+                  onClick={() => setIsEdit(true)}
                 >
                   Edit
                 </button>
@@ -835,56 +1162,17 @@ export default function MainBoard() {
                   Save
                 </button>
               </div>
-              <table
-                id="menu3-table"
-                className="table table-hover table-striped"
-              >
-                <thead>
-                  <tr>
-                    <th className="text-center" scope="col">
-                      ID
-                    </th>
-                    <th className="text-center" scope="col">
-                      Тип сделки
-                    </th>
-                    <th className="text-center" scope="col">
-                      Символ
-                    </th>
-                    <th className="text-center" scope="col">
-                      Сумма
-                    </th>
-                    <th className="text-center" scope="col">
-                      Цена открытия
-                    </th>
-                    <th className="text-center" scope="col">
-                      Профит
-                    </th>
-                    <th className="text-center" scope="col">
-                      Дата
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>ID01</td>
-                    <td>05-05-2023</td>
-                    <td>Bitcoin</td>
-                    <td>0.2</td>
-                    <td>25630.22</td>
-                    <td>+120</td>
-                    <td>05-05-2023</td>
-                  </tr>
-                  <tr>
-                    <td>ID11</td>
-                    <td>02-05-2023</td>
-                    <td>Ethereum</td>
-                    <td>0.5</td>
-                    <td>1590.22</td>
-                    <td>-24.22</td>
-                    <td>06-05-2023</td>
-                  </tr>
-                </tbody>
-              </table>
+
+              <DataTable
+                columns={dealsColumns}
+                data={userOrderData}
+                highlightOnHover
+                pointerOnHover
+                pagination
+                paginationPerPage={5}
+                paginationRowsPerPageOptions={[5, 10]}
+                // responsive
+              />
             </div>
           )}
 
@@ -929,38 +1217,110 @@ export default function MainBoard() {
 
           {tab === 6 && (
             <div id="menu6">
-              <table className="table table-hover table-striped">
-                <thead>
-                  <tr>
-                    <th className="text-center" scope="col">
-                      Player
-                    </th>
-                    <th className="text-center" scope="col">
-                      Date
-                    </th>
-                    <th className="text-center" scope="col">
-                      Sum
-                    </th>
-                    <th className="text-center" scope="col">
-                      Transaction ID
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Test</td>
-                    <td>05-05-2023</td>
-                    <td>$100</td>
-                    <td>ID001</td>
-                  </tr>
-                  <tr>
-                    <td>Test</td>
-                    <td>01-12-2023</td>
-                    <td>$50</td>
-                    <td>ID002</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="ref-table w-100 pt-2 pb-4 mb-1">
+                <p className="my-3">Referral Information</p>
+                <form id="addNewUser">
+                  <div id="" className="">
+                    <input
+                      type="text"
+                      placeholder="John Doe"
+                      className="refInput"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Qc1iOSzP"
+                      className="refInput"
+                    />
+                  </div>
+                </form>
+              </div>
+              <div className="ref-table">
+                <p className="text-center my-3">Referred</p>
+                <DataTable
+                  columns={userColumns}
+                  data={mappedData}
+                  highlightOnHover
+                  pointerOnHover
+                  pagination
+                  paginationPerPage={5}
+                  paginationRowsPerPageOptions={[5, 10]}
+                  responsive
+                />
+                {/* <table
+                  id="refsTable"
+                  className="table table-hover table-striped w-100"
+                >
+                  <thead>
+                    <tr>
+                      <th scope="col" className="text-center">
+                        ID
+                      </th>
+                      <th scope="col" className="text-center">
+                        Registered
+                      </th>
+                      <th scope="col" className="text-center">
+                        Name
+                      </th>
+                      <th scope="col" className="text-center">
+                        Status
+                      </th>
+                      <th scope="col" className="text-center">
+                        Sale
+                      </th>
+                      <th scope="col" className="text-center">
+                        Reten
+                      </th>
+                      <th scope="col" className="text-center">
+                        Phone
+                      </th>
+                      <th scope="col" className="text-center">
+                        Email
+                      </th>
+                      <th scope="col" className="text-center">
+                        Balance
+                      </th>
+                      <th scope="col" clatab-contentssName="text-center">
+                        Deposit
+                      </th>
+                      <th scope="col" className="text-center">
+                        Manager
+                      </th>
+                      <th scope="col" className="text-center">
+                        Affiliates
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users?.map((e, i) => (
+                      <tr onClick={() => fetchOrders(e?.id)}>
+                        <td>{i + 1}</td>
+                        <td>{e?.createdAt}</td>
+                        <td>
+                          {e?.surname === undefined
+                            ? e?.name
+                            : e?.name + " " + e?.surname}
+                        </td>
+                        <td>
+                          <ProgressBar
+                            variant={progressBarConfig[e.status].variant}
+                            now={progressBarConfig[e.status].now}
+                            className="progressbar"
+                          />
+                        </td>
+
+                        <td>{e?.sale}</td>
+                        <td>{e?.reten}</td>
+                        <td>{e?.phone}</td>
+                        <td>{e?.email}</td>
+                        <td>{e?.balance}</td>
+                        <td>{e?.deposit}</td>
+                        <td>{e?.manager}</td>
+                        <td>{e?.affiliates}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table> */}
+              </div>
             </div>
           )}
         </div>

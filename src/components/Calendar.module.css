@@ -1,0 +1,122 @@
+.calendarGrid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  /* border: 1px solid #80808029; */
+  /* width: 70%; */
+  padding: 70px 20px 20px;
+  /* margin: 30px 100px auto; */
+  width: 100%;
+  border-radius: 10px;
+
+  /* box-shadow: 0px 0px 50px 0px rgb(100 100 100); */
+  background: whitesmoke;
+  cursor: pointer;
+  overflow-y: scroll;
+}
+
+.dayBox,
+.currentDay {
+  display: grid;
+  justify-items: center;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #80808029;
+  font-weight: bold;
+  overflow: auto;
+}
+
+.dayBox:hover {
+  background: #b6b6b629;
+}
+
+.currentDay {
+  background: #b6b6b629;
+}
+/* 
+.numStyle {
+  position: fixed;
+} */
+
+.pointerNormal {
+  cursor: pointer;
+}
+
+.notСurrentMonth {
+  /* color: transparent; */
+  cursor: not-allowed;
+  color: rgba(128, 128, 128, 0.279);
+}
+
+.stopClik {
+  cursor: not-allowed;
+}
+
+.notСurrentMonth .weekend {
+  color: rgba(240, 128, 128, 0.279);
+}
+
+.weekend {
+  color: lightcoral;
+}
+
+.nameMonthWrapper {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  top: 0px;
+  left: 25px;
+
+  /* background-color: var(--background-color); */
+}
+
+.nameMonth {
+  font-size: 18px;
+  padding: 0 10px;
+}
+
+.year {
+  margin-left: 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.buttonGroup {
+  position: absolute;
+  top: 0px;
+  right: 20px;
+}
+
+.btn svg {
+  transition: all 250ms;
+}
+
+.btn:hover svg {
+  color: currentColor;
+  transition: all 250ms;
+}
+
+.wrapperNameDay {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(1, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  width: 100%;
+  padding: 0 20px;
+  z-index: 1;
+  color: grey;
+  cursor: not-allowed;
+}
+
+.nameDay {
+  display: grid;
+  justify-items: center;
+  font-size: 14px;
+}
