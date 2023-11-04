@@ -3,8 +3,8 @@ import placeholder from "../acc-img-placeholder.png";
 import { Dropdown, Nav, NavItem, Navbar, ProgressBar } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { db } from "../firebase";
+import { collection } from "firebase/firestore";
 import {
-  collection,
   getDocs,
   query,
   where,
@@ -32,6 +32,22 @@ export default function MainBoard() {
   const [modalShow, setModalShow] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
+  const [userOrderData, setUserOrderData] = useState(
+    state?.map((order, i) => ({
+      index: i + 1,
+      id: order?.id,
+      type: order?.type,
+      symbol: order?.symbol,
+      sl: order?.sl,
+      volumn: order?.volume,
+      symbolValue: order?.symbolValue,
+      tp: order?.tp,
+      status: order?.status,
+      profit: order?.profit,
+      userId: order?.userId,
+      createdAt: order?.createdAt,
+    }))
+  );
 
   console.log("Selected image", selectedImage);
   console.log("show modal", modalShow);
@@ -79,78 +95,154 @@ export default function MainBoard() {
     fetchUsers();
     setIsEdit(false);
   }, []);
-  useEffect(() => {
-    if (isEdit) {
-      edit();
-    }
-  }, [isEdit]);
-  const save = () => {
-    const tableCells = document.querySelectorAll("#menu3-table tbody td");
-    tableCells.forEach((cell) => {
-      const input = cell.querySelector("input");
-      if (input) {
-        cell.textContent = input.value;
-      }
-    });
+  const save = async () => {
+    // console.log("updated data", userOrderData);
+    // const docRef = firestore.collection("your-collection");
+
+    // userOrderData.forEach((object) => {
+    //   const { id, index, ...rest } = object;
+    //   console.log("rest------>", rest);
+    //   Update the Firestore document with the given ID and fields in the 'rest' object
+    //   docRef
+    //     .doc(id)
+    //     .update(rest)
+    //     .then(() => {
+    //       console.log(`Document with ID ${id} updated successfully`);
+    //     })
+    //     .catch((error) => {
+    //       console.error(`Error updating document with ID ${id}:`, error);
+    //     });
+    // });
+
+    // const tableCells = document.querySelectorAll("#menu3-table tbody td");
+    // tableCells.forEach((cell) => {
+    //   const input = cell.querySelector("input");
+    //   if (input) {
+    //     cell.textContent = input.value;
+    //   }
+    // });
     setIsEdit(false);
   };
 
-  const edit = () => {
-    setIsEdit(true);
-    const tableRows = document.querySelectorAll("#menu3-table tbody tr");
-    tableRows.forEach((row) => {
-      const cellsToSkip = [0, 7];
-      const cells = row.querySelectorAll("td");
-      cells.forEach((cell, index) => {
-        if (cellsToSkip.includes(index)) {
-          return;
-        }
-        const text = cell.textContent;
-        const inputElement = document.createElement("input");
-        inputElement.type = "text";
-        inputElement.value = text;
-        inputElement.style.width = "80px";
-        cell.innerHTML = "";
-        cell.appendChild(inputElement);
-      });
-    });
+  const handleEdit = (id, field, value) => {
+    const updatedData = userOrderData.map((item) =>
+      item.id === id ? { ...item, [field]: value } : item
+    );
+    setUserOrderData(updatedData);
   };
-
   const dealsColumns = [
     {
       name: "ID",
-      selector: (row) => row.id,
+      selector: (row) => row.index,
       sortable: true,
     },
     {
       name: "Transaction Type",
       selector: (row) => row.type,
       sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.type}
+            onChange={(e) => {
+              handleEdit(row.id, "type", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.type
+        ),
     },
     {
       name: "Symbol",
       selector: (row) => row.symbol,
       sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.symbol}
+            onChange={(e) => {
+              handleEdit(row.id, "symbol", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.symbol
+        ),
     },
     {
       name: "Sum",
-      selector: (row) => row.sum,
+      selector: (row) => row.volumn,
       sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.volumn}
+            onChange={(e) => {
+              handleEdit(row.id, "volumn", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.volumn
+        ),
     },
     {
       name: "Price",
-      selector: (row) => row.price,
+      selector: (row) => row.symbolValue,
       sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.symbolValue}
+            onChange={(e) => {
+              handleEdit(row.id, "symbolValue", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.symbolValue
+        ),
     },
     {
       name: "Status",
       selector: (row) => row.status,
       sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.status}
+            onChange={(e) => {
+              handleEdit(row.id, "status", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.status
+        ),
     },
     {
       name: "Profit",
       selector: (row) => row.profit,
       sortable: true,
+      cell: (row) =>
+        isEdit ? (
+          <input
+            type="text"
+            value={row.profit}
+            onChange={(e) => {
+              handleEdit(row.id, "profit", e.target.value);
+            }}
+            style={{ width: "100%" }}
+          />
+        ) : (
+          row.profit
+        ),
     },
     {
       name: "Date",
@@ -158,17 +250,6 @@ export default function MainBoard() {
       sortable: true,
     },
   ];
-
-  const dealsData = state?.map((order, i) => ({
-    id: i + 1,
-    type: order?.type,
-    symbol: order?.symbol,
-    sum: order?.volume,
-    price: order?.symbolValue,
-    status: order?.status,
-    profit: order?.profit,
-    createdAt: order?.createdAt,
-  }));
 
   const userColumns = [
     {
@@ -1069,7 +1150,7 @@ export default function MainBoard() {
                 <button
                   id="menu3-edit"
                   className="btn btn-secondary"
-                  onClick={edit}
+                  onClick={() => setIsEdit(true)}
                 >
                   Edit
                 </button>
@@ -1081,66 +1162,17 @@ export default function MainBoard() {
                   Save
                 </button>
               </div>
-              {!isEdit ? (
-                <DataTable
-                  columns={dealsColumns}
-                  data={dealsData}
-                  highlightOnHover
-                  pointerOnHover
-                  pagination
-                  paginationPerPage={5}
-                  paginationRowsPerPageOptions={[5, 10]}
-                  // responsive
-                />
-              ) : (
-                <table
-                  id="menu3-table"
-                  className="table table-hover table-striped"
-                >
-                  <thead>
-                    <tr>
-                      <th className="text-center" scope="col">
-                        ID
-                      </th>
-                      <th className="text-center" scope="col">
-                        Transaction Type
-                      </th>
-                      <th className="text-center" scope="col">
-                        Symbol
-                      </th>
-                      <th className="text-center" scope="col">
-                        Sum
-                      </th>
-                      <th className="text-center" scope="col">
-                        Opening Price
-                      </th>
-                      <th className="text-center" scope="col">
-                        Status
-                      </th>
-                      <th className="text-center" scope="col">
-                        Profit
-                      </th>
-                      <th className="text-center" scope="col">
-                        Date
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {state?.map((order, i) => (
-                      <tr>
-                        <td>{i + 1}</td>
-                        <td>{order?.type}</td>
-                        <td>{order?.symbol}</td>
-                        <td>{order?.volume}</td>
-                        <td>{order?.symbolValue}</td>
-                        <td>{order?.status}</td>
-                        <td>{order?.profit}</td>
-                        <td>{order?.createdAt}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+
+              <DataTable
+                columns={dealsColumns}
+                data={userOrderData}
+                highlightOnHover
+                pointerOnHover
+                pagination
+                paginationPerPage={5}
+                paginationRowsPerPageOptions={[5, 10]}
+                // responsive
+              />
             </div>
           )}
 

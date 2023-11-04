@@ -35,35 +35,50 @@ export default function Sidebar({ setTab, tab }) {
           <li
             id="menu-dash"
             className={tab === "Dashboard" && "active"}
-            onClick={() => setTab("Dashboard")}
+            onClick={() => {
+              setTab("Dashboard");
+              navigate("/home");
+            }}
           >
             Dashboard
           </li>
           <li
             id="menu-leads"
             className={tab === "Players" && "active"}
-            onClick={() => setTab("Players")}
+            onClick={() => {
+              setTab("Players");
+              navigate("/home");
+            }}
           >
             Players
           </li>
           <li
             id="menu-transactions"
             className={tab === "Transactions" && "active"}
-            onClick={() => setTab("Transactions")}
+            onClick={() => {
+              setTab("Transactions");
+              navigate("/home");
+            }}
           >
             Transactions
           </li>
           <li
             id="menu-users"
             className={tab === "Managers" && "active"}
-            onClick={() => setTab("Managers")}
+            onClick={() => {
+              setTab("Managers");
+              navigate("/home");
+            }}
           >
             Managers
           </li>
           <li
             id="menu-calendar"
             className={tab === "Calendar" && "active"}
-            onClick={() => setTab("Calendar")}
+            onClick={() => {
+              setTab("Calendar");
+              navigate("/home");
+            }}
           >
             Calendar
           </li>
