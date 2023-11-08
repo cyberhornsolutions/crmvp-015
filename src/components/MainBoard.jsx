@@ -33,7 +33,7 @@ export default function MainBoard() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const [userOrderData, setUserOrderData] = useState(
-    state?.map((order, i) => ({
+    state?.state?.map((order, i) => ({
       index: i + 1,
       id: order?.id,
       type: order?.type,
@@ -79,7 +79,12 @@ export default function MainBoard() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "users"));
+        const querySnapshot = await getDocs(
+          query(
+            collection(db, "users"),
+            where("useRefCode", "==", state?.user?.refCode)
+          )
+        );
         const userData = [];
 
         querySnapshot.forEach((doc) => {
@@ -95,32 +100,22 @@ export default function MainBoard() {
     fetchUsers();
     setIsEdit(false);
   }, []);
+
   const save = async () => {
-    // console.log("updated data", userOrderData);
-    // const docRef = firestore.collection("your-collection");
+    console.log("updated data", userOrderData);
 
-    // userOrderData.forEach((object) => {
-    //   const { id, index, ...rest } = object;
-    //   console.log("rest------>", rest);
-    //   Update the Firestore document with the given ID and fields in the 'rest' object
-    //   docRef
-    //     .doc(id)
-    //     .update(rest)
-    //     .then(() => {
-    //       console.log(`Document with ID ${id} updated successfully`);
-    //     })
-    //     .catch((error) => {
-    //       console.error(`Error updating document with ID ${id}:`, error);
-    //     });
-    // });
+    userOrderData.forEach(async (object) => {
+      const { id, index, ...rest } = object;
+      console.log("rest------>", rest);
 
-    // const tableCells = document.querySelectorAll("#menu3-table tbody td");
-    // tableCells.forEach((cell) => {
-    //   const input = cell.querySelector("input");
-    //   if (input) {
-    //     cell.textContent = input.value;
-    //   }
-    // });
+      const docRef = doc(db, "orders", id);
+      try {
+        await updateDoc(docRef, rest);
+        console.log(`Document with ID ${id} updated successfully`);
+      } catch (error) {
+        console.error(`Error updating document with ID ${id}:`, error);
+      }
+    });
     setIsEdit(false);
   };
 
@@ -285,19 +280,19 @@ export default function MainBoard() {
     },
     {
       name: "Sale",
-      selector: (row) => row.sale,
+      selector: (row) => (row.sale ? row.sale : "New"),
       sortable: true,
       width: "8%",
     },
     {
       name: "Reten",
-      selector: (row) => row.reten,
+      selector: (row) => (row.reten ? row.reten : "New"),
       sortable: true,
       width: "8%",
     },
     {
       name: "Phone",
-      selector: (row) => row.phone,
+      selector: (row) => (row.phone ? row.phone : "12312321"),
       sortable: true,
       width: "8%",
     },
@@ -309,25 +304,25 @@ export default function MainBoard() {
     },
     {
       name: "Balance",
-      selector: (row) => row.balance,
+      selector: (row) => (row.balance ? row.balance : "100"),
       sortable: true,
       width: "8%",
     },
     {
       name: "Deposit",
-      selector: (row) => row.deposit,
+      selector: (row) => (row.deposit ? row.deposit : "50"),
       sortable: true,
       width: "8%",
     },
     {
       name: "Manager",
-      selector: (row) => row.manager,
+      selector: (row) => (row.manager ? row.manager : "Jhon"),
       sortable: true,
       width: "8%",
     },
     {
       name: "Affiliates",
-      selector: (row) => row.affiliates,
+      selector: (row) => (row.affiliates ? row.affiliates : "Candy Land"),
       sortable: true,
       width: "8%",
     },
@@ -477,7 +472,7 @@ export default function MainBoard() {
         </div>
         <div id="profile-referral-code">
           <h5>Referral code</h5>
-          <input type="text" disabled="true" />
+          <input type="text" disabled="true" value={state?.user?.refCode} />
         </div>
       </div>
 
@@ -1170,7 +1165,7 @@ export default function MainBoard() {
                 pointerOnHover
                 pagination
                 paginationPerPage={5}
-                paginationRowsPerPageOptions={[5, 10]}
+                paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 // responsive
               />
             </div>
@@ -1223,11 +1218,13 @@ export default function MainBoard() {
                   <div id="" className="">
                     <input
                       type="text"
+                      value={state?.user?.name}
                       placeholder="John Doe"
                       className="refInput"
                     />
                     <input
                       type="text"
+                      value={state?.user?.refCode}
                       placeholder="Qc1iOSzP"
                       className="refInput"
                     />
@@ -1243,7 +1240,7 @@ export default function MainBoard() {
                   pointerOnHover
                   pagination
                   paginationPerPage={5}
-                  paginationRowsPerPageOptions={[5, 10]}
+                  paginationRowsPerPageOptions={[5, 10, 20, 50]}
                   responsive
                 />
                 {/* <table

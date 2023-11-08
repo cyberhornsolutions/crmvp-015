@@ -1,52 +1,122 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Nav, Navbar } from "react-bootstrap";
+import { auth, db } from "../firebase";
+import { addDoc, collection, query, onSnapshot } from "firebase/firestore";
+import DataTable from "react-data-table-component";
 
 export default function Users() {
   const [tab, setTab] = useState(0);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("");
+  const [desk, setDesk] = useState("");
+  const [managers, setManagers] = useState([]);
+  const [originalManagers, setOriginalManagers] = useState([]);
 
-  const addUser = () => {
-    var name = document.getElementById("newUserName").value;
-    var email = document.getElementById("newUserEmail").value;
-    var pos = document.getElementById("newUserPosition").value;
-    var desk = document.getElementById("newUserDesk").value;
-
-    var table = document
-      .getElementById("users-table")
-      .getElementsByTagName("tbody")[0];
-    var newRow = table.insertRow(table.rows.length);
-    var cell1 = newRow.insertCell(0);
-    var cellID = newRow.insertCell(1);
-    var cell2 = newRow.insertCell(2);
-    var cell3 = newRow.insertCell(3);
-    var cell4 = newRow.insertCell(4);
-    var cell5 = newRow.insertCell(5);
-    var cell6 = newRow.insertCell(6);
-
-    const randomNum = Math.floor(Math.random() * 100) + 1;
-
-    cell1.innerHTML = '<input type="checkbox">';
-    cellID.innerHTML = randomNum;
-    cell2.innerHTML = name;
-    cell3.innerHTML = email;
-    cell4.innerHTML = pos;
-    cell5.innerHTML = desk;
-
-    // Create a new Date object for the current date and time
-    const currentDate = new Date();
-
-    // Extract the year, month, and day components
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth() + 1; // Month is 0-based, so add 1
-    const day = currentDate.getDate();
-
-    // Create a formatted date string in YYYY-MM-DD format
-    const formattedDate = `${year}-${month < 10 ? "0" : ""}${month}-${
-      day < 10 ? "0" : ""
-    }${day}`;
-
-    cell6.innerHTML = formattedDate;
+  const addUser = async () => {
+    try {
+      const formattedDate = new Date().toLocaleDateString("en-US");
+      const docRef = await addDoc(collection(db, "managers"), {
+        name,
+        email,
+        role,
+        desk,
+        date: formattedDate,
+      });
+      console.log("Manager Record Added Successfully.!", docRef);
+      setName("");
+      setEmail("");
+      setDesk("");
+      setRole("");
+    } catch (error) {
+      console.log("Error While Adding The Manager Record : ", error);
+    }
   };
+  const fetchManagers = async () => {
+    try {
+      const q = query(collection(db, "managers"));
 
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const managerData = [];
+        let index = 0;
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          index += 1;
+          managerData.push({
+            index,
+            id: doc.id,
+            ...data,
+          });
+        });
+        setManagers(managerData);
+        setOriginalManagers(managerData);
+      });
+      return () => {
+        unsubscribe();
+      };
+    } catch (error) {
+      console.error("Error fetching managers:", error);
+    }
+  };
+  const columns = [
+    {
+      name: "ID",
+      selector: (row) => row.index,
+    },
+    {
+      name: "Name", // Translate the header using your t function
+      selector: (row) => row.name,
+      sortable: true,
+    },
+    {
+      name: "Email",
+      selector: (row) => row.email,
+      sortable: true,
+    },
+    {
+      name: "Position",
+      selector: (row) => row.role,
+      sortable: true,
+    },
+    {
+      name: "Desk",
+      selector: (row) => row.desk,
+      sortable: true,
+    },
+    {
+      name: "Date",
+      selector: (row) => row.date,
+      sortable: true,
+    },
+  ];
+  const filterManagers = (role, tab) => {
+    let filteredManagersArray;
+
+    if (role === "All") {
+      filteredManagersArray = originalManagers;
+    } else {
+      filteredManagersArray = originalManagers.filter(
+        (manager) => manager.role === role
+      );
+    }
+
+    setManagers(filteredManagersArray);
+    setTab(tab);
+  };
+  const dataTable = () => {
+    return (
+      <DataTable
+        columns={columns}
+        data={managers}
+        pagination
+        paginationPerPage={5}
+        paginationRowsPerPageOptions={[5, 10, 20, 50]}
+        highlightOnHover
+        pointerOnHover
+        responsive
+      />
+    );
+  };
   const deleteUser = () => {
     var table = document.getElementById("users-table");
     var checkboxes = table.querySelectorAll(
@@ -57,7 +127,9 @@ export default function Users() {
       row.remove();
     });
   };
-
+  useEffect(() => {
+    fetchManagers();
+  }, []);
   return (
     <div id="users" className="active">
       <div
@@ -68,25 +140,25 @@ export default function Users() {
           <Nav className="me-auto" style={{ gap: "2px" }}>
             <Nav.Link
               className={tab === 0 && "active"}
-              onClick={() => setTab(0)}
+              onClick={() => filterManagers("All", 0)}
             >
               All
             </Nav.Link>
             <Nav.Link
               className={tab === 1 && "active"}
-              onClick={() => setTab(1)}
+              onClick={() => filterManagers("Sale", 1)}
             >
               Sale
             </Nav.Link>
             <Nav.Link
               className={tab === 2 && "active"}
-              onClick={() => setTab(2)}
+              onClick={() => filterManagers("Reten", 2)}
             >
               Reten
             </Nav.Link>
             <Nav.Link
               className={tab === 3 && "active"}
-              onClick={() => setTab(3)}
+              onClick={() => filterManagers("Teams", 3)}
             >
               Teams
             </Nav.Link>
@@ -161,233 +233,13 @@ export default function Users() {
           />
         </div>
         <div className="tab-content">
-          {tab === 0 && (
-            <div>
-              <table
-                id="users-table"
-                className="table table-hover table-striped"
-              >
-                <thead>
-                  <tr>
-                    <th className="text-center" scope="col"></th>
-                    <th className="text-center" scope="col">
-                      ID
-                    </th>
-                    <th className="text-center" scope="col">
-                      Name
-                    </th>
-                    <th className="text-center" scope="col">
-                      Email
-                    </th>
-                    <th className="text-center" scope="col">
-                      Position
-                    </th>
-                    <th className="text-center" scope="col">
-                      Desk
-                    </th>
-                    <th className="text-center" scope="col">
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                    <td>1</td>
-                    <td>Jason Bandera</td>
-                    <td>testmail@gmail.com</td>
-                    <td>Sale</td>
-                    <td>Demo</td>
-                    <td>2023-09-03</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                    <td>2</td>
-                    <td>Antony Obama</td>
-                    <td>testmail2@gmail.com</td>
-                    <td>Admin</td>
-                    <td>Demo</td>
-                    <td>2023-08-13</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
+          {tab === 0 && <div>{dataTable()}</div>}
 
-          {tab === 1 && (
-            <div>
-              <table
-                id="users-table"
-                className="table table-hover table-striped"
-              >
-                <thead>
-                  <tr>
-                    <th className="text-center" scope="col"></th>
-                    <th className="text-center" scope="col">
-                      ID
-                    </th>
-                    <th className="text-center" scope="col">
-                      Name
-                    </th>
-                    <th className="text-center" scope="col">
-                      Email
-                    </th>
-                    <th className="text-center" scope="col">
-                      Position
-                    </th>
-                    <th className="text-center" scope="col">
-                      Desk
-                    </th>
-                    <th className="text-center" scope="col">
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                    <td>3</td>
-                    <td>Jason Bandera</td>
-                    <td>testmail@gmail.com</td>
-                    <td>Sale</td>
-                    <td>Demo</td>
-                    <td>2023-09-03</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                    <td>4</td>
-                    <td>Antony Obama</td>
-                    <td>testmail2@gmail.com</td>
-                    <td>Admin</td>
-                    <td>Demo</td>
-                    <td>2023-08-13</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
+          {tab === 1 && <div>{dataTable()}</div>}
 
-          {tab === 2 && (
-            <div>
-              <table
-                id="users-table"
-                className="table table-hover table-striped"
-              >
-                <thead>
-                  <tr>
-                    <th className="text-center" scope="col"></th>
-                    <th className="text-center" scope="col">
-                      ID
-                    </th>
-                    <th className="text-center" scope="col">
-                      Name
-                    </th>
-                    <th className="text-center" scope="col">
-                      Email
-                    </th>
-                    <th className="text-center" scope="col">
-                      Position
-                    </th>
-                    <th className="text-center" scope="col">
-                      Desk
-                    </th>
-                    <th className="text-center" scope="col">
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                    <td>5</td>
-                    <td>Jason Bandera</td>
-                    <td>testmail@gmail.com</td>
-                    <td>Sale</td>
-                    <td>Demo</td>
-                    <td>2023-09-03</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                    <td>6</td>
-                    <td>Antony Obama</td>
-                    <td>testmail2@gmail.com</td>
-                    <td>Admin</td>
-                    <td>Demo</td>
-                    <td>2023-08-13</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
+          {tab === 2 && <div>{dataTable()}</div>}
 
-          {tab === 3 && (
-            <div>
-              <table
-                id="users-table"
-                className="table table-hover table-striped"
-              >
-                <thead>
-                  <tr>
-                    <th className="text-center" scope="col"></th>
-                    <th className="text-center" scope="col">
-                      ID
-                    </th>
-                    <th className="text-center" scope="col">
-                      Name
-                    </th>
-                    <th className="text-center" scope="col">
-                      Email
-                    </th>
-                    <th className="text-center" scope="col">
-                      Position
-                    </th>
-                    <th className="text-center" scope="col">
-                      Desk
-                    </th>
-                    <th className="text-center" scope="col">
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                    <td>7</td>
-                    <td>Jason Bandera</td>
-                    <td>testmail@gmail.com</td>
-                    <td>Sale</td>
-                    <td>Demo</td>
-                    <td>2023-09-03</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                    <td>8</td>
-                    <td>Antony Obama</td>
-                    <td>testmail2@gmail.com</td>
-                    <td>Admin</td>
-                    <td>Demo</td>
-                    <td>2023-08-13</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
+          {tab === 3 && <div>{dataTable()}</div>}
         </div>
       </div>
       <div
@@ -397,10 +249,34 @@ export default function Users() {
         <h5>Manage</h5>
         <form id="addNewUser">
           <div id="new-user-fields" className="px-2">
-            <input type="text" placeholder="Name" id="newUserName" />
-            <input type="email" placeholder="Email" id="newUserEmail" />
-            <input type="text" placeholder="Position" id="newUserPosition" />
-            <input type="text" placeholder="Desk" id="newUserDesk" />
+            <input
+              type="text"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Name"
+              id="newUserName"
+            />
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Email"
+              id="newUserEmail"
+            />
+            <input
+              type="text"
+              value={role}
+              onChange={(event) => setRole(event.target.value)}
+              placeholder="Position"
+              id="newUserPosition"
+            />
+            <input
+              type="text"
+              value={desk}
+              onChange={(event) => setDesk(event.target.value)}
+              placeholder="Desk"
+              id="newUserDesk"
+            />
           </div>
         </form>
         <div className="mt-3">
