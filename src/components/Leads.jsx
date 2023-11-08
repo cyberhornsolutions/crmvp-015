@@ -20,6 +20,7 @@ export default function Leads({ setTab }) {
   const [users, setUsers] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
   const [statusUpdate, setStatusUpdate] = useState(false);
+  const [selectedUser, setSelectedUser] = useState({});
   const navigate = useNavigate();
 
   const progressBarConfig = {
@@ -53,10 +54,10 @@ export default function Leads({ setTab }) {
     fetchUsers();
   }, [statusUpdate]);
 
-  const fetchOrders = async (userId) => {
-    console.log("UserId", userId);
+  const fetchOrders = async (row) => {
+    console.log("UserId", row?.id);
     try {
-      const q = query(collection(db, "orders"), where("userId", "==", userId));
+      const q = query(collection(db, "orders"), where("userId", "==", row?.id));
 
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const orders = [];
@@ -65,7 +66,7 @@ export default function Leads({ setTab }) {
         });
         setOrdersData(orders);
       });
-
+      setSelectedUser(row);
       // Return a cleanup function to unsubscribe when the component unmounts
       return () => {
         unsubscribe();
@@ -146,7 +147,13 @@ export default function Leads({ setTab }) {
     {
       name: "Name",
       cell: (row) => (
-        <div onClick={() => fetchOrders(row.id)}>
+        <div
+          onClick={() => fetchOrders(row)}
+          onDoubleClick={async () => {
+            await fetchOrders(row.id);
+            navigate("/home/mainBoard", { state: ordersData });
+          }}
+        >
           {row.surname === undefined ? row.name : row.name + " " + row.surname}
         </div>
       ),
@@ -400,7 +407,7 @@ export default function Leads({ setTab }) {
             pointerOnHover
             pagination
             paginationPerPage={5}
-            paginationRowsPerPageOptions={[5, 10]}
+            paginationRowsPerPageOptions={[5, 10, 20, 50]}
             // responsive
           />
         </div>
@@ -514,7 +521,11 @@ export default function Leads({ setTab }) {
             id="lead-card-button"
             type="button"
             className="btn btn-secondary"
-            onClick={() => navigate("/home/mainBoard", { state: ordersData })}
+            onClick={() =>
+              navigate("/home/mainBoard", {
+                state: { state: ordersData, user: selectedUser },
+              })
+            }
           >
             Player card
           </button>
@@ -525,7 +536,7 @@ export default function Leads({ setTab }) {
             data={data}
             pagination
             paginationPerPage={5}
-            paginationRowsPerPageOptions={[5, 10]}
+            paginationRowsPerPageOptions={[5, 10, 20, 50]}
             highlightOnHover
             pointerOnHover
             // responsive
