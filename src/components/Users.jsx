@@ -173,46 +173,6 @@ export default function Users() {
             // height: 25,
           }}
         >
-          {/* <button
-            className="btn dropdown-toggle"
-            type="button"
-            id="usersDropdown"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            Search
-          </button>
-          <div className="dropdown-menu" aria-labelledby="usersDropdown">
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By name"
-            >
-              By name
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By email"
-            >
-              By email
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By position"
-            >
-              By position
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By desk"
-            >
-              By desk
-            </a>
-          </div> */}
           <select className="btn dropdown-toggle">
             <option
               className="dropdown-item text-left"
