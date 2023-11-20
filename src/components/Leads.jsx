@@ -13,6 +13,9 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { Dropdown, ProgressBar } from "react-bootstrap";
 import DataTable from "react-data-table-component";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faClose } from "@fortawesome/free-solid-svg-icons";
+import DelOrderModal from "./DelOrderModal";
 
 export default function Leads({ setTab }) {
   const [selected, setSelected] = useState();
@@ -21,6 +24,7 @@ export default function Leads({ setTab }) {
   const [ordersData, setOrdersData] = useState([]);
   const [statusUpdate, setStatusUpdate] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
+  const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const progressBarConfig = {
@@ -29,7 +33,13 @@ export default function Leads({ setTab }) {
     Confirmed: { variant: "warning", now: 75 },
     Closed: { variant: "danger", now: 100 },
   };
-
+  const handleCloseModal = () => {
+    console.log("hhhhhhh");
+    setIsDelModalOpen(false);
+  };
+  const handleDelModal = () => {
+    setIsDelModalOpen(true);
+  };
   console.log("OrdersData", ordersData);
 
   console.log("Users:", users);
@@ -67,6 +77,7 @@ export default function Leads({ setTab }) {
         setOrdersData(orders);
       });
       setSelectedUser(row);
+      setSelected(row?.id);
       // Return a cleanup function to unsubscribe when the component unmounts
       return () => {
         unsubscribe();
@@ -121,6 +132,26 @@ export default function Leads({ setTab }) {
       selector: (row) => row.createdAt,
       sortable: true,
     },
+    {
+      name: "",
+      selector: (row) => (
+        <div className="order-actions">
+          <div className="custom-edit-icon" onClick={() => {}}>
+            <FontAwesomeIcon icon={faEdit} />
+          </div>
+          <div
+            style={{ marginLeft: "10px" }}
+            className="custom-delete-icon"
+            onClick={() => {
+              handleDelModal();
+            }}
+          >
+            <FontAwesomeIcon icon={faClose} />
+          </div>
+        </div>
+      ),
+      sortable: true,
+    },
   ];
 
   const data = ordersData?.map((order, i) => ({
@@ -136,8 +167,13 @@ export default function Leads({ setTab }) {
   const userColumns = [
     {
       name: "ID",
-      selector: (row) => row.id,
-      sortable: true,
+      selector: (row) => (
+        <div className="online-container">
+          <div className="status"></div>
+          <div>{row.id}</div>
+        </div>
+      ),
+      sortable: false,
     },
     {
       name: "Registered",
@@ -235,95 +271,110 @@ export default function Leads({ setTab }) {
     id: user?.id,
   }));
   return (
-    <div id="leads" className="active">
-      <div id="leads-div">
-        <div className="dropdown">
-          <select className="btn dropdown-toggle">
-            <option
-              className="dropdown-item text-center"
-              style={{ display: "none" }}
-            >
-              Search
-            </option>
+    <>
+      <div id="leads" className="active">
+        <div id="leads-div">
+          <div className="dropdown">
+            <select className="btn dropdown-toggle">
+              <option
+                className="dropdown-item text-center"
+                style={{ display: "none" }}
+              >
+                Search
+              </option>
 
-            <option
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By name"
-            >
-              By name
-            </option>
-            <option
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By phone"
-            >
-              By phone
-            </option>
-            <option
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By email"
-            >
-              By email
-            </option>
-          </select>
-          <input
-            type="text"
-            id="leadsSearchInput"
-            onKeyUp="leadsSearch()"
-            placeholder="Search.."
-          />
+              <option
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By name"
+              >
+                By name
+              </option>
+              <option
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By phone"
+              >
+                By phone
+              </option>
+              <option
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By email"
+              >
+                By email
+              </option>
+            </select>
+            <div className="show_all">
+              <button className="btn btn-secondary">Show All</button>
+            </div>
+            <div className="search_div">
+              <button className="btn btn-secondary show_online">
+                Show Online
+              </button>
+              <input
+                type="text"
+                id="leadsSearchInput"
+                onKeyUp="leadsSearch()"
+                placeholder="Search.."
+              />
+            </div>
+          </div>
+          <div className="">
+            <DataTable
+              columns={userColumns}
+              data={mappedData}
+              highlightOnHover
+              pointerOnHover
+              pagination
+              paginationPerPage={5}
+              paginationRowsPerPageOptions={[5, 10, 20, 50]}
+              // responsive
+            />
+          </div>
         </div>
-        <div className="">
-          <DataTable
-            columns={userColumns}
-            data={mappedData}
-            highlightOnHover
-            pointerOnHover
-            pagination
-            paginationPerPage={5}
-            paginationRowsPerPageOptions={[5, 10, 20, 50]}
-            // responsive
-          />
-        </div>
-      </div>
-      <div
-        id="lead-transactions"
-        // className="hidden"
-      >
         <div
-          id="lead-transactions-header"
-          className="lead-transactions-header-height"
+          id="lead-transactions"
+          // className="hidden"
         >
-          <h2>Deals</h2>
-          <h2 id="lead-transactions-name">{selected}</h2>
-
-          <button
-            id="lead-card-button"
-            type="button"
-            className="btn btn-secondary"
-            onClick={() =>
-              navigate("/home/mainBoard", {
-                state: { state: ordersData, user: selectedUser },
-              })
-            }
+          <div
+            id="lead-transactions-header"
+            className="lead-transactions-header-height"
           >
-            Player card
-          </button>
-        </div>
-        <div>
-          <DataTable
-            columns={columns}
-            data={data}
-            pagination
-            paginationPerPage={5}
-            paginationRowsPerPageOptions={[5, 10, 20, 50]}
-            highlightOnHover
-            pointerOnHover
-          />
+            <div style={{ display: "flex" }}>
+              <h2>Deals</h2>
+              <h2 id="lead-transactions-name">{selected}</h2>
+            </div>
+
+            <button
+              id="lead-card-button"
+              type="button"
+              className="btn btn-secondary"
+              onClick={() =>
+                navigate("/home/mainBoard", {
+                  state: { state: ordersData, user: selectedUser },
+                })
+              }
+            >
+              Player card
+            </button>
+          </div>
+          <div>
+            <DataTable
+              columns={columns}
+              data={data}
+              pagination
+              paginationPerPage={5}
+              paginationRowsPerPageOptions={[5, 10, 20, 50]}
+              highlightOnHover
+              pointerOnHover
+            />
+          </div>
         </div>
       </div>
-    </div>
+      {isDelModalOpen && (
+        <DelOrderModal show={isDelModalOpen} onClose={handleCloseModal} />
+      )}
+    </>
   );
 }

@@ -16,6 +16,9 @@ export default function Login() {
       <div id="title">
         <h2>CRM</h2>
       </div>
+      <div className="admin_role">
+        <input type="radio" value="Admin" name="role" /> <span>Admin</span>
+      </div>
       <div className="fields">
         <input
           className="email_input  text-left"
@@ -33,7 +36,14 @@ export default function Login() {
           required
         />
       </div>
-
+      <div className="other_roles">
+        <div className="other_role">
+          <input type="radio" value="Sale" name="role" /> <span>Sale</span>
+        </div>
+        <div className="other_role">
+          <input type="radio" value="Reten" name="role" /> <span>Reten</span>
+        </div>
+      </div>
       <button className="button" onClick={() => navigate("/home")}>
         Enter
       </button>

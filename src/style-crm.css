@@ -43,6 +43,19 @@ body {
   border-radius: 5px;
   box-shadow: 0px 0px 5px var(--main-elc2);
 }
+.login_form .admin_role span,
+.login_form .other_role span {
+  color: #fff !important;
+}
+.login_form .other_roles {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 10px;
+}
+.login_form .admin_role input[type="radio"],
+.login_form .other_role input[type="radio"] {
+  accent-color: #232323;
+}
 
 .logo_wrapper {
   display: flex;
