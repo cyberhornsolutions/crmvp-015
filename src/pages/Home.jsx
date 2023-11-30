@@ -8,11 +8,14 @@ import Users from "../components/Users";
 import Calendar from "../components/Calendar";
 import MainBoard from "../components/MainBoard";
 import Symbols from "../components/Symbols";
+import { ToastContainer } from "react-toastify";
 
 export default function Home() {
   const [tab, setTab] = useState("Dashboard");
   return (
     <div id="content">
+      <ToastContainer />
+
       <Sidebar tab={tab} setTab={setTab} />
       <div id="main">
         <Header title={tab} />

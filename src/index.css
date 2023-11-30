@@ -73,3 +73,7 @@ button:focus-visible {
 .dropdown-toggle {
   border: none;
 }
+
+.editInput {
+  border: 1px solid black;
+}

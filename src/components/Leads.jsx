@@ -159,6 +159,8 @@ export default function Leads({ setTab }) {
           <div
             className="custom-edit-icon"
             onClick={() => {
+              console.log(row, 888888);
+
               setSelectedOrder(row);
               setIsEdit(true);
             }}
@@ -182,12 +184,18 @@ export default function Leads({ setTab }) {
 
   const data = ordersData?.map((order, i) => ({
     id: i + 1,
+    docId: order.id,
     type: order?.type,
     symbol: order?.symbol,
     sum: order?.volume,
     price: order?.symbolValue,
     profit: order?.profit,
     createdAt: order?.createdAt,
+    createdTime: order.createdTime,
+    sl: order.sl,
+    tp: order.tp,
+    userId: order.userId,
+    status: order.status,
   }));
 
   const userColumns = [
@@ -422,6 +430,7 @@ export default function Leads({ setTab }) {
           show={isEdit}
           onClose={handleCloseModal}
           selectedOrder={selectedOrder}
+          fetchOrders={fetchOrders}
         />
       )}
     </>
