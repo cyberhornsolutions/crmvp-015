@@ -14,9 +14,10 @@ import { useNavigate } from "react-router-dom";
 import { Dropdown, ProgressBar } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faClose } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faClose, faL } from "@fortawesome/free-solid-svg-icons";
 import DelOrderModal from "./DelOrderModal";
-
+import CircleIcon from "@mui/icons-material/Circle";
+import EditOrder from "./EditOrder";
 export default function Leads({ setTab }) {
   const [selected, setSelected] = useState();
   const [popup, setPopup] = useState(false);
@@ -24,7 +25,10 @@ export default function Leads({ setTab }) {
   const [ordersData, setOrdersData] = useState([]);
   const [statusUpdate, setStatusUpdate] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
+  const [selectedOrder, setSelectedOrder] = useState();
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
   const navigate = useNavigate();
 
   const progressBarConfig = {
@@ -36,7 +40,9 @@ export default function Leads({ setTab }) {
   const handleCloseModal = () => {
     console.log("hhhhhhh");
     setIsDelModalOpen(false);
+    setIsEdit(false);
   };
+
   const handleDelModal = () => {
     setIsDelModalOpen(true);
   };
@@ -44,40 +50,54 @@ export default function Leads({ setTab }) {
 
   console.log("Users:", users);
 
+  const fetchUsers = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "users"));
+      const userData = [];
+
+      querySnapshot.forEach((doc) => {
+        userData.push({ id: doc.id, ...doc.data() });
+      });
+
+      setUsers(userData);
+      setStatusUpdate(false);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const showOnline = async () => {
+    setIsOnline(true);
+    const result = users.filter((el) => el.onlineStatus == true);
+    setUsers(result);
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "users"));
-        const userData = [];
+    if (isOnline == false) {
+      fetchUsers();
+    }
+  }, [statusUpdate, isOnline]);
 
-        querySnapshot.forEach((doc) => {
-          userData.push({ id: doc.id, ...doc.data() });
-        });
-
-        setUsers(userData);
-        setStatusUpdate(false);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
-
-    fetchUsers();
-  }, [statusUpdate]);
-
-  const fetchOrders = async (row) => {
+  const fetchOrders = async (row, isOk) => {
     console.log("UserId", row?.id);
+    const orders = [];
+
     try {
       const q = query(collection(db, "orders"), where("userId", "==", row?.id));
 
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const orders = [];
-        querySnapshot.forEach((doc) => {
-          orders.push({ id: doc.id, ...doc.data() });
+      const unsubscribe = await onSnapshot(q, async (querySnapshot) => {
+        await querySnapshot.forEach(async (doc) => {
+          await orders.push({ id: doc.id, ...doc.data() });
         });
         setOrdersData(orders);
+        if (isOk) {
+          navigate("/home/mainBoard", { state: { state: orders, user: row } });
+        }
       });
       setSelectedUser(row);
       setSelected(row?.id);
+      console.log(orders, row, 222);
+
       // Return a cleanup function to unsubscribe when the component unmounts
       return () => {
         unsubscribe();
@@ -136,7 +156,13 @@ export default function Leads({ setTab }) {
       name: "",
       selector: (row) => (
         <div className="order-actions">
-          <div className="custom-edit-icon" onClick={() => {}}>
+          <div
+            className="custom-edit-icon"
+            onClick={() => {
+              setSelectedOrder(row);
+              setIsEdit(true);
+            }}
+          >
             <FontAwesomeIcon icon={faEdit} />
           </div>
           <div
@@ -168,9 +194,13 @@ export default function Leads({ setTab }) {
     {
       name: "ID",
       selector: (row) => (
-        <div className="online-container">
-          <div className="status"></div>
-          <div>{row.id}</div>
+        <div className="d-flex">
+          {row.onlineStatus ? (
+            <CircleIcon className="onlineGreen" />
+          ) : (
+            <CircleIcon className="onlineRed" />
+          )}
+          <p>{row.id}</p>
         </div>
       ),
       sortable: false,
@@ -186,8 +216,7 @@ export default function Leads({ setTab }) {
         <div
           onClick={() => fetchOrders(row)}
           onDoubleClick={async () => {
-            await fetchOrders(row.id);
-            navigate("/home/mainBoard", { state: ordersData });
+            await fetchOrders(row, true);
           }}
         >
           {row.surname === undefined ? row.name : row.name + " " + row.surname}
@@ -306,10 +335,23 @@ export default function Leads({ setTab }) {
               </option>
             </select>
             <div className="show_all">
-              <button className="btn btn-secondary">Show All</button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  setIsOnline(false);
+                  fetchUsers();
+                }}
+              >
+                Show All
+              </button>
             </div>
             <div className="search_div">
-              <button className="btn btn-secondary show_online">
+              <button
+                className="btn btn-secondary show_online"
+                onClick={() => {
+                  showOnline();
+                }}
+              >
                 Show Online
               </button>
               <input
@@ -374,6 +416,13 @@ export default function Leads({ setTab }) {
       </div>
       {isDelModalOpen && (
         <DelOrderModal show={isDelModalOpen} onClose={handleCloseModal} />
+      )}
+      {isEdit && (
+        <EditOrder
+          show={isEdit}
+          onClose={handleCloseModal}
+          selectedOrder={selectedOrder}
+        />
       )}
     </>
   );

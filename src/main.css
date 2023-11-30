@@ -456,7 +456,7 @@ td:hover {
 .online-container {
   /* display: flex; */
 }
-.online-container .status {
+.status {
   width: 10px;
   height: 10px;
   background-color: green;
@@ -1043,4 +1043,16 @@ td.editing {
 }
 .active-status.dropdown-item {
   padding: 0px;
+}
+
+.onlineRed {
+  color: red;
+  width: 1.2rem !important;
+  height: 1.2rem !important;
+}
+
+.onlineGreen {
+  color: green;
+  width: 1.2rem !important;
+  height: 1.2rem !important;
 }

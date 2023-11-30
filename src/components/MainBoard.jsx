@@ -99,7 +99,7 @@ export default function MainBoard() {
 
     fetchUsers();
     setIsEdit(false);
-  }, []);
+  }, [state?.state?.length]);
 
   const save = async () => {
     console.log("updated data", userOrderData);

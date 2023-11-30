@@ -50,133 +50,149 @@ export default function Transactions() {
           >
             Search
           </button>*/}
+          <div>
+            <div
+              className="dropdown-menu"
+              aria-labelledby="transactionsDropdown"
+            >
+              <a
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By manager"
+              >
+                By manager
+              </a>
+              <a
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By date"
+              >
+                By date
+              </a>
+              <a
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By player"
+              >
+                By player
+              </a>
+              <a
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By status"
+              >
+                By status
+              </a>
+              <a
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By desk"
+              >
+                By desk
+              </a>
+              <a
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By sum"
+              >
+                By sum
+              </a>
+              <a
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By type"
+              >
+                By type
+              </a>
+              <a
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By ID"
+              >
+                By ID
+              </a>
+              <a
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By method"
+              >
+                By method
+              </a>
+              <a
+                className="dropdown-item text-center"
+                href="#"
+                data-option="By card"
+              >
+                By card
+              </a>
+            </div>
+            <select className="btn dropdown-toggle">
+              <option
+                className="dropdown-item text-left"
+                style={{ display: "none" }}
+              >
+                Search
+              </option>
 
-          <div className="dropdown-menu" aria-labelledby="transactionsDropdown">
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By manager"
-            >
-              By manager
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By date"
-            >
-              By date
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By player"
-            >
-              By player
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By status"
-            >
-              By status
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By desk"
-            >
-              By desk
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By sum"
-            >
-              By sum
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By type"
-            >
-              By type
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By ID"
-            >
-              By ID
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By method"
-            >
-              By method
-            </a>
-            <a
-              className="dropdown-item text-center"
-              href="#"
-              data-option="By card"
-            >
-              By card
-            </a>
+              <option
+                className="dropdown-item text-left"
+                data-option="By manager"
+              >
+                By manager
+              </option>
+              <option className="dropdown-item text-left" data-option="By date">
+                By date
+              </option>
+              <option
+                className="dropdown-item text-left"
+                data-option="By player"
+              >
+                By player
+              </option>
+              <option
+                className="dropdown-item text-left"
+                data-option="By status"
+              >
+                By status
+              </option>
+              <option className="dropdown-item text-left" data-option="By desk">
+                By desk
+              </option>
+              <option className="dropdown-item text-left" data-option="By sum">
+                By sum
+              </option>
+              <option className="dropdown-item text-left" data-option="By type">
+                By type
+              </option>
+              <option className="dropdown-item text-left" data-option="By ID">
+                By ID
+              </option>
+              <option
+                className="dropdown-item text-left"
+                data-option="By method"
+              >
+                By method
+              </option>
+              <option className="dropdown-item text-left" data-option="By card">
+                By card
+              </option>
+            </select>
+            <input
+              type="text"
+              id="transactionsSearchInput"
+              onkeyup="transactionSearch()"
+              placeholder="Search.."
+              className="p-1"
+            />
           </div>
-          <select className="btn dropdown-toggle">
-            <option
-              className="dropdown-item text-left"
-              style={{ display: "none" }}
-            >
-              Search
-            </option>
-
-            <option
-              className="dropdown-item text-left"
-              data-option="By manager"
-            >
-              By manager
-            </option>
-            <option className="dropdown-item text-left" data-option="By date">
-              By date
-            </option>
-            <option className="dropdown-item text-left" data-option="By player">
-              By player
-            </option>
-            <option className="dropdown-item text-left" data-option="By status">
-              By status
-            </option>
-            <option className="dropdown-item text-left" data-option="By desk">
-              By desk
-            </option>
-            <option className="dropdown-item text-left" data-option="By sum">
-              By sum
-            </option>
-            <option className="dropdown-item text-left" data-option="By type">
-              By type
-            </option>
-            <option className="dropdown-item text-left" data-option="By ID">
-              By ID
-            </option>
-            <option className="dropdown-item text-left" data-option="By method">
-              By method
-            </option>
-            <option className="dropdown-item text-left" data-option="By card">
-              By card
-            </option>
-          </select>
-          <button class="btn btn-secondary" id="editTransactions">
-            Edit
-          </button>
-          <button class="btn btn-secondary" id="saveTransactions">
-            Save
-          </button>
-          <input
-            type="text"
-            id="transactionsSearchInput"
-            onkeyup="transactionSearch()"
-            placeholder="Search.."
-          />
+          <div>
+            <button class="btn btn-secondary ml-2" id="editTransactions">
+              Edit
+            </button>
+            <button class="btn btn-secondary ml-2" id="saveTransactions">
+              Save
+            </button>
+          </div>
         </div>
         <table
           id="transactions-table"

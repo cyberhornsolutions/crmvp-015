@@ -7,6 +7,7 @@ import Transactions from "../components/Transactions";
 import Users from "../components/Users";
 import Calendar from "../components/Calendar";
 import MainBoard from "../components/MainBoard";
+import Symbols from "../components/Symbols";
 
 export default function Home() {
   const [tab, setTab] = useState("Dashboard");
@@ -20,6 +21,7 @@ export default function Home() {
           {tab === "Players" && <Leads setTab={setTab} />}
           {tab === "Transactions" && <Transactions />}
           {tab === "Managers" && <Users />}
+          {tab === "Symbols" && <Symbols />}
           {tab === "Calendar" && <Calendar />}
           {tab === "MainBoard" && <MainBoard />}
         </div>
