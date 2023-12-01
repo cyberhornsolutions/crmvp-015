@@ -99,6 +99,10 @@ export default function Sidebar({ setTab, tab }) {
               borderTop: "1px solid whitesmoke",
               paddingTop: 25,
             }}
+            onClick={() => {
+              setTab("Affiliates");
+              navigate("/home");
+            }}
           >
             Affiliates
           </li>

@@ -200,6 +200,17 @@ export default function Leads({ setTab }) {
 
   const userColumns = [
     {
+      name: "",
+      selector: "",
+      cell: (row) => (
+        <input
+          type="checkbox"
+          checked={row.checked}
+          // onChange={() => handleCheckboxChange(row.id)}
+        />
+      ),
+    },
+    {
       name: "ID",
       selector: (row) => (
         <div className="d-flex">
@@ -216,7 +227,7 @@ export default function Leads({ setTab }) {
     {
       name: "Registered",
       selector: (row) => row.createdAt,
-      sortable: true,
+      sortable: false,
     },
     {
       name: "Name",
@@ -231,6 +242,20 @@ export default function Leads({ setTab }) {
         </div>
       ),
       sortable: true,
+      sortFunction: (rowA, rowB) => {
+        const a = rowA.name;
+        const b = rowB.name;
+
+        if (a > b) {
+          return 1;
+        }
+
+        if (b > a) {
+          return -1;
+        }
+
+        return 0;
+      },
     },
     {
       name: "Status",
@@ -263,42 +288,56 @@ export default function Leads({ setTab }) {
     {
       name: "Sale",
       selector: (row) => (row.sale ? row.sale : "New"),
-      sortable: true,
+      sortable: false,
     },
     {
       name: "Reten",
       selector: (row) => (row.reten ? row.reten : "New"),
-      sortable: true,
+      sortable: false,
     },
     {
       name: "Phone",
       selector: (row) => (row.phone ? row.phone : "12312321"),
-      sortable: true,
+      // sortable: false,
     },
     {
       name: "Email",
       selector: (row) => row.email,
       sortable: true,
+      sortFunction: (rowA, rowB) => {
+        const a = rowA.email;
+        const b = rowB.email;
+
+        if (a > b) {
+          return 1;
+        }
+
+        if (b > a) {
+          return -1;
+        }
+
+        return 0;
+      },
     },
     {
       name: "Balance",
       selector: (row) => row.totalBalance,
-      sortable: true,
+      // sortable: true,
     },
     {
       name: "Deposit",
       selector: (row) => (row.deposit ? row.deposit : "50"),
-      sortable: true,
+      // sortable: true,
     },
     {
       name: "Manager",
       selector: (row) => (row.manager ? row.manager : "Jhon"),
-      sortable: true,
+      // sortable: true,
     },
     {
       name: "Affiliates",
       selector: (row) => (row.affiliates ? row.affiliates : "Candy Land"),
-      sortable: true,
+      // sortable: true,
     },
   ];
 

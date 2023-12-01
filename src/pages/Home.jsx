@@ -25,6 +25,7 @@ export default function Home() {
           {tab === "Transactions" && <Transactions />}
           {tab === "Managers" && <Users />}
           {tab === "Symbols" && <Symbols />}
+          {tab === "Affiliates" && <Symbols />}
           {tab === "Calendar" && <Calendar />}
           {tab === "MainBoard" && <MainBoard />}
         </div>
