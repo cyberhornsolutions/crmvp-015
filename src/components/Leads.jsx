@@ -29,6 +29,7 @@ export default function Leads({ setTab }) {
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
+  const [userProfit, setUserProfit] = useState(0);
   const navigate = useNavigate();
 
   const progressBarConfig = {
@@ -89,9 +90,18 @@ export default function Leads({ setTab }) {
         await querySnapshot.forEach(async (doc) => {
           await orders.push({ id: doc.id, ...doc.data() });
         });
+        let profit = 0;
+        orders?.map((el) => {
+          if (el.status == "success") {
+            profit = profit + parseFloat(el.profit);
+          }
+          setUserProfit(profit);
+        });
         setOrdersData(orders);
         if (isOk) {
-          navigate("/home/mainBoard", { state: { state: orders, user: row } });
+          navigate("/home/mainBoard", {
+            state: { state: orders, user: row, profit: userProfit },
+          });
         }
       });
       setSelectedUser(row);
@@ -346,6 +356,17 @@ export default function Leads({ setTab }) {
     status: user?.status,
     id: user?.id,
   }));
+
+  const conditionalRowStyles = [
+    {
+      when: (row) => row.toggleSelected,
+      style: {
+        backgroundColor: "green",
+        userSelect: "none",
+      },
+    },
+  ];
+
   return (
     <>
       <div id="leads" className="active">
@@ -418,6 +439,8 @@ export default function Leads({ setTab }) {
               pagination
               paginationPerPage={5}
               paginationRowsPerPageOptions={[5, 10, 20, 50]}
+              conditionalRowStyles={conditionalRowStyles}
+
               // responsive
             />
           </div>
@@ -435,7 +458,7 @@ export default function Leads({ setTab }) {
               <h2 id="lead-transactions-name">{selected}</h2>
             </div>
 
-            <button
+            {/* <button
               id="lead-card-button"
               type="button"
               className="btn btn-secondary"
@@ -446,7 +469,7 @@ export default function Leads({ setTab }) {
               }
             >
               Player card
-            </button>
+            </button> */}
           </div>
           <div>
             <DataTable

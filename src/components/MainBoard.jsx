@@ -1,9 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import placeholder from "../acc-img-placeholder.png";
-import { Dropdown, Nav, NavItem, Navbar, ProgressBar } from "react-bootstrap";
+import {
+  Dropdown,
+  Modal,
+  Nav,
+  NavItem,
+  Navbar,
+  ProgressBar,
+} from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { db } from "../firebase";
 import { collection } from "firebase/firestore";
+import { addUserNewBalance, getUserById } from "../utills/firebaseHelpers";
 import {
   getDocs,
   query,
@@ -15,6 +23,9 @@ import {
 import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
 import Sidebar from "./Sidebar";
+import { toast } from "react-toastify";
+import { faClose } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function MainBoard() {
   const [tab, setTab] = useState(0);
@@ -24,7 +35,8 @@ export default function MainBoard() {
   const locationInputRef = useRef(null);
   const mapInputRef = useRef(null);
   const placeInputRef = useRef(null);
-
+  const [isBalOpen, setIsBalOpen] = useState(false);
+  const [newBalance, setNewBalance] = useState(0);
   const [idFiles, setIdFiles] = useState([]);
   const [locationFiles, setLocationFiles] = useState([]);
   const [mapFiles, setMapFiles] = useState([]);
@@ -32,6 +44,9 @@ export default function MainBoard() {
   const [modalShow, setModalShow] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
+  const [newUserData, setNewUserData] = useState();
+  const [userProfit, setUserProfit] = useState(0);
+
   const [userOrderData, setUserOrderData] = useState(
     state?.state?.map((order, i) => ({
       index: i + 1,
@@ -51,6 +66,7 @@ export default function MainBoard() {
 
   console.log("Selected image", selectedImage);
   console.log("show modal", modalShow);
+  console.log(9999, state);
 
   const handleImageClick = (image) => {
     console.log("Image", image);
@@ -60,6 +76,12 @@ export default function MainBoard() {
 
   const handleUploadClick = (inputRef) => {
     inputRef.current.click();
+  };
+
+  const addNewBalance = async (amount) => {
+    await addUserNewBalance(state?.user?.id, amount);
+    setNewBalance(0);
+    setIsBalOpen(false);
   };
 
   const handleFileChange = (e, fileStateSetter) => {
@@ -76,6 +98,7 @@ export default function MainBoard() {
     Confirmed: { variant: "warning", now: 75 },
     Closed: { variant: "danger", now: 100 },
   };
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -101,6 +124,83 @@ export default function MainBoard() {
     setIsEdit(false);
   }, [state?.state?.length]);
 
+  const getSelectedUserData = async () => {
+    return new Promise((resolve, reject) => {
+      try {
+        const userDocRef = doc(db, "users", state?.user.id);
+
+        const unsubscribe = onSnapshot(
+          userDocRef,
+          (userDocSnapshot) => {
+            if (userDocSnapshot.exists()) {
+              const userData = userDocSnapshot.data();
+              resolve(setNewUserData(userData)); // Resolve with the user data
+            } else {
+              console.error("User ID does not exist in the database.");
+              resolve(null); // Resolve with null if the user doesn't exist
+            }
+          },
+          (error) => {
+            console.error("Error fetching user:", error);
+            reject(error); // Reject the Promise in case of an error
+          }
+        );
+
+        // Optionally returning unsubscribe function for cleanup if needed
+        // return unsubscribe;
+      } catch (error) {
+        console.error("Error:", error);
+        reject(error); // Reject the Promise in case of an error
+      }
+    });
+  };
+  const calulateProfit = () => {
+    let totalProfit = 0;
+    userOrderData.map((el) => {
+      if (el.status == "Success") {
+        totalProfit = totalProfit + el.profit;
+      }
+    });
+    setUserProfit(totalProfit);
+  };
+  useEffect(() => {
+    getSelectedUserData();
+    calulateProfit();
+  }, []);
+  const updateOrderStatus = (orderId, newStatus) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const orderRef = doc(db, "orders", orderId);
+
+        const unsubscribe = onSnapshot(
+          orderRef,
+          (docSnapshot) => {
+            if (docSnapshot.exists()) {
+              // Update the order status
+              updateDoc(orderRef, { status: newStatus })
+                .then(() => {
+                  resolve("Order status updated successfully");
+                })
+                .catch((error) => {
+                  reject(error);
+                });
+            } else {
+              reject("Order does not exist");
+            }
+          },
+          (error) => {
+            reject(error);
+          }
+        );
+
+        // Optionally returning unsubscribe function for cleanup if needed
+        // return unsubscribe;
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
   const save = async () => {
     console.log("updated data", userOrderData);
 
@@ -119,6 +219,16 @@ export default function MainBoard() {
     setIsEdit(false);
   };
 
+  const updateOrderState = (id) => {
+    const orders = userOrderData.map((el) => {
+      if (el?.id == id) {
+        return { ...el, status: "Closed" };
+      } else {
+        return el;
+      }
+    });
+    setUserOrderData(orders);
+  };
   const handleEdit = (id, field, value) => {
     const updatedData = userOrderData.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
@@ -244,8 +354,26 @@ export default function MainBoard() {
       selector: (row) => row.createdAt,
       sortable: true,
     },
+    {
+      name: "Action",
+      selector: (row) => row.id,
+      cell: (row) => (
+        <div>
+          <FontAwesomeIcon
+            icon={faClose}
+            onClick={() => {
+              updateOrderStatus(row.id, "Closed");
+              updateOrderState(row.id);
+            }}
+          />
+        </div>
+      ),
+      sortable: false,
+    },
   ];
-
+  const handleClose = () => {
+    setIsBalOpen(false);
+  };
   const userColumns = [
     {
       name: "ID",
@@ -341,14 +469,14 @@ export default function MainBoard() {
         <img id="profile-pic" src={placeholder} alt="" />
         <div id="profile-i">
           <h5 className="f-w-inherit f-s-inherit" style={{ lineHeight: 1.1 }}>
-            #11202
+            {state?.user?.id}{" "}
           </h5>
           <h4
             id="lead-name"
             className="f-w-inherit f-s-inherit"
             style={{ lineHeight: 1.1 }}
           >
-            Тест Лид
+            {state?.user?.name}{" "}
           </h4>
         </div>
         <div id="profile-deals">
@@ -390,8 +518,14 @@ export default function MainBoard() {
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
                 Баланс
               </h5>
-              <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                888.00
+              <h4
+                className="text-left f-w-inherit"
+                style={{ lineHeight: 1.1 }}
+                onClick={() => {
+                  setIsBalOpen(true);
+                }}
+              >
+                {newUserData?.totalBalance}
               </h4>
             </div>
             <div>
@@ -407,7 +541,7 @@ export default function MainBoard() {
                 Профит
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                180.00
+                {userProfit.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -1248,6 +1382,33 @@ export default function MainBoard() {
           )}
         </div>
       </div>
+      {console.log(isBalOpen)}
+      <Modal show={isBalOpen} onHide={handleClose}>
+        <Modal.Header closeButton>Add Balance</Modal.Header>
+        <Modal.Body>
+          <input
+            type="number"
+            className="form-control"
+            placeholder="Enter new balance"
+            value={newBalance}
+            onChange={(e) => {
+              setNewBalance(e.target.value);
+            }}
+          />
+          <button
+            className="btn btn-primary mt-3"
+            onClick={() => {
+              if (!newBalance) {
+                toast.error("Please enter amount");
+              } else {
+                addNewBalance(newBalance);
+              }
+            }}
+          >
+            Add Balance
+          </button>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }
