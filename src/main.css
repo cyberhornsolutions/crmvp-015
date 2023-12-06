@@ -495,9 +495,9 @@ td:hover {
   margin: 10px;
   background-color: whitesmoke;
   border-radius: 5px;
-  max-height: 420px;
+  max-height: 50vh;
   overflow-y: auto;
-  min-height: 420px;
+  min-height: 50vh;
   overflow-y: auto;
 }
 #leads-div .search_div .show_online {
@@ -523,9 +523,9 @@ td:hover {
   margin-top: 5px;
   background-color: whitesmoke;
   border-radius: 5px;
-  max-height: 275px;
+  max-height: 30vh;
   overflow-y: auto;
-  min-height: 275px;
+  min-height: 30vh;
   overflow-y: auto;
 }
 #lead-transactions-header {
@@ -1055,4 +1055,11 @@ td.editing {
   color: green;
   width: 1.2rem !important;
   height: 1.2rem !important;
+}
+td.editing input {
+  width: 100%;
+}
+#transactions-table td,
+th {
+  width: 45px;
 }

@@ -8,16 +8,23 @@ import {
   onSnapshot,
   doc,
   updateDoc,
+  orderBy,
 } from "firebase/firestore";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import { Dropdown, ProgressBar } from "react-bootstrap";
+import { Dropdown, Modal, ProgressBar } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faClose, faL } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faClose,
+  faL,
+  faEllipsis,
+} from "@fortawesome/free-solid-svg-icons";
 import DelOrderModal from "./DelOrderModal";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditOrder from "./EditOrder";
+import { addUserNewBalance } from "../utills/firebaseHelpers";
 export default function Leads({ setTab }) {
   const [selected, setSelected] = useState();
   const [popup, setPopup] = useState(false);
@@ -30,6 +37,8 @@ export default function Leads({ setTab }) {
   const [isEdit, setIsEdit] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
   const [userProfit, setUserProfit] = useState(0);
+  const [isBalanceModal, setIsBalanceModal] = useState(false);
+  const [newBalance, setNewBalance] = useState(0);
   const navigate = useNavigate();
 
   const progressBarConfig = {
@@ -39,7 +48,6 @@ export default function Leads({ setTab }) {
     Closed: { variant: "danger", now: 100 },
   };
   const handleCloseModal = () => {
-    console.log("hhhhhhh");
     setIsDelModalOpen(false);
     setIsEdit(false);
   };
@@ -47,9 +55,6 @@ export default function Leads({ setTab }) {
   const handleDelModal = () => {
     setIsDelModalOpen(true);
   };
-  console.log("OrdersData", ordersData);
-
-  console.log("Users:", users);
 
   const fetchUsers = async () => {
     try {
@@ -84,7 +89,11 @@ export default function Leads({ setTab }) {
     const orders = [];
 
     try {
-      const q = query(collection(db, "orders"), where("userId", "==", row?.id));
+      const q = query(
+        collection(db, "orders"),
+        orderBy("createdTime", "desc"),
+        where("userId", "==", row?.id)
+      );
 
       const unsubscribe = await onSnapshot(q, async (querySnapshot) => {
         await querySnapshot.forEach(async (doc) => {
@@ -98,7 +107,8 @@ export default function Leads({ setTab }) {
           setUserProfit(profit);
         });
         setOrdersData(orders);
-        if (isOk) {
+        if (isOk === true) {
+          isOk = false;
           navigate("/home/mainBoard", {
             state: { state: orders, user: row, profit: userProfit },
           });
@@ -106,7 +116,6 @@ export default function Leads({ setTab }) {
       });
       setSelectedUser(row);
       setSelected(row?.id);
-      console.log(orders, row, 222);
 
       // Return a cleanup function to unsubscribe when the component unmounts
       return () => {
@@ -169,8 +178,6 @@ export default function Leads({ setTab }) {
           <div
             className="custom-edit-icon"
             onClick={() => {
-              console.log(row, 888888);
-
               setSelectedOrder(row);
               setIsEdit(true);
             }}
@@ -181,6 +188,8 @@ export default function Leads({ setTab }) {
             style={{ marginLeft: "10px" }}
             className="custom-delete-icon"
             onClick={() => {
+              setSelectedOrder(row);
+
               handleDelModal();
             }}
           >
@@ -206,7 +215,20 @@ export default function Leads({ setTab }) {
     tp: order.tp,
     userId: order.userId,
     status: order.status,
+    orderId: order.id,
   }));
+
+  const onUserRowClick = (row) => {
+    fetchOrders(row, false);
+    const newUsers = users.map((el) => {
+      if (el.id == row.id) {
+        return { ...el, isSelected: true };
+      } else {
+        return { ...el, isSelected: false };
+      }
+    });
+    setUsers(newUsers);
+  };
 
   const userColumns = [
     {
@@ -243,7 +265,9 @@ export default function Leads({ setTab }) {
       name: "Name",
       cell: (row) => (
         <div
-          onClick={() => fetchOrders(row)}
+          // onClick={() => {
+          //   fetchOrders(row);
+          // }}
           onDoubleClick={async () => {
             await fetchOrders(row, true);
           }}
@@ -349,8 +373,23 @@ export default function Leads({ setTab }) {
       selector: (row) => (row.affiliates ? row.affiliates : "Candy Land"),
       // sortable: true,
     },
+    {
+      name: "Actions",
+      selector: (row) => row.id,
+      cell: (row) => (
+        <div
+          className="text-center w-100 "
+          onClick={() => {
+            setSelectedUser(row);
+            setIsBalanceModal(true);
+          }}
+        >
+          <FontAwesomeIcon icon={faEllipsis} />
+        </div>
+      ),
+    },
   ];
-
+  console.log(selectedUser, 9090);
   const mappedData = users?.map((user, i) => ({
     ...user,
     status: user?.status,
@@ -359,13 +398,26 @@ export default function Leads({ setTab }) {
 
   const conditionalRowStyles = [
     {
-      when: (row) => row.toggleSelected,
+      when: (row) => row.isSelected,
       style: {
-        backgroundColor: "green",
+        backgroundColor: "#D1FFBD",
         userSelect: "none",
       },
     },
   ];
+
+  const handleClose = () => {
+    setIsBalanceModal(false);
+    setSelectedUser({});
+  };
+
+  const addNewBalance = async (amount) => {
+    await addUserNewBalance(selectedUser.id, amount);
+    setNewBalance(0);
+    setIsBalanceModal(false);
+    setSelectedUser({});
+    fetchUsers();
+  };
 
   return (
     <>
@@ -433,14 +485,14 @@ export default function Leads({ setTab }) {
           <div className="">
             <DataTable
               columns={userColumns}
-              data={mappedData}
+              data={users}
               highlightOnHover
               pointerOnHover
               pagination
               paginationPerPage={5}
               paginationRowsPerPageOptions={[5, 10, 20, 50]}
               conditionalRowStyles={conditionalRowStyles}
-
+              onRowClicked={onUserRowClick}
               // responsive
             />
           </div>
@@ -484,8 +536,40 @@ export default function Leads({ setTab }) {
           </div>
         </div>
       </div>
+      <Modal show={isBalanceModal} onHide={handleClose}>
+        <Modal.Header closeButton>Add Balance</Modal.Header>
+        <Modal.Body>
+          <input
+            type="number"
+            className="form-control"
+            placeholder="Enter new balance"
+            value={newBalance}
+            onChange={(e) => {
+              setNewBalance(e.target.value);
+            }}
+          />
+          <button
+            className="btn btn-primary mt-3"
+            onClick={() => {
+              if (!newBalance) {
+                toast.error("Please enter amount");
+              } else {
+                addNewBalance(newBalance);
+              }
+            }}
+          >
+            Add Balance
+          </button>
+        </Modal.Body>
+      </Modal>
+
       {isDelModalOpen && (
-        <DelOrderModal show={isDelModalOpen} onClose={handleCloseModal} />
+        <DelOrderModal
+          show={isDelModalOpen}
+          onClose={handleCloseModal}
+          selectedOrder={selectedOrder}
+          isMain={false}
+        />
       )}
       {isEdit && (
         <EditOrder
@@ -493,6 +577,7 @@ export default function Leads({ setTab }) {
           onClose={handleCloseModal}
           selectedOrder={selectedOrder}
           fetchOrders={fetchOrders}
+          isMain={false}
         />
       )}
     </>

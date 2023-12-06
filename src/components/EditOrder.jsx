@@ -5,7 +5,8 @@ import { toast } from "react-toastify";
 import { db } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 
-const EditOrder = ({ onClose, show, selectedOrder, fetchOrders }) => {
+const EditOrder = ({ onClose, show, selectedOrder, fetchOrders, isMain }) => {
+  console.log(selectedOrder, 89898989);
   const [record, setRecord] = useState({
     type: selectedOrder?.type,
     symbol: selectedOrder?.symbol,
@@ -54,7 +55,7 @@ const EditOrder = ({ onClose, show, selectedOrder, fetchOrders }) => {
     const updatedData = doc(db, "orders", selectedOrder.docId);
     try {
       await updateDoc(updatedData, record);
-      fetchOrders({ id: selectedOrder.userId });
+      await fetchOrders({ id: selectedOrder.userId }, false);
       onClose();
     } catch (error) {
       console.log(error);

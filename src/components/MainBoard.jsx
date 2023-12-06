@@ -19,13 +19,16 @@ import {
   onSnapshot,
   doc,
   updateDoc,
+  orderBy,
 } from "firebase/firestore";
 import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
 import Sidebar from "./Sidebar";
 import { toast } from "react-toastify";
-import { faClose } from "@fortawesome/free-solid-svg-icons";
+import { faClose, faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import DelOrderModal from "./DelOrderModal";
+import EditOrder from "./EditOrder";
 
 export default function MainBoard() {
   const [tab, setTab] = useState(0);
@@ -46,7 +49,9 @@ export default function MainBoard() {
   const [isEdit, setIsEdit] = useState(false);
   const [newUserData, setNewUserData] = useState();
   const [userProfit, setUserProfit] = useState(0);
-
+  const [isDelModalOpen, setIsDelModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState();
+  const [isDealEdit, setIsDealEdit] = useState(false);
   const [userOrderData, setUserOrderData] = useState(
     state?.state?.map((order, i) => ({
       index: i + 1,
@@ -54,15 +59,70 @@ export default function MainBoard() {
       type: order?.type,
       symbol: order?.symbol,
       sl: order?.sl,
-      volumn: order?.volume,
-      symbolValue: order?.symbolValue,
+      sum: order?.volume,
+      price: order?.symbolValue,
       tp: order?.tp,
       status: order?.status,
       profit: order?.profit,
       userId: order?.userId,
       createdAt: order?.createdAt,
+      docId: order?.id,
+      createdTime: order?.createdTime,
     }))
   );
+
+  const fetchOrders = async (row, isOk = false) => {
+    console.log("UserId", row?.id);
+    const orders = [];
+
+    try {
+      const q = query(
+        collection(db, "orders"),
+        orderBy("createdTime", "desc"),
+        where("userId", "==", row?.id)
+      );
+
+      const unsubscribe = await onSnapshot(q, async (querySnapshot) => {
+        await querySnapshot.forEach(async (doc) => {
+          await orders.push({ id: doc.id, ...doc.data() });
+        });
+        let profit = 0;
+        orders?.map((el) => {
+          if (el.status == "success") {
+            profit = profit + parseFloat(el.profit);
+          }
+          setUserProfit(profit);
+        });
+        setUserOrderData(
+          orders?.map((order, i) => ({
+            index: i + 1,
+            id: order?.id,
+            type: order?.type,
+            symbol: order?.symbol,
+            sl: order?.sl,
+            sum: order?.volume,
+            price: order?.symbolValue,
+            tp: order?.tp,
+            status: order?.status,
+            profit: order?.profit,
+            userId: order?.userId,
+            createdAt: order?.createdAt,
+            docId: order?.id,
+            createdTime: order?.createdTime,
+          }))
+        );
+      });
+
+      console.log(orders, row, 222);
+
+      // Return a cleanup function to unsubscribe when the component unmounts
+      return () => {
+        unsubscribe();
+      };
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
 
   console.log("Selected image", selectedImage);
   console.log("show modal", modalShow);
@@ -167,39 +227,6 @@ export default function MainBoard() {
     getSelectedUserData();
     calulateProfit();
   }, []);
-  const updateOrderStatus = (orderId, newStatus) => {
-    return new Promise((resolve, reject) => {
-      try {
-        const orderRef = doc(db, "orders", orderId);
-
-        const unsubscribe = onSnapshot(
-          orderRef,
-          (docSnapshot) => {
-            if (docSnapshot.exists()) {
-              // Update the order status
-              updateDoc(orderRef, { status: newStatus })
-                .then(() => {
-                  resolve("Order status updated successfully");
-                })
-                .catch((error) => {
-                  reject(error);
-                });
-            } else {
-              reject("Order does not exist");
-            }
-          },
-          (error) => {
-            reject(error);
-          }
-        );
-
-        // Optionally returning unsubscribe function for cleanup if needed
-        // return unsubscribe;
-      } catch (error) {
-        reject(error);
-      }
-    });
-  };
 
   const save = async () => {
     console.log("updated data", userOrderData);
@@ -279,38 +306,38 @@ export default function MainBoard() {
     },
     {
       name: "Sum",
-      selector: (row) => row.volumn,
+      selector: (row) => row.sum,
       sortable: true,
       cell: (row) =>
         isEdit ? (
           <input
             type="text"
-            value={row.volumn}
+            value={row.sum}
             onChange={(e) => {
-              handleEdit(row.id, "volumn", e.target.value);
+              handleEdit(row.id, "sum", e.target.value);
             }}
             style={{ width: "100%" }}
           />
         ) : (
-          row.volumn
+          row.sum
         ),
     },
     {
       name: "Price",
-      selector: (row) => row.symbolValue,
+      selector: (row) => row.price,
       sortable: true,
       cell: (row) =>
         isEdit ? (
           <input
             type="text"
-            value={row.symbolValue}
+            value={row.price}
             onChange={(e) => {
-              handleEdit(row.id, "symbolValue", e.target.value);
+              handleEdit(row.id, "price", e.target.value);
             }}
             style={{ width: "100%" }}
           />
         ) : (
-          row.symbolValue
+          row.price
         ),
     },
     {
@@ -358,14 +385,27 @@ export default function MainBoard() {
       name: "Action",
       selector: (row) => row.id,
       cell: (row) => (
-        <div>
-          <FontAwesomeIcon
-            icon={faClose}
+        <div className="order-actions">
+          <div
+            className="custom-edit-icon"
             onClick={() => {
-              updateOrderStatus(row.id, "Closed");
-              updateOrderState(row.id);
+              setSelectedOrder(row);
+              setIsDealEdit(true);
             }}
-          />
+          >
+            <FontAwesomeIcon icon={faEdit} />
+          </div>
+          <div className="ml-5">
+            <FontAwesomeIcon
+              icon={faClose}
+              onClick={() => {
+                setSelectedOrder(row);
+                setIsDelModalOpen(true);
+                // updateOrderStatus(row.id, "Closed");
+                // updateOrderState(row.id);
+              }}
+            />
+          </div>
         </div>
       ),
       sortable: false,
@@ -373,7 +413,10 @@ export default function MainBoard() {
   ];
   const handleClose = () => {
     setIsBalOpen(false);
+    setIsDelModalOpen(false);
+    setIsDealEdit(false);
   };
+
   const userColumns = [
     {
       name: "ID",
@@ -1382,7 +1425,6 @@ export default function MainBoard() {
           )}
         </div>
       </div>
-      {console.log(isBalOpen)}
       <Modal show={isBalOpen} onHide={handleClose}>
         <Modal.Header closeButton>Add Balance</Modal.Header>
         <Modal.Body>
@@ -1409,6 +1451,25 @@ export default function MainBoard() {
           </button>
         </Modal.Body>
       </Modal>
+
+      {isDelModalOpen && (
+        <DelOrderModal
+          selectedOrder={selectedOrder}
+          onClose={handleClose}
+          show={isDelModalOpen}
+          updateOrderState={updateOrderState}
+          isMain={true}
+        />
+      )}
+
+      {isDealEdit && (
+        <EditOrder
+          onClose={handleClose}
+          show={isDealEdit}
+          selectedOrder={selectedOrder}
+          fetchOrders={fetchOrders}
+        />
+      )}
     </div>
   );
 }

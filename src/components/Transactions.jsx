@@ -1,4 +1,34 @@
+import moment from "moment";
 import React, { useEffect } from "react";
+
+const transactionData = [
+  {
+    id: 1,
+    player: "Mark Otto",
+    type: "Deposit",
+    sum: 100,
+    method: "VISA",
+    card: "0000111100001111",
+    status: "Success",
+    manager: "Manager #1",
+    desk: "Desk #1",
+    date: moment("21/08/2023").format("DD/MM/YYYY"),
+    ftd: "Yes",
+  },
+  {
+    id: 1,
+    player: "John Doe",
+    type: "Withdrawal",
+    sum: 100,
+    method: "VISA",
+    card: "0000111100001111",
+    status: "Success",
+    manager: "Manager #1",
+    desk: "Desk #1",
+    date: moment("21/08/2023").format("DD/MM/YYYY"),
+    ftd: "Yes",
+  },
+];
 
 export default function Transactions() {
   useEffect(() => {
@@ -35,7 +65,33 @@ export default function Transactions() {
       });
     }
   }, []);
+  const transactionSearch = () => {
+    const input = document.getElementById("transactionsSearchInput");
+    const filter = input.value.toUpperCase();
+    const table = document.getElementById("transactions-table");
+    const tbody = table.getElementsByTagName("tbody")[0];
+    const tr = tbody.getElementsByTagName("tr");
 
+    for (let i = 0; i < tr.length; i++) {
+      const td = tr[i].getElementsByTagName("td");
+      let matchFound = false;
+
+      for (let j = 0; j < td.length; j++) {
+        const txtValue = td[j].textContent || td[j].innerText;
+
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          matchFound = true;
+          break;
+        }
+      }
+
+      if (matchFound) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  };
   return (
     <div id="transactions" className="active">
       <div id="transactions-div">
@@ -180,7 +236,8 @@ export default function Transactions() {
             <input
               type="text"
               id="transactionsSearchInput"
-              onkeyup="transactionSearch()"
+              // onkeyup="transactionSearch()"
+              onKeyUp={transactionSearch}
               placeholder="Search.."
               className="p-1"
             />
