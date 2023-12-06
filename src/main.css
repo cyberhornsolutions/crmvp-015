@@ -1063,3 +1063,9 @@ td.editing input {
 th {
   width: 45px;
 }
+
+.no-spinner-arrows::-webkit-inner-spin-button,
+.no-spinner-arrows::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
