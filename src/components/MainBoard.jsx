@@ -55,7 +55,7 @@ export default function MainBoard() {
   const [userOrderData, setUserOrderData] = useState(
     state?.state?.map((order, i) => ({
       index: i + 1,
-      id: order?.id,
+      id: i + 1,
       type: order?.type,
       symbol: order?.symbol,
       sl: order?.sl,

@@ -112,7 +112,7 @@ const DelOrderModal = ({
           closeButton
         >
           <p className="bg-transparent text-white mb-0 w-100">
-            Close order -- {selectedOrder.docId} + {selectedOrder.symbol}
+            Close order -- {selectedOrder.id} + {selectedOrder.symbol}
           </p>
         </Modal.Header>
         <Modal.Body className="bg-secondry text-white d-flex flex-column gap-3 p-3 pt-0">
