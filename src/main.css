@@ -1069,3 +1069,10 @@ th {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.arrowClass {
+  -webkit-appearance: none !important; /* Webkit browsers */
+  -moz-appearance: textfield !important; /* Firefox */
+  appearance: textfield !important; /* Others */
+  width: calc(100% - 2ch); /* Adjust width as needed */
+}

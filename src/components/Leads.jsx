@@ -536,7 +536,7 @@ export default function Leads({ setTab }) {
         <Modal.Body>
           <input
             type="number"
-            className="form-control no-spinner-arrows"
+            className="form-control no-spinner-arrows arrowClass"
             placeholder="Enter new balance"
             value={newBalance}
             onChange={(e) => {

@@ -72,7 +72,15 @@ export default function MainBoard() {
       closedDate: order?.closedDate,
     }))
   );
+  const handleKeyPress = (event) => {
+    const keyCode = event.keyCode || event.which;
+    const keyValue = String.fromCharCode(keyCode);
 
+    // Allow only numeric keys (0-9)
+    if (!/^\d+$/.test(keyValue)) {
+      event.preventDefault();
+    }
+  };
   const fetchOrders = async (row, isOk = false) => {
     console.log("UserId", row?.id);
     const orders = [];
@@ -1444,8 +1452,9 @@ export default function MainBoard() {
         <Modal.Body>
           <input
             type="number"
-            className="form-control no-spinner-arrows"
+            className="form-control no-spinner-arrows arrowClass"
             placeholder="Enter new balance"
+            onKeyPress={handleKeyPress}
             value={newBalance}
             onChange={(e) => {
               setNewBalance(e.target.value);
