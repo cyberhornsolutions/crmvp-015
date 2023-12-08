@@ -8,6 +8,8 @@ import {
   doc,
   setDoc,
   onSnapshot,
+  addDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -42,6 +44,16 @@ export const addUserNewBalance = async (userId, amount) => {
         { totalBalance: updatedBalance },
         { merge: true }
       );
+
+      const depositRef = collection(db, "deposits");
+
+      await addDoc(depositRef, {
+        userId: userId,
+        amount: parseFloat(amount),
+        comment: "Bonus",
+        createdAt: serverTimestamp(),
+      });
+
       console.log("Balance updated successfully!");
     } else {
       console.error("User ID does not exist in the database.");

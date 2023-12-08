@@ -216,6 +216,7 @@ export default function Leads({ setTab }) {
     userId: order.userId,
     status: order.status,
     orderId: order.id,
+    closedPrice: order?.closedPrice,
   }));
 
   const onUserRowClick = (row) => {
@@ -230,6 +231,9 @@ export default function Leads({ setTab }) {
     setUsers(newUsers);
   };
 
+  const onUserDoubleClick = async (row) => {
+    await fetchOrders(row, true);
+  };
   const userColumns = [
     {
       name: "",
@@ -263,18 +267,8 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Name",
-      cell: (row) => (
-        <div
-          // onClick={() => {
-          //   fetchOrders(row);
-          // }}
-          onDoubleClick={async () => {
-            await fetchOrders(row, true);
-          }}
-        >
-          {row.surname === undefined ? row.name : row.name + " " + row.surname}
-        </div>
-      ),
+      cell: (row) =>
+        row?.surname === undefined ? row.name : row.name + " " + row.surname,
       sortable: true,
       sortFunction: (rowA, rowB) => {
         const a = rowA.name;
@@ -493,6 +487,7 @@ export default function Leads({ setTab }) {
               paginationRowsPerPageOptions={[5, 10, 20, 50]}
               conditionalRowStyles={conditionalRowStyles}
               onRowClicked={onUserRowClick}
+              onRowDoubleClicked={onUserDoubleClick}
               // responsive
             />
           </div>

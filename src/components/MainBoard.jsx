@@ -68,6 +68,8 @@ export default function MainBoard() {
       createdAt: order?.createdAt,
       docId: order?.id,
       createdTime: order?.createdTime,
+      closedPrice: order?.closedPrice,
+      closedDate: order?.closedDate,
     }))
   );
 
@@ -523,7 +525,10 @@ export default function MainBoard() {
           </h4>
         </div>
         <div id="profile-deals">
-          <h4 style={{ lineHeight: 1.1 }}> Сделки</h4>
+          <h4 style={{ lineHeight: 1.1 }}>
+            {/* Сделки */}
+            Transactions
+          </h4>
           <div id="sdelki-numbers">
             <div>
               <h5
@@ -559,7 +564,8 @@ export default function MainBoard() {
           <div>
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                Баланс
+                {/* Баланс */}
+                Balance
               </h5>
               <h4
                 className="text-left f-w-inherit"
@@ -573,7 +579,8 @@ export default function MainBoard() {
             </div>
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                Свободно
+                {/* Свободно */}
+                Free
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
                 500.00
@@ -581,7 +588,7 @@ export default function MainBoard() {
             </div>
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                Профит
+                {/* Профит */}Profit
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
                 {userProfit.toFixed(6)}
@@ -589,7 +596,8 @@ export default function MainBoard() {
             </div>
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                Бонус
+                {/* Бонус */}
+                Bonus
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
                 50.00
@@ -597,7 +605,8 @@ export default function MainBoard() {
             </div>
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                Заведено
+                {/* Заведено */}
+                Started
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
                 100.00
@@ -607,7 +616,8 @@ export default function MainBoard() {
           <div>
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                Залог
+                {/* Залог */}
+                Pledge
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
                 00.00
@@ -615,7 +625,8 @@ export default function MainBoard() {
             </div>
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                Эквити
+                {/* Эквити */}
+                Equity
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
                 828.00
@@ -623,7 +634,8 @@ export default function MainBoard() {
             </div>
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                Уровень маржи
+                {/* Уровень маржи */}
+                Margin level
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
                 88.05%
@@ -631,7 +643,8 @@ export default function MainBoard() {
             </div>
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                Кредит
+                {/* Кредит */}
+                Credit
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
                 00.00
@@ -639,7 +652,8 @@ export default function MainBoard() {
             </div>
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                Выведено
+                {/* Выведено */}
+                Withdrawn
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
                 00.00
