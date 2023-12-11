@@ -101,7 +101,10 @@ export default function Leads({ setTab }) {
         });
         let profit = 0;
         orders?.map((el) => {
-          if (el.status == "success") {
+          if (
+            el.status.toLocaleLowerCase() == "success" ||
+            el.status.toLocaleLowerCase() == "closed"
+          ) {
             profit = profit + parseFloat(el.profit);
           }
           setUserProfit(profit);
@@ -399,18 +402,30 @@ export default function Leads({ setTab }) {
       },
     },
   ];
+  const handleKeyPress = (event) => {
+    const keyCode = event.keyCode || event.which;
+    const keyValue = String.fromCharCode(keyCode);
 
+    // Allow only numeric keys (0-9)
+    if (!/^\d+$/.test(keyValue)) {
+      event.preventDefault();
+    }
+  };
   const handleClose = () => {
     setIsBalanceModal(false);
     setSelectedUser({});
   };
 
   const addNewBalance = async (amount) => {
-    await addUserNewBalance(selectedUser.id, amount);
-    setNewBalance(0);
-    setIsBalanceModal(false);
-    setSelectedUser({});
-    fetchUsers();
+    if (amount < 0) {
+      toast.error("Please enter amount greater than 0");
+    } else {
+      await addUserNewBalance(selectedUser.id, amount);
+      setNewBalance(0);
+      setIsBalanceModal(false);
+      setSelectedUser({});
+      fetchUsers();
+    }
   };
 
   return (
@@ -539,6 +554,7 @@ export default function Leads({ setTab }) {
             className="form-control no-spinner-arrows arrowClass"
             placeholder="Enter new balance"
             value={newBalance}
+            onKeyPress={handleKeyPress}
             onChange={(e) => {
               setNewBalance(e.target.value);
             }}

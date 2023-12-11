@@ -11,7 +11,7 @@ import {
 import { useLocation } from "react-router-dom";
 import { db } from "../firebase";
 import { collection } from "firebase/firestore";
-import { addUserNewBalance, getUserById } from "../utills/firebaseHelpers";
+import { addUserNewBalance } from "../utills/firebaseHelpers";
 import {
   getDocs,
   query,
@@ -98,7 +98,10 @@ export default function MainBoard() {
         });
         let profit = 0;
         orders?.map((el) => {
-          if (el.status == "success") {
+          if (
+            el.status.toLocaleLowerCase() == "success" ||
+            el.status.toLocaleLowerCase() == "closed"
+          ) {
             profit = profit + parseFloat(el.profit);
           }
           setUserProfit(profit);
@@ -149,9 +152,13 @@ export default function MainBoard() {
   };
 
   const addNewBalance = async (amount) => {
-    await addUserNewBalance(state?.user?.id, amount);
-    setNewBalance(0);
-    setIsBalOpen(false);
+    if (amount < 0) {
+      toast.error("Please enter amount greater than 0");
+    } else {
+      await addUserNewBalance(state?.user?.id, amount);
+      setNewBalance(0);
+      setIsBalOpen(false);
+    }
   };
 
   const handleFileChange = (e, fileStateSetter) => {
@@ -227,7 +234,10 @@ export default function MainBoard() {
   const calulateProfit = () => {
     let totalProfit = 0;
     userOrderData.map((el) => {
-      if (el.status == "Success") {
+      if (
+        el.status.toLocaleLowerCase() == "success" ||
+        el.status.toLocaleLowerCase() == "closed"
+      ) {
         totalProfit = totalProfit + el.profit;
       }
     });
