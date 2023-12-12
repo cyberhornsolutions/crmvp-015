@@ -426,17 +426,13 @@ export default function Leads({ setTab }) {
     setIsBalanceModal(false);
     setSelectedUser({});
   };
-
+  console.log(newBalance, 90909090, selectedUser);
   const addNewBalance = async (amount) => {
-    if (amount < 0) {
-      toast.error("Please enter amount greater than 0");
-    } else {
-      await addUserNewBalance(selectedUser.id, amount);
-      setNewBalance(0);
-      setIsBalanceModal(false);
-      setSelectedUser({});
-      fetchUsers();
-    }
+    await addUserNewBalance(selectedUser.id, amount);
+    setNewBalance(0);
+    setIsBalanceModal(false);
+    setSelectedUser({});
+    fetchUsers();
   };
 
   return (
@@ -562,10 +558,9 @@ export default function Leads({ setTab }) {
         <Modal.Body>
           <input
             type="number"
-            className="form-control no-spinner-arrows arrowClass"
+            className="form-control "
             placeholder="Enter new balance"
             value={newBalance}
-            onKeyPress={handleKeyPress}
             onChange={(e) => {
               setNewBalance(e.target.value);
             }}

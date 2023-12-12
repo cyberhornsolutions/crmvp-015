@@ -174,13 +174,9 @@ export default function MainBoard() {
   };
 
   const addNewBalance = async (amount) => {
-    if (amount < 0) {
-      toast.error("Please enter amount greater than 0");
-    } else {
-      await addUserNewBalance(state?.user?.id, amount);
-      setNewBalance(0);
-      setIsBalOpen(false);
-    }
+    await addUserNewBalance(state?.user?.id, amount);
+    setNewBalance(0);
+    setIsBalOpen(false);
   };
 
   const handleFileChange = (e, fileStateSetter) => {
@@ -1511,9 +1507,8 @@ export default function MainBoard() {
         <Modal.Body>
           <input
             type="number"
-            className="form-control no-spinner-arrows arrowClass"
+            className="form-control "
             placeholder="Enter new balance"
-            onKeyPress={handleKeyPress}
             value={newBalance}
             onChange={(e) => {
               setNewBalance(e.target.value);
