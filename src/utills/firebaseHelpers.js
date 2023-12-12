@@ -27,6 +27,62 @@ export const getData = async (collectionName) => {
   }
 };
 
+export const addDuplicateSymbol = async (selectedSymbol, duplicate) => {
+  try {
+    const symbolDocRef = query(
+      collection(db, "symbols"),
+      where("symbol", "==", selectedSymbol.symbol)
+    );
+    const symbolDocSnapshot = await getDocs(symbolDocRef);
+
+    if (!symbolDocSnapshot.empty) {
+      const symbolDocRef = symbolDocSnapshot.docs[0].ref;
+      const symbolData = symbolDocSnapshot.docs[0].data();
+      console.log("symbol data = ", symbolData);
+      const duplicates = symbolData.duplicates || [];
+      duplicates.push(duplicate);
+
+      // Update the balance in the database directly
+      await setDoc(symbolDocRef, { duplicates }, { merge: true });
+      console.log("Symbol updated successfully!");
+    } else {
+      console.error("Symbol does not exist in the database.");
+    }
+  } catch (error) {
+    console.error("Error updating Symbol:", error);
+    throw new Error(error.message);
+  }
+};
+
+export const removeDuplicateSymbol = async (selectedSymbol, duplicate) => {
+  try {
+    const symbolDocRef = query(
+      collection(db, "symbols"),
+      where("symbol", "==", selectedSymbol.duplicate)
+    );
+    const symbolDocSnapshot = await getDocs(symbolDocRef);
+
+    if (!symbolDocSnapshot.empty) {
+      const symbolDocRef = symbolDocSnapshot.docs[0].ref;
+      const symbolData = symbolDocSnapshot.docs[0].data();
+      console.log("symbol data = ", symbolData);
+      let duplicates = symbolData.duplicates || [];
+      duplicates = duplicates.filter(
+        (symbol) => symbol !== selectedSymbol.symbol
+      );
+
+      // Update the balance in the database directly
+      await setDoc(symbolDocRef, { duplicates }, { merge: true });
+      console.log("Symbol updated successfully!");
+    } else {
+      console.error("Symbol does not exist in the database.");
+    }
+  } catch (error) {
+    console.error("Error updating Symbol:", error);
+    throw new Error(error.message);
+  }
+};
+
 export const addUserNewBalance = async (userId, amount) => {
   try {
     const userDocRef = doc(db, "users", userId);

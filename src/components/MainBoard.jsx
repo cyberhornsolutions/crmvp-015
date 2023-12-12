@@ -10,10 +10,10 @@ import {
 } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { db } from "../firebase";
-import { collection } from "firebase/firestore";
 import { addUserNewBalance } from "../utills/firebaseHelpers";
 import {
   getDocs,
+  collection,
   query,
   where,
   onSnapshot,
@@ -159,9 +159,9 @@ export default function MainBoard() {
   //   }
   // };
 
-  console.log("Selected image", selectedImage);
-  console.log("show modal", modalShow);
-  console.log(9999, state);
+  // console.log("Selected image", selectedImage);
+  // console.log("show modal", modalShow);
+  // console.log(9999, state);
 
   const handleImageClick = (image) => {
     console.log("Image", image);
@@ -189,7 +189,7 @@ export default function MainBoard() {
     fileStateSetter((prevFiles) => [...prevFiles, ...fileArray]);
   };
 
-  console.log("state", state);
+  // console.log("state", state);
 
   const progressBarConfig = {
     New: { variant: "success", now: 25 },
@@ -286,6 +286,16 @@ export default function MainBoard() {
       }
     });
     setIsEdit(false);
+  };
+
+  const handleSaveVerification = async () => {
+    try {
+      const userDocRef = doc(db, "users", state?.user.id);
+      await updateDoc(userDocRef, { allowTrading: newUserData.allowTrading });
+      console.log("User updated successfully");
+    } catch (error) {
+      console.log("error in updating user =", error);
+    }
   };
 
   const updateOrderState = (id) => {
@@ -547,6 +557,11 @@ export default function MainBoard() {
     id: i + 1,
   }));
 
+  const openOrders = userOrders.filter(
+    ({ status }) => status === "Pending"
+  ).length;
+  const closedOrders = userOrders.length - openOrders;
+
   return (
     <div id="mainboard">
       <Sidebar tab={tab} setTab={setTab} />
@@ -575,13 +590,14 @@ export default function MainBoard() {
                 className="f-s-inherit  f-w-inherit "
                 style={{ lineHeight: 1.1 }}
               >
-                4
+                {openOrders}
               </h5>
               <h5
                 className="f-s-inherit  f-w-inherit "
                 style={{ lineHeight: 1.1 }}
               >
-                Открытые
+                {/* Открытые */}
+                Open
               </h5>
             </div>
             <div>
@@ -589,13 +605,14 @@ export default function MainBoard() {
                 className="f-s-inherit  f-w-inherit "
                 style={{ lineHeight: 1.1 }}
               >
-                5
+                {closedOrders}
               </h5>
               <h5
                 className="f-s-inherit  f-w-inherit "
                 style={{ lineHeight: 1.1 }}
               >
-                Закрытые
+                {/* Закрытые */}
+                Closed
               </h5>
             </div>
           </div>
@@ -1215,13 +1232,23 @@ export default function MainBoard() {
                   <h4 className="f-s-inherit" style={{ lineHeight: 1.1 }}>
                     Rights
                   </h4>
-                  <button>Save</button>
+                  <button onClick={handleSaveVerification}>Save</button>
                 </div>
                 <div className="form-check form-switch">
                   <label className="form-check-label f-s-inherit f-w-700">
                     Allow Trading
                   </label>
-                  <input className="form-check-input" type="checkbox" />
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    checked={newUserData.allowTrading}
+                    onChange={(e) =>
+                      setNewUserData((p) => ({
+                        ...p,
+                        allowTrading: e.target.checked,
+                      }))
+                    }
+                  />
                 </div>
                 <div className="form-check form-switch">
                   <label className="form-check-label  f-s-inherit f-w-700">
@@ -1395,8 +1422,8 @@ export default function MainBoard() {
                 highlightOnHover
                 pointerOnHover
                 pagination
-                paginationPerPage={5}
-                paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                paginationPerPage={10}
+                paginationRowsPerPageOptions={[10, 20, 50]}
                 // responsive
               />
             </div>

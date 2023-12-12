@@ -549,8 +549,8 @@ export default function Leads({ setTab }) {
               columns={columns}
               data={data}
               pagination
-              paginationPerPage={5}
-              paginationRowsPerPageOptions={[5, 10, 20, 50]}
+              paginationPerPage={10}
+              paginationRowsPerPageOptions={[10, 20, 50]}
               highlightOnHover
               pointerOnHover
             />
