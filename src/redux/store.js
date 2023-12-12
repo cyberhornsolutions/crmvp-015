@@ -11,11 +11,13 @@ import {
 // import { authReducer } from './auth/authReducer';
 import { calendarReducer } from "./calendar/calendarReducer";
 import symbolsSlicer from "./slicer/symbolsSlicer";
+import orderSlicer from "./slicer/orderSlicer";
 
 export const store = configureStore({
   reducer: {
     calendar: calendarReducer,
     symbols: symbolsSlicer,
+    userOrders: orderSlicer,
   },
   middleware: getDefaultMiddleware({
     serializableCheck: {

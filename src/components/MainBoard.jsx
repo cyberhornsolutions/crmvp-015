@@ -29,8 +29,12 @@ import { faClose, faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DelOrderModal from "./DelOrderModal";
 import EditOrder from "./EditOrder";
+import { setUserOrders } from "../redux/slicer/orderSlicer";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function MainBoard() {
+  const dispatch = useDispatch();
+  const userOrders = useSelector((state) => state?.userOrders?.orders);
   const [tab, setTab] = useState(0);
   const [users, setUsers] = useState([]);
   const { state } = useLocation();
@@ -81,61 +85,79 @@ export default function MainBoard() {
       event.preventDefault();
     }
   };
-  const fetchOrders = async (row, isOk = false) => {
-    console.log("UserId", row?.id);
-    const orders = [];
+  // const fetchOrders = async (row, isOk = false) => {
+  //   console.log("UserId", row?.id);
+  //   const orders = [];
 
-    try {
-      const q = query(
-        collection(db, "orders"),
-        orderBy("createdTime", "desc"),
-        where("userId", "==", row?.id)
-      );
+  //   try {
+  //     const q = query(
+  //       collection(db, "orders"),
+  //       orderBy("createdTime", "desc"),
+  //       where("userId", "==", row?.id)
+  //     );
 
-      const unsubscribe = await onSnapshot(q, async (querySnapshot) => {
-        await querySnapshot.forEach(async (doc) => {
-          await orders.push({ id: doc.id, ...doc.data() });
-        });
-        let profit = 0;
-        orders?.map((el) => {
-          if (
-            el.status.toLocaleLowerCase() == "success" ||
-            el.status.toLocaleLowerCase() == "closed"
-          ) {
-            profit = profit + parseFloat(el.profit);
-          }
-          setUserProfit(profit);
-        });
-        setUserOrderData(
-          orders?.map((order, i) => ({
-            index: i + 1,
-            id: order?.id,
-            type: order?.type,
-            symbol: order?.symbol,
-            sl: order?.sl,
-            sum: order?.volume,
-            price: order?.symbolValue,
-            tp: order?.tp,
-            status: order?.status,
-            profit: order?.profit,
-            userId: order?.userId,
-            createdAt: order?.createdAt,
-            docId: order?.id,
-            createdTime: order?.createdTime,
-          }))
-        );
-      });
+  //     const unsubscribe = await onSnapshot(q, async (querySnapshot) => {
+  //       await querySnapshot.forEach(async (doc) => {
+  //         await orders.push({ id: doc.id, ...doc.data() });
+  //       });
+  //       let profit = 0;
+  //       orders?.map((el) => {
+  //         if (
+  //           el.status.toLocaleLowerCase() == "success" ||
+  //           el.status.toLocaleLowerCase() == "closed"
+  //         ) {
+  //           profit = profit + parseFloat(el.profit);
+  //         }
 
-      console.log(orders, row, 222);
+  //         setUserProfit(profit);
+  //       });
+  //       const newO = orders?.map((order, i) => ({
+  //         index: i + 1,
+  //         id: order?.id,
+  //         type: order?.type,
+  //         symbol: order?.symbol,
+  //         sl: order?.sl,
+  //         sum: order?.volume,
+  //         price: order?.symbolValue,
+  //         tp: order?.tp,
+  //         status: order?.status,
+  //         profit: order?.profit,
+  //         userId: order?.userId,
+  //         createdAt: order?.createdAt,
+  //         docId: order?.id,
+  //         createdTime: order?.createdTime,
+  //       }));
+  //       dispatch(setUserOrders(newO));
+  //       setUserOrderData(
+  //         orders?.map((order, i) => ({
+  //           index: i + 1,
+  //           id: order?.id,
+  //           type: order?.type,
+  //           symbol: order?.symbol,
+  //           sl: order?.sl,
+  //           sum: order?.volume,
+  //           price: order?.symbolValue,
+  //           tp: order?.tp,
+  //           status: order?.status,
+  //           profit: order?.profit,
+  //           userId: order?.userId,
+  //           createdAt: order?.createdAt,
+  //           docId: order?.id,
+  //           createdTime: order?.createdTime,
+  //         }))
+  //       );
+  //     });
 
-      // Return a cleanup function to unsubscribe when the component unmounts
-      return () => {
-        unsubscribe();
-      };
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-  };
+  //     console.log(orders, row, 222);
+
+  //     // Return a cleanup function to unsubscribe when the component unmounts
+  //     return () => {
+  //       unsubscribe();
+  //     };
+  //   } catch (error) {
+  //     console.error("Error fetching orders:", error);
+  //   }
+  // };
 
   console.log("Selected image", selectedImage);
   console.log("show modal", modalShow);
@@ -233,7 +255,7 @@ export default function MainBoard() {
   };
   const calulateProfit = () => {
     let totalProfit = 0;
-    userOrderData.map((el) => {
+    userOrderData?.map((el) => {
       if (
         el.status.toLocaleLowerCase() == "success" ||
         el.status.toLocaleLowerCase() == "closed"
@@ -267,7 +289,7 @@ export default function MainBoard() {
   };
 
   const updateOrderState = (id) => {
-    const orders = userOrderData.map((el) => {
+    const orders = userOrderData?.map((el) => {
       if (el?.id == id) {
         return { ...el, status: "Closed" };
       } else {
@@ -277,7 +299,7 @@ export default function MainBoard() {
     setUserOrderData(orders);
   };
   const handleEdit = (id, field, value) => {
-    const updatedData = userOrderData.map((item) =>
+    const updatedData = userOrderData?.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
     );
     setUserOrderData(updatedData);
@@ -519,7 +541,7 @@ export default function MainBoard() {
     },
   ];
 
-  const mappedData = users?.map((user, i) => ({
+  const mappedData = userOrders?.map((user, i) => ({
     ...user,
     status: user?.status,
     id: i + 1,
@@ -1002,7 +1024,7 @@ export default function MainBoard() {
                       </div>
                     )}
                     <div className="d-flex align-items-center justify-content-between">
-                      {idFiles.map((file, index) => (
+                      {idFiles?.map((file, index) => (
                         <img
                           key={index}
                           src={URL.createObjectURL(file)}
@@ -1063,7 +1085,7 @@ export default function MainBoard() {
                       </div>
                     )}
                     <div className="d-flex align-items-center justify-content-between">
-                      {locationFiles.map((file, index) => (
+                      {locationFiles?.map((file, index) => (
                         <img
                           key={index}
                           src={URL.createObjectURL(file)}
@@ -1116,7 +1138,7 @@ export default function MainBoard() {
                       </div>
                     )}
                     <div className="d-flex align-items-center justify-content-between">
-                      {mapFiles.map((file, index) => (
+                      {mapFiles?.map((file, index) => (
                         <img
                           key={index}
                           src={URL.createObjectURL(file)}
@@ -1169,7 +1191,7 @@ export default function MainBoard() {
                       </div>
                     )}
                     <div className="d-flex align-items-center justify-content-between px-3">
-                      {placeFiles.map((file, index) => (
+                      {placeFiles?.map((file, index) => (
                         <img
                           key={index}
                           src={URL.createObjectURL(file)}
@@ -1500,7 +1522,6 @@ export default function MainBoard() {
           onClose={handleClose}
           show={isDealEdit}
           selectedOrder={selectedOrder}
-          fetchOrders={fetchOrders}
         />
       )}
     </div>

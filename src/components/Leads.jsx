@@ -25,7 +25,10 @@ import DelOrderModal from "./DelOrderModal";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditOrder from "./EditOrder";
 import { addUserNewBalance } from "../utills/firebaseHelpers";
+import { setUserOrders } from "../redux/slicer/orderSlicer";
+import { useDispatch, useSelector } from "react-redux";
 export default function Leads({ setTab }) {
+  const userOrders = useSelector((state) => state?.userOrders?.orders);
   const [selected, setSelected] = useState();
   const [popup, setPopup] = useState(false);
   const [users, setUsers] = useState([]);
@@ -40,7 +43,7 @@ export default function Leads({ setTab }) {
   const [isBalanceModal, setIsBalanceModal] = useState(false);
   const [newBalance, setNewBalance] = useState(0);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const progressBarConfig = {
     New: { variant: "success", now: 25 },
     InProgress: { variant: "info", now: 50 },
@@ -86,7 +89,8 @@ export default function Leads({ setTab }) {
 
   const fetchOrders = async (row, isOk) => {
     console.log("UserId", row?.id);
-    const orders = [];
+    let orders = [];
+    const okara = [];
 
     try {
       const q = query(
@@ -95,10 +99,15 @@ export default function Leads({ setTab }) {
         where("userId", "==", row?.id)
       );
 
-      const unsubscribe = await onSnapshot(q, async (querySnapshot) => {
-        await querySnapshot.forEach(async (doc) => {
-          await orders.push({ id: doc.id, ...doc.data() });
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          console.log({ id: doc.id, ...doc.data() }, orders, 7070);
+          // orders.push({ id: doc.id, ...doc.data() });
+          orders = [...orders, { id: doc.id, ...doc.data() }];
+          console.log(okara, 8989);
+          dispatch(setUserOrders(orders));
         });
+
         let profit = 0;
         orders?.map((el) => {
           if (
@@ -107,9 +116,12 @@ export default function Leads({ setTab }) {
           ) {
             profit = profit + parseFloat(el.profit);
           }
+
           setUserProfit(profit);
         });
-        setOrdersData(orders);
+        console.log(8989, orders);
+
+        // setOrdersData(orders);
         if (isOk === true) {
           isOk = false;
           navigate("/home/mainBoard", {
@@ -204,8 +216,9 @@ export default function Leads({ setTab }) {
     },
   ];
 
-  const data = ordersData?.map((order, i) => ({
+  const data = userOrders?.map((order, i) => ({
     id: i + 1,
+    index: i + 1,
     docId: order.id,
     type: order?.type,
     symbol: order?.symbol,
