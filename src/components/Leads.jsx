@@ -90,7 +90,6 @@ export default function Leads({ setTab }) {
   const fetchOrders = async (row, isOk) => {
     console.log("UserId", row?.id);
     let orders = [];
-    const okara = [];
 
     try {
       const q = query(
@@ -103,10 +102,9 @@ export default function Leads({ setTab }) {
         querySnapshot.forEach((doc) => {
           console.log({ id: doc.id, ...doc.data() }, orders, 7070);
           // orders.push({ id: doc.id, ...doc.data() });
-          orders = [...orders, { id: doc.id, ...doc.data() }];
-          console.log(okara, 8989);
-          dispatch(setUserOrders(orders));
+          orders.push({ id: doc.id, ...doc.data() });
         });
+        dispatch(setUserOrders(orders));
 
         let profit = 0;
         orders?.map((el) => {

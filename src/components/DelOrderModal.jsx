@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { calculateProfit } from "../utills/helpers";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const DelOrderModal = ({
   onClose,
@@ -21,6 +22,7 @@ const DelOrderModal = ({
   isMain,
   updateOrderState,
 }) => {
+  console.log(8080, selectedOrder.sum);
   const [isFull, setIsFull] = useState(false);
   const [volume, setVolume] = useState(selectedOrder.sum);
   const [isPartial, setIsPartial] = useState(false);
@@ -42,19 +44,33 @@ const DelOrderModal = ({
     }
   };
 
-  const updateOrderStatus = async (orderId, newStatus) => {
+  const updateOrderStatus = async (orderId, newStatus, volume1) => {
     try {
       const orderRef = doc(db, "orders", orderId);
 
       const docSnapshot = await getDoc(orderRef);
-      if (docSnapshot.exists()) {
-        // Update the order status
-        await updateDoc(orderRef, {
+      let newData = {};
+
+      if (volume1 != null) {
+        const newVolume = parseFloat(selectedOrder.sum) - parseFloat(volume1);
+        newData = {
           status: newStatus,
           closedDate: serverTimestamp(),
           closedPrice: price?.price,
           profit: profit,
-        });
+          closedVolume: newVolume,
+        };
+      } else {
+        newData = {
+          status: newStatus,
+          closedDate: serverTimestamp(),
+          closedPrice: price?.price,
+          profit: profit,
+        };
+      }
+      if (docSnapshot.exists()) {
+        // Update the order status
+        await updateDoc(orderRef, newData);
         onClose(); // Close the order
 
         return "Order status updated successfully";
@@ -68,7 +84,8 @@ const DelOrderModal = ({
 
   const newOrder = async () => {
     if (isPartial) {
-      if (parseFloat(volume) > parseFloat(selectedOrder.volume)) {
+      if (parseFloat(volume) > parseFloat(selectedOrder.sum)) {
+        alert("ok");
         toast.error(
           "Please add a volume which is less or equal than the current volume"
         );
@@ -76,7 +93,7 @@ const DelOrderModal = ({
         try {
           const formattedDate = new Date().toLocaleDateString("en-US");
 
-          const newOrder = {
+          const newOrder1 = {
             symbol: selectedOrder.symbol,
             symbolValue: selectedOrder.price,
             volume: volume,
@@ -91,11 +108,11 @@ const DelOrderModal = ({
             closedPrice: null,
             closedDate: null,
           };
-          console.log(newOrder, 777);
+          console.log(newOrder1, 777);
           const orderRef = collection(db, "orders");
 
-          await addDoc(orderRef, newOrder);
-          await updateOrderStatus(selectedOrder.docId, "Closed");
+          await addDoc(orderRef, newOrder1);
+          await updateOrderStatus(selectedOrder.docId, "Closed", volume);
         } catch (error) {
           console.log(error, 777);
         }
