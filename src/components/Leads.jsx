@@ -42,6 +42,7 @@ export default function Leads({ setTab }) {
   const [userProfit, setUserProfit] = useState(0);
   const [isBalanceModal, setIsBalanceModal] = useState(false);
   const [newBalance, setNewBalance] = useState(0);
+  const [unsub, setUnsub] = useState();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const progressBarConfig = {
@@ -88,9 +89,6 @@ export default function Leads({ setTab }) {
   }, [statusUpdate, isOnline]);
 
   const fetchOrders = async (row, isOk) => {
-    console.log("UserId", row?.id);
-    let orders = [];
-
     try {
       const q = query(
         collection(db, "orders"),
@@ -99,13 +97,15 @@ export default function Leads({ setTab }) {
       );
 
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const orders = [];
+
         querySnapshot.forEach((doc) => {
-          console.log({ id: doc.id, ...doc.data() }, orders, 7070);
-          // orders.push({ id: doc.id, ...doc.data() });
           orders.push({ id: doc.id, ...doc.data() });
         });
         dispatch(setUserOrders(orders));
-
+        console.log("snap", orders);
+        // setOrdersData(orders);
+        console.log("SET ORDER DATA HAS BEEN CALLED");
         let profit = 0;
         orders?.map((el) => {
           if (
@@ -117,7 +117,6 @@ export default function Leads({ setTab }) {
 
           setUserProfit(profit);
         });
-        console.log(8989, orders);
 
         // setOrdersData(orders);
         if (isOk === true) {
@@ -397,7 +396,6 @@ export default function Leads({ setTab }) {
       ),
     },
   ];
-  console.log(selectedUser, 9090);
   const mappedData = users?.map((user, i) => ({
     ...user,
     status: user?.status,
@@ -426,7 +424,6 @@ export default function Leads({ setTab }) {
     setIsBalanceModal(false);
     setSelectedUser({});
   };
-  console.log(newBalance, 90909090, selectedUser);
   const addNewBalance = async (amount) => {
     await addUserNewBalance(selectedUser.id, amount);
     setNewBalance(0);
@@ -434,6 +431,7 @@ export default function Leads({ setTab }) {
     setSelectedUser({});
     fetchUsers();
   };
+  //console.log(data, 9080);
 
   return (
     <>

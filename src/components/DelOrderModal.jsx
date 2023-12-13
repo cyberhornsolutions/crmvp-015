@@ -22,7 +22,6 @@ const DelOrderModal = ({
   isMain,
   updateOrderState,
 }) => {
-  console.log(8080, selectedOrder.sum);
   const [isFull, setIsFull] = useState(false);
   const [volume, setVolume] = useState(selectedOrder.sum);
   const [isPartial, setIsPartial] = useState(false);
@@ -108,13 +107,12 @@ const DelOrderModal = ({
             closedPrice: null,
             closedDate: null,
           };
-          console.log(newOrder1, 777);
           const orderRef = collection(db, "orders");
 
           await addDoc(orderRef, newOrder1);
           await updateOrderStatus(selectedOrder.docId, "Closed", volume);
         } catch (error) {
-          console.log(error, 777);
+          console.log(error);
         }
       }
     } else {

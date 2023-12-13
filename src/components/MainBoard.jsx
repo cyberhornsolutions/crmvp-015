@@ -56,26 +56,7 @@ export default function MainBoard() {
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
-  const [userOrderData, setUserOrderData] = useState(
-    state?.state?.map((order, i) => ({
-      index: i + 1,
-      id: i + 1,
-      type: order?.type,
-      symbol: order?.symbol,
-      sl: order?.sl,
-      sum: order?.volume,
-      price: order?.symbolValue,
-      tp: order?.tp,
-      status: order?.status,
-      profit: order?.profit,
-      userId: order?.userId,
-      createdAt: order?.createdAt,
-      docId: order?.id,
-      createdTime: order?.createdTime,
-      closedPrice: order?.closedPrice,
-      closedDate: order?.closedDate,
-    }))
-  );
+  const [userOrderData, setUserOrderData] = useState();
   const handleKeyPress = (event) => {
     const keyCode = event.keyCode || event.which;
     const keyValue = String.fromCharCode(keyCode);
@@ -295,7 +276,7 @@ export default function MainBoard() {
   };
 
   const updateOrderState = (id) => {
-    const orders = userOrderData?.map((el) => {
+    const orders = userOrders?.map((el) => {
       if (el?.id == id) {
         return { ...el, status: "Closed" };
       } else {
@@ -305,7 +286,7 @@ export default function MainBoard() {
     setUserOrderData(orders);
   };
   const handleEdit = (id, field, value) => {
-    const updatedData = userOrderData?.map((item) =>
+    const updatedData = userOrders?.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
     );
     setUserOrderData(updatedData);
@@ -557,7 +538,24 @@ export default function MainBoard() {
     ({ status }) => status === "Pending"
   ).length;
   const closedOrders = userOrders.length - openOrders;
-
+  const data1 = userOrders?.map((order, i) => ({
+    index: i + 1,
+    id: i + 1,
+    type: order?.type,
+    symbol: order?.symbol,
+    sl: order?.sl,
+    sum: order?.volume,
+    price: order?.symbolValue,
+    tp: order?.tp,
+    status: order?.status,
+    profit: order?.profit,
+    userId: order?.userId,
+    createdAt: order?.createdAt,
+    docId: order?.id,
+    createdTime: order?.createdTime,
+    closedPrice: order?.closedPrice,
+    closedDate: order?.closedDate,
+  }));
   return (
     <div id="mainboard">
       <Sidebar tab={tab} setTab={setTab} />
@@ -1414,7 +1412,7 @@ export default function MainBoard() {
 
               <DataTable
                 columns={dealsColumns}
-                data={userOrderData}
+                data={data1}
                 highlightOnHover
                 pointerOnHover
                 pagination
