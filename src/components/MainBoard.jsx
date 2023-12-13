@@ -24,7 +24,7 @@ import {
 import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
 import Sidebar from "./Sidebar";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { faClose, faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DelOrderModal from "./DelOrderModal";
@@ -57,6 +57,7 @@ export default function MainBoard() {
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
   const [userOrderData, setUserOrderData] = useState();
+  const [userBonus, setUserBonus] = useState(0);
   const handleKeyPress = (event) => {
     const keyCode = event.keyCode || event.which;
     const keyValue = String.fromCharCode(keyCode);
@@ -174,7 +175,41 @@ export default function MainBoard() {
     Confirmed: { variant: "warning", now: 75 },
     Closed: { variant: "danger", now: 100 },
   };
+  const getDeposits = async (userId) => {
+    try {
+      const depositsRef = collection(db, "deposits");
+      const userDepositsQuery = query(
+        depositsRef,
+        orderBy("createdAt", "desc"),
+        where("userId", "==", userId)
+      );
 
+      const unsubscribe = onSnapshot(
+        userDepositsQuery,
+        (snapshot) => {
+          let totalBonus = 0;
+          const depositsData = [];
+          snapshot.forEach((doc) => {
+            depositsData.push({ id: doc.id, ...doc.data() });
+          });
+
+          depositsData?.map((el) => {
+            totalBonus = totalBonus + parseFloat(el.amount);
+          });
+          console.log(9090, depositsData);
+          setUserBonus(totalBonus);
+        },
+        (error) => {
+          console.error("Error fetching data:", error);
+        }
+      );
+
+      // Optionally returning unsubscribe function for cleanup if needed
+      return unsubscribe;
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  };
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -195,8 +230,9 @@ export default function MainBoard() {
         console.error("Error fetching users:", error);
       }
     };
-
     fetchUsers();
+    getDeposits(userOrders[0]?.userId);
+
     setIsEdit(false);
   }, [state?.state?.length]);
 
@@ -232,7 +268,7 @@ export default function MainBoard() {
   };
   const calulateProfit = () => {
     let totalProfit = 0;
-    userOrderData?.map((el) => {
+    userOrders?.map((el) => {
       if (
         el.status.toLocaleLowerCase() == "success" ||
         el.status.toLocaleLowerCase() == "closed"
@@ -269,6 +305,8 @@ export default function MainBoard() {
     try {
       const userDocRef = doc(db, "users", state?.user.id);
       await updateDoc(userDocRef, { allowTrading: newUserData.allowTrading });
+      toast.success("User info updated");
+
       console.log("User updated successfully");
     } catch (error) {
       console.log("error in updating user =", error);
@@ -558,6 +596,7 @@ export default function MainBoard() {
   }));
   return (
     <div id="mainboard">
+      <ToastContainer />
       <Sidebar tab={tab} setTab={setTab} />
       <div id="profile">
         <img id="profile-pic" src={placeholder} alt="" />
@@ -651,7 +690,7 @@ export default function MainBoard() {
                 Bonus
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                50.00
+                {userBonus}
               </h4>
             </div>
             <div>
@@ -717,7 +756,6 @@ export default function MainBoard() {
           <input type="text" disabled="true" value={state?.user?.refCode} />
         </div>
       </div>
-
       <div id="board">
         {/* <ul className="nav nav-tabs">
           <li className="active">
@@ -1526,7 +1564,6 @@ export default function MainBoard() {
           </button>
         </Modal.Body>
       </Modal>
-
       {isDelModalOpen && (
         <DelOrderModal
           selectedOrder={selectedOrder}
@@ -1536,7 +1573,6 @@ export default function MainBoard() {
           isMain={true}
         />
       )}
-
       {isDealEdit && (
         <EditOrder
           onClose={handleClose}

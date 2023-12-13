@@ -24,6 +24,7 @@ const DelOrderModal = ({
 }) => {
   const [isFull, setIsFull] = useState(false);
   const [volume, setVolume] = useState(selectedOrder.sum);
+  const [isLoading, setIsLoading] = useState(false);
   const [isPartial, setIsPartial] = useState(false);
   const symbols = useSelector((state) => state?.symbols?.symbols);
   const price = symbols?.find((el) => el.symbol == selectedOrder?.symbol);
@@ -45,6 +46,8 @@ const DelOrderModal = ({
 
   const updateOrderStatus = async (orderId, newStatus, volume1) => {
     try {
+      setIsLoading(true);
+
       const orderRef = doc(db, "orders", orderId);
 
       const docSnapshot = await getDoc(orderRef);
@@ -70,13 +73,17 @@ const DelOrderModal = ({
       if (docSnapshot.exists()) {
         // Update the order status
         await updateDoc(orderRef, newData);
+        setIsLoading(false);
+
         onClose(); // Close the order
 
         return "Order status updated successfully";
       } else {
         throw new Error("Order does not exist");
+        setIsLoading(false);
       }
     } catch (error) {
+      setIsLoading(false);
       throw error;
     }
   };
@@ -84,11 +91,12 @@ const DelOrderModal = ({
   const newOrder = async () => {
     if (isPartial) {
       if (parseFloat(volume) > parseFloat(selectedOrder.sum)) {
-        alert("ok");
         toast.error(
           "Please add a volume which is less or equal than the current volume"
         );
       } else {
+        setIsLoading(true);
+
         try {
           const formattedDate = new Date().toLocaleDateString("en-US");
 
@@ -110,6 +118,8 @@ const DelOrderModal = ({
           const orderRef = collection(db, "orders");
 
           await addDoc(orderRef, newOrder1);
+          setIsLoading(false);
+
           await updateOrderStatus(selectedOrder.docId, "Closed", volume);
         } catch (error) {
           console.log(error);
@@ -203,6 +213,7 @@ const DelOrderModal = ({
           <div className="w-100 text-center my-2">
             <button
               className="modal-close-btn btn btn-success fs-5 rounded-4 mx-auto"
+              disabled={isLoading}
               onClick={() => {
                 newOrder();
               }}
