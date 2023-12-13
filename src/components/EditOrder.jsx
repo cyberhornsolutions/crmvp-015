@@ -24,30 +24,30 @@ const EditOrder = ({ onClose, show, selectedOrder, fetchOrders, isMain }) => {
     e.preventDefault();
     const symbol = symbols.find((sm) => sm.symbol === selectedOrder.symbol);
 
-    if (
-      selectedOrder.type === "Buy" &&
-      (parseFloat(symbol.price) >= sl || parseFloat(symbol.price) <= tp)
-    ) {
-      toast.error(
-        "In buy case SL should be less than current price and TP should be greater than current price"
-      );
-    } else if (
-      selectedOrder.type === "Sell" &&
-      (parseFloat(symbol.price) <= sl || parseFloat(symbol.price) >= tp)
-    ) {
-      toast.error(
-        "In buy case TP should be less than current price and SL should be greater than current price"
-      );
-    } else {
-      const updatedData = doc(db, "orders", selectedOrder.docId);
-      try {
-        await updateDoc(updatedData, record);
-        onClose();
-      } catch (error) {
-        console.log(error);
-        toast.error("Something went wrong");
-      }
+    // if (
+    //   selectedOrder.type === "Buy" &&
+    //   (parseFloat(symbol.price) >= sl || parseFloat(symbol.price) <= tp)
+    // ) {
+    //   toast.error(
+    //     "In buy case SL should be less than current price and TP should be greater than current price"
+    //   );
+    // } else if (
+    //   selectedOrder.type === "Sell" &&
+    //   (parseFloat(symbol.price) <= sl || parseFloat(symbol.price) >= tp)
+    // ) {
+    //   toast.error(
+    //     "In buy case TP should be less than current price and SL should be greater than current price"
+    //   );
+    // } else {
+    const updatedData = doc(db, "orders", selectedOrder.docId);
+    try {
+      await updateDoc(updatedData, record);
+      onClose();
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
     }
+    // }
   };
 
   return (
