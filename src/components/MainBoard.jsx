@@ -31,6 +31,7 @@ import DelOrderModal from "./DelOrderModal";
 import EditOrder from "./EditOrder";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
+import EditUserModal from "./EditUserModal";
 
 export default function MainBoard() {
   const dispatch = useDispatch();
@@ -58,6 +59,7 @@ export default function MainBoard() {
   const [isDealEdit, setIsDealEdit] = useState(false);
   const [userOrderData, setUserOrderData] = useState();
   const [userBonus, setUserBonus] = useState(0);
+  const [isUserEdit, setIsUserEdit] = useState(false);
   const handleKeyPress = (event) => {
     const keyCode = event.keyCode || event.which;
     const keyValue = String.fromCharCode(keyCode);
@@ -196,7 +198,6 @@ export default function MainBoard() {
           depositsData?.map((el) => {
             totalBonus = totalBonus + parseFloat(el.amount);
           });
-          console.log(9090, depositsData);
           setUserBonus(totalBonus);
         },
         (error) => {
@@ -482,6 +483,7 @@ export default function MainBoard() {
     setIsBalOpen(false);
     setIsDelModalOpen(false);
     setIsDealEdit(false);
+    setIsUserEdit(false);
   };
 
   const userColumns = [
@@ -612,6 +614,14 @@ export default function MainBoard() {
             {state?.user?.name}{" "}
           </h4>
         </div>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            setIsUserEdit(true);
+          }}
+        >
+          Edit
+        </button>
         <div id="profile-deals">
           <h4 style={{ lineHeight: 1.1 }}>
             {/* Сделки */}
@@ -1580,6 +1590,8 @@ export default function MainBoard() {
           selectedOrder={selectedOrder}
         />
       )}
+
+      {isUserEdit && <EditUserModal onClose={handleClose} show={isUserEdit} />}
     </div>
   );
 }

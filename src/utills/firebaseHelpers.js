@@ -126,8 +126,10 @@ export const getUserById = async (userId) => {
 
     if (userDocSnapshot.exists()) {
       const userData = userDocSnapshot.data();
+      const userWithId = { id: userDocSnapshot.id, ...userData }; // Include ID in the returned object
+
       console.log("User data:", userData);
-      return userData; // Return the user data or perform operations here
+      return userWithId; // Return the user data or perform operations here
     } else {
       console.error("User ID does not exist in the database.");
       return null; // Or handle as needed if the user doesn't exist

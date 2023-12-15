@@ -12,12 +12,14 @@ import {
 import { calendarReducer } from "./calendar/calendarReducer";
 import symbolsSlicer from "./slicer/symbolsSlicer";
 import orderSlicer from "./slicer/orderSlicer";
+import userSlicer from "./slicer/userSlice";
 
 export const store = configureStore({
   reducer: {
     calendar: calendarReducer,
     symbols: symbolsSlicer,
     userOrders: orderSlicer,
+    user: userSlicer,
   },
   middleware: getDefaultMiddleware({
     serializableCheck: {

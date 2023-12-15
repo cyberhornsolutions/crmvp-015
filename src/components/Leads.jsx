@@ -24,9 +24,10 @@ import {
 import DelOrderModal from "./DelOrderModal";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditOrder from "./EditOrder";
-import { addUserNewBalance } from "../utills/firebaseHelpers";
+import { addUserNewBalance, getUserById } from "../utills/firebaseHelpers";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../redux/slicer/userSlice";
 export default function Leads({ setTab }) {
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const [selected, setSelected] = useState();
@@ -103,7 +104,6 @@ export default function Leads({ setTab }) {
           orders.push({ id: doc.id, ...doc.data() });
         });
         dispatch(setUserOrders(orders));
-        console.log("snap", orders);
         // setOrdersData(orders);
         console.log("SET ORDER DATA HAS BEEN CALLED");
         let profit = 0;
@@ -117,7 +117,6 @@ export default function Leads({ setTab }) {
 
           setUserProfit(profit);
         });
-
         // setOrdersData(orders);
         if (isOk === true) {
           isOk = false;
@@ -245,6 +244,8 @@ export default function Leads({ setTab }) {
   };
 
   const onUserDoubleClick = async (row) => {
+    const u = await getUserById(row.id);
+    dispatch(setUser(u));
     await fetchOrders(row, true);
   };
   const userColumns = [
