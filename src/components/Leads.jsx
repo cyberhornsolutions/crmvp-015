@@ -32,9 +32,7 @@ import AddBalanceModal from "./AddBalanceModal";
 export default function Leads({ setTab }) {
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const [selected, setSelected] = useState();
-  const [popup, setPopup] = useState(false);
   const [users, setUsers] = useState([]);
-  const [ordersData, setOrdersData] = useState([]);
   const [statusUpdate, setStatusUpdate] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
   const [selectedOrder, setSelectedOrder] = useState();
@@ -43,7 +41,6 @@ export default function Leads({ setTab }) {
   const [isOnline, setIsOnline] = useState(false);
   const [userProfit, setUserProfit] = useState(0);
   const [isBalanceModal, setIsBalanceModal] = useState(false);
-  const [unsub, setUnsub] = useState();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const progressBarConfig = {
@@ -55,10 +52,6 @@ export default function Leads({ setTab }) {
   const handleCloseModal = () => {
     setIsDelModalOpen(false);
     setIsEdit(false);
-  };
-
-  const handleDelModal = () => {
-    setIsDelModalOpen(true);
   };
 
   const fetchUsers = async () => {
@@ -200,8 +193,7 @@ export default function Leads({ setTab }) {
             className="custom-delete-icon"
             onClick={() => {
               setSelectedOrder(row);
-
-              handleDelModal();
+              setIsDelModalOpen(true);
             }}
           >
             <FontAwesomeIcon icon={faClose} />
