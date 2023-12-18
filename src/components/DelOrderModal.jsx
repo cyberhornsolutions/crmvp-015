@@ -34,14 +34,13 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
       const docSnapshot = await getDoc(orderRef);
       let newData = {};
 
-      if (volume1 != null) {
-        const newVolume = parseFloat(selectedOrder.sum) - parseFloat(volume1);
+      if (volume1) {
         newData = {
           status: newStatus,
           closedDate: serverTimestamp(),
           closedPrice: price?.price,
           profit: profit,
-          closedVolume: newVolume,
+          volume: volume1,
         };
       } else {
         newData = {
@@ -67,9 +66,9 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
 
   const newOrder = async () => {
     if (type === "Partial") {
-      if (parseFloat(volume) > parseFloat(selectedOrder.sum)) {
+      if (parseFloat(volume) >= parseFloat(selectedOrder.sum)) {
         toast.error(
-          "Please add a volume which is less or equal than the current volume"
+          "Please add a volume which is less than the current volume"
         );
       } else {
         setIsLoading(true);
@@ -80,7 +79,7 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
           const newOrder1 = {
             symbol: selectedOrder.symbol,
             symbolValue: selectedOrder.price,
-            volume: volume,
+            volume: parseFloat(selectedOrder.sum) - parseFloat(volume),
             sl: selectedOrder.sl,
             tp: selectedOrder.tp,
             profit: 0,

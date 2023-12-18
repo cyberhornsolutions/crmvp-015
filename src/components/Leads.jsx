@@ -213,22 +213,13 @@ export default function Leads({ setTab }) {
   ];
 
   const data = userOrders?.map((order, i) => ({
+    ...order,
     id: i + 1,
     index: i + 1,
     docId: order.id,
-    type: order?.type,
-    symbol: order?.symbol,
     sum: order?.volume,
     price: order?.symbolValue,
-    profit: order?.profit,
-    createdAt: order?.createdAt,
-    createdTime: order.createdTime,
-    sl: order.sl,
-    tp: order.tp,
-    userId: order.userId,
-    status: order.status,
     orderId: order.id,
-    closedPrice: order?.closedPrice,
   }));
 
   const onUserRowClick = (row) => {
