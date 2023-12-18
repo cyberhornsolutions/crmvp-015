@@ -1,5 +1,4 @@
-// Example: EditModal.js
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import { db } from "../firebase";
 import {
@@ -15,17 +14,10 @@ import { calculateProfit } from "../utills/helpers";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-const DelOrderModal = ({
-  onClose,
-  show,
-  selectedOrder,
-  isMain,
-  updateOrderState,
-}) => {
-  const [isFull, setIsFull] = useState(false);
+const DelOrderModal = ({ onClose, show, selectedOrder }) => {
   const [volume, setVolume] = useState(selectedOrder.sum);
   const [isLoading, setIsLoading] = useState(false);
-  const [isPartial, setIsPartial] = useState(false);
+  const [type, setType] = useState("Full");
   const symbols = useSelector((state) => state?.symbols?.symbols);
   const price = symbols?.find((el) => el.symbol == selectedOrder?.symbol);
   const profit = calculateProfit(
@@ -34,22 +26,11 @@ const DelOrderModal = ({
     selectedOrder?.price,
     selectedOrder?.sum
   );
-  const handleChange = (isChecked, type) => {
-    if (type == "isFull") {
-      setIsFull(true);
-      setIsPartial(false);
-    } else if (type == "isPartial") {
-      setIsFull(false);
-      setIsPartial(true);
-    }
-  };
 
   const updateOrderStatus = async (orderId, newStatus, volume1) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-
       const orderRef = doc(db, "orders", orderId);
-
       const docSnapshot = await getDoc(orderRef);
       let newData = {};
 
@@ -73,23 +54,19 @@ const DelOrderModal = ({
       if (docSnapshot.exists()) {
         // Update the order status
         await updateDoc(orderRef, newData);
-        setIsLoading(false);
-
+        toast.success("Order status updated successfully");
         onClose(); // Close the order
-
-        return "Order status updated successfully";
       } else {
-        throw new Error("Order does not exist");
-        setIsLoading(false);
+        toast.error("Order does not exist");
       }
     } catch (error) {
-      setIsLoading(false);
-      throw error;
+      toast.error(error.message);
     }
+    setIsLoading(false);
   };
 
   const newOrder = async () => {
-    if (isPartial) {
+    if (type === "Partial") {
       if (parseFloat(volume) > parseFloat(selectedOrder.sum)) {
         toast.error(
           "Please add a volume which is less or equal than the current volume"
@@ -125,7 +102,7 @@ const DelOrderModal = ({
           console.log(error);
         }
       }
-    } else {
+    } else if (type === "Full") {
       await updateOrderStatus(selectedOrder.docId, "Closed");
     }
   };
@@ -150,50 +127,48 @@ const DelOrderModal = ({
         <Modal.Body className="bg-secondry text-white d-flex flex-column gap-3 p-3 pt-0">
           <div className="d-flex flex-column justify-content-start align-items-start gap-2">
             <label
-              className="form-check-label fs-6 mb-2 ms-2"
+              className="form-check-label my-2 ms-2"
               for="flexRadioDefault1"
             >
               Closing type:
             </label>
-            <div className="d-flex gap-4 fs-6 ">
-              <div class="form-check form-check-inline">
+            <div className="d-flex align-items-center justify-content-around w-full ">
+              <div className="form-check form-check-inline">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   type="radio"
                   name="inlineRadioOptions"
                   id="inlineRadio1"
-                  value={isFull}
-                  onChange={(e) => {
-                    handleChange(e.target.checked, "isFull");
+                  onChange={() => {
+                    if (type !== "Full") setType("Full");
                   }}
                 />
-                <label class="form-check-labels" for="inlineRadio1">
+                <label className="form-check-labels" for="inlineRadio1">
                   Full
                 </label>
               </div>
-              <div class="form-check form-check-inline">
+              <div className="form-check form-check-inline">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   type="radio"
                   name="inlineRadioOptions"
                   id="inlineRadio2"
-                  value={isPartial}
-                  onChange={(e) => {
-                    handleChange(e.target.checked, "isPartial");
+                  onChange={() => {
+                    if (type === "Full") setType("Partial");
                   }}
                 />
-                <label class="form-check-labels" for="inlineRadio2">
+                <label className="form-check-labels" for="inlineRadio2">
                   Partial
                 </label>
               </div>
             </div>
           </div>
-          {isPartial && (
+          {type === "Partial" && (
             <div className="row my-2">
-              <label for="staticEmail" class="col-sm-4 col-form-label">
+              <label for="staticEmail" className="col-sm-4 col-form-label">
                 Volume
               </label>
-              <div class="col-sm-8">
+              <div className="col-sm-8">
                 <input
                   type="text"
                   className="form-control border-1 border-black rounded-0 input-number"

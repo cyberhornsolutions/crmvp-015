@@ -83,7 +83,7 @@ export default function Calendar() {
             x-on:click="openEventModal = !openEventModal"
           >
             <svg
-              class="fill-current w-6 h-4"
+              className="fill-current w-6 h-4"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
             >
