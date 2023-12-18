@@ -32,6 +32,7 @@ import EditOrder from "./EditOrder";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
 import EditUserModal from "./EditUserModal";
+import AddBalanceModal from "./AddBalanceModal";
 
 export default function MainBoard() {
   const dispatch = useDispatch();
@@ -44,7 +45,6 @@ export default function MainBoard() {
   const mapInputRef = useRef(null);
   const placeInputRef = useRef(null);
   const [isBalOpen, setIsBalOpen] = useState(false);
-  const [newBalance, setNewBalance] = useState(0);
   const [idFiles, setIdFiles] = useState([]);
   const [locationFiles, setLocationFiles] = useState([]);
   const [mapFiles, setMapFiles] = useState([]);
@@ -1548,32 +1548,12 @@ export default function MainBoard() {
           )}
         </div>
       </div>
-      <Modal show={isBalOpen} onHide={handleClose}>
-        <Modal.Header closeButton>Add Balance</Modal.Header>
-        <Modal.Body>
-          <input
-            type="number"
-            className="form-control "
-            placeholder="Enter new balance"
-            value={newBalance}
-            onChange={(e) => {
-              setNewBalance(e.target.value);
-            }}
-          />
-          <button
-            className="btn btn-primary mt-3"
-            onClick={() => {
-              if (!newBalance) {
-                toast.error("Please enter amount");
-              } else {
-                addNewBalance(newBalance);
-              }
-            }}
-          >
-            Add Balance
-          </button>
-        </Modal.Body>
-      </Modal>
+      {isBalOpen && (
+        <AddBalanceModal
+          setShowModal={setIsBalOpen}
+          selectedUser={state?.user}
+        />
+      )}
       {isDelModalOpen && (
         <DelOrderModal
           selectedOrder={selectedOrder}

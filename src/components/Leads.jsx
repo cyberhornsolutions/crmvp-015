@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import { Dropdown, Modal, ProgressBar } from "react-bootstrap";
+import { Dropdown, ProgressBar } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -24,10 +24,11 @@ import {
 import DelOrderModal from "./DelOrderModal";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditOrder from "./EditOrder";
-import { addUserNewBalance, getUserById } from "../utills/firebaseHelpers";
+import { getUserById } from "../utills/firebaseHelpers";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../redux/slicer/userSlice";
+import AddBalanceModal from "./AddBalanceModal";
 export default function Leads({ setTab }) {
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const [selected, setSelected] = useState();
@@ -42,7 +43,6 @@ export default function Leads({ setTab }) {
   const [isOnline, setIsOnline] = useState(false);
   const [userProfit, setUserProfit] = useState(0);
   const [isBalanceModal, setIsBalanceModal] = useState(false);
-  const [newBalance, setNewBalance] = useState(0);
   const [unsub, setUnsub] = useState();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -421,18 +421,6 @@ export default function Leads({ setTab }) {
       event.preventDefault();
     }
   };
-  const handleClose = () => {
-    setIsBalanceModal(false);
-    setSelectedUser({});
-  };
-  const addNewBalance = async (amount) => {
-    await addUserNewBalance(selectedUser.id, amount);
-    setNewBalance(0);
-    setIsBalanceModal(false);
-    setSelectedUser({});
-    fetchUsers();
-  };
-  //console.log(data, 9080);
 
   return (
     <>
@@ -552,32 +540,14 @@ export default function Leads({ setTab }) {
           </div>
         </div>
       </div>
-      <Modal show={isBalanceModal} onHide={handleClose}>
-        <Modal.Header closeButton>Add Balance</Modal.Header>
-        <Modal.Body>
-          <input
-            type="number"
-            className="form-control "
-            placeholder="Enter new balance"
-            value={newBalance}
-            onChange={(e) => {
-              setNewBalance(e.target.value);
-            }}
-          />
-          <button
-            className="btn btn-primary mt-3"
-            onClick={() => {
-              if (!newBalance) {
-                toast.error("Please enter amount");
-              } else {
-                addNewBalance(newBalance);
-              }
-            }}
-          >
-            Add Balance
-          </button>
-        </Modal.Body>
-      </Modal>
+      {isBalanceModal && (
+        <AddBalanceModal
+          setShowModal={setIsBalanceModal}
+          fetchUsers={fetchUsers}
+          selectedUser={selectedUser}
+          setSelectedUser={setSelectedUser}
+        />
+      )}
 
       {isDelModalOpen && (
         <DelOrderModal

@@ -83,7 +83,7 @@ export const removeDuplicateSymbol = async (selectedSymbol, duplicate) => {
   }
 };
 
-export const addUserNewBalance = async (userId, amount) => {
+export const addUserNewBalance = async (userId, amount, balanceType) => {
   try {
     const userDocRef = doc(db, "users", userId);
     const userDocSnapshot = await getDoc(userDocRef);
@@ -106,7 +106,8 @@ export const addUserNewBalance = async (userId, amount) => {
       await addDoc(depositRef, {
         userId: userId,
         amount: parseFloat(amount),
-        comment: "Bonus",
+        type: balanceType,
+        // comment: "Bonus",
         createdAt: serverTimestamp(),
       });
 
