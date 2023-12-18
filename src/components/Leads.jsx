@@ -551,10 +551,8 @@ export default function Leads({ setTab }) {
 
       {isDelModalOpen && (
         <DelOrderModal
-          show={isDelModalOpen}
           onClose={handleCloseModal}
           selectedOrder={selectedOrder}
-          isMain={false}
         />
       )}
       {isEdit && (

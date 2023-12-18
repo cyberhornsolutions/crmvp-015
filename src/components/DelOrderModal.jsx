@@ -14,7 +14,7 @@ import { calculateProfit } from "../utills/helpers";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-const DelOrderModal = ({ onClose, show, selectedOrder }) => {
+const DelOrderModal = ({ onClose, selectedOrder }) => {
   const [volume, setVolume] = useState(selectedOrder.sum);
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState("Full");
@@ -111,7 +111,7 @@ const DelOrderModal = ({ onClose, show, selectedOrder }) => {
     <>
       <Modal
         size="md"
-        show={show}
+        show
         onHide={onClose}
         className="modal-style-edit modal-style-del"
         centered
@@ -126,24 +126,20 @@ const DelOrderModal = ({ onClose, show, selectedOrder }) => {
         </Modal.Header>
         <Modal.Body className="bg-secondry text-white d-flex flex-column gap-3 p-3 pt-0">
           <div className="d-flex flex-column justify-content-start align-items-start gap-2">
-            <label
-              className="form-check-label my-2 ms-2"
-              for="flexRadioDefault1"
-            >
-              Closing type:
-            </label>
+            <label className="form-check-label my-2 ms-2">Closing type:</label>
             <div className="d-flex align-items-center justify-content-around w-full ">
               <div className="form-check form-check-inline">
                 <input
                   className="form-check-input"
                   type="radio"
+                  checked={type === "Full"}
                   name="inlineRadioOptions"
-                  id="inlineRadio1"
+                  id="radioFull"
                   onChange={() => {
                     if (type !== "Full") setType("Full");
                   }}
                 />
-                <label className="form-check-labels" for="inlineRadio1">
+                <label className="form-check-labels" htmlFor="radioFull">
                   Full
                 </label>
               </div>
@@ -151,13 +147,14 @@ const DelOrderModal = ({ onClose, show, selectedOrder }) => {
                 <input
                   className="form-check-input"
                   type="radio"
+                  checked={type === "Partial"}
                   name="inlineRadioOptions"
-                  id="inlineRadio2"
+                  id="radioPartial"
                   onChange={() => {
                     if (type === "Full") setType("Partial");
                   }}
                 />
-                <label className="form-check-labels" for="inlineRadio2">
+                <label className="form-check-labels" htmlFor="radioPartial">
                   Partial
                 </label>
               </div>
@@ -165,14 +162,17 @@ const DelOrderModal = ({ onClose, show, selectedOrder }) => {
           </div>
           {type === "Partial" && (
             <div className="row my-2">
-              <label for="staticEmail" className="col-sm-4 col-form-label">
+              <label
+                htmlFor="volumeTextInput"
+                className="col-sm-4 col-form-label"
+              >
                 Volume
               </label>
               <div className="col-sm-8">
                 <input
                   type="text"
                   className="form-control border-1 border-black rounded-0 input-number"
-                  id="staticEmail"
+                  id="volumeTextInput"
                   onChange={(e) => {
                     setVolume(e.target.value);
                   }}

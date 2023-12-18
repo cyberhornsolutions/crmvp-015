@@ -1555,13 +1555,7 @@ export default function MainBoard() {
         />
       )}
       {isDelModalOpen && (
-        <DelOrderModal
-          selectedOrder={selectedOrder}
-          onClose={handleClose}
-          show={isDelModalOpen}
-          updateOrderState={updateOrderState}
-          isMain={true}
-        />
+        <DelOrderModal selectedOrder={selectedOrder} onClose={handleClose} />
       )}
       {isDealEdit && (
         <EditOrder
