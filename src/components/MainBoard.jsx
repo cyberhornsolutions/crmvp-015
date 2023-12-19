@@ -25,8 +25,6 @@ import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
 import Sidebar from "./Sidebar";
 import { ToastContainer, toast } from "react-toastify";
-import { faClose, faEdit } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DelOrderModal from "./DelOrderModal";
 import EditOrder from "./EditOrder";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
@@ -34,6 +32,7 @@ import { useDispatch, useSelector } from "react-redux";
 import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import moment from "moment";
+import dealsColumns from "./columns/dealsColumns";
 
 const newDate = (date) => {
   const jsDate = new Date(date.seconds * 1000 + date.nanoseconds / 1000000);
@@ -60,6 +59,7 @@ export default function MainBoard() {
   const [modalShow, setModalShow] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
+  const [isEditProfit, setIsEditProfit] = useState(false);
   const [newUserData, setNewUserData] = useState();
   const [userProfit, setUserProfit] = useState(0);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
@@ -339,155 +339,15 @@ export default function MainBoard() {
     );
     setUserOrderData(updatedData);
   };
-  const dealsColumns = [
-    {
-      name: "ID",
-      selector: (row) => row.index,
-      sortable: true,
-    },
-    {
-      name: "Transaction Type",
-      selector: (row) => row.type,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.type}
-            onChange={(e) => {
-              handleEdit(row.id, "type", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.type
-        ),
-    },
-    {
-      name: "Symbol",
-      selector: (row) => row.symbol,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.symbol}
-            onChange={(e) => {
-              handleEdit(row.id, "symbol", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.symbol
-        ),
-    },
-    {
-      name: "Sum",
-      selector: (row) => row.sum,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.sum}
-            onChange={(e) => {
-              handleEdit(row.id, "sum", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.sum
-        ),
-    },
-    {
-      name: "Price",
-      selector: (row) => row.price,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.price}
-            onChange={(e) => {
-              handleEdit(row.id, "price", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.price
-        ),
-    },
-    {
-      name: "Status",
-      selector: (row) => row.status,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.status}
-            onChange={(e) => {
-              handleEdit(row.id, "status", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.status
-        ),
-    },
-    {
-      name: "Profit",
-      selector: (row) => row.profit,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.profit}
-            onChange={(e) => {
-              handleEdit(row.id, "profit", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.profit
-        ),
-    },
-    {
-      name: "Date",
-      selector: (row) => row.createdAt,
-      sortable: true,
-    },
-    {
-      name: "Action",
-      selector: (row) => row.id,
-      cell: (row) => (
-        <div className="order-actions">
-          <div
-            className="custom-edit-icon"
-            onClick={() => {
-              setSelectedOrder(row);
-              setIsDealEdit(true);
-            }}
-          >
-            <FontAwesomeIcon icon={faEdit} />
-          </div>
-          <div className="ml-5">
-            <FontAwesomeIcon
-              icon={faClose}
-              onClick={() => {
-                setSelectedOrder(row);
-                setIsDelModalOpen(true);
-                // updateOrderStatus(row.id, "Closed");
-                // updateOrderState(row.id);
-              }}
-            />
-          </div>
-        </div>
-      ),
-      sortable: false,
-    },
-  ];
+  const handleEditOrder = (row) => {
+    setSelectedOrder(row);
+    setIsDealEdit(true);
+  };
+  const handleCloseOrder = (row) => {
+    setSelectedOrder(row);
+    setIsDelModalOpen(true);
+  };
+
   const depositColumns = [
     {
       name: "Date",
@@ -1336,8 +1196,29 @@ export default function MainBoard() {
 
           {tab === 2 && (
             <div id="menu2">
+              <div id="menu3-buttons">
+                <button
+                  id="menu3-edit"
+                  className="btn btn-secondary"
+                  onClick={() => setIsEditProfit(true)}
+                >
+                  Edit
+                </button>
+                <button
+                  id="menu3-save"
+                  className="btn btn-secondary"
+                  onClick={updateProfit}
+                >
+                  Save
+                </button>
+              </div>
               <DataTable
-                columns={dealsColumns}
+                columns={dealsColumns({
+                  isEdit,
+                  handleEdit,
+                  handleEditOrder,
+                  handleCloseOrder,
+                })}
                 data={closedOrders}
                 highlightOnHover
                 pointerOnHover
@@ -1351,7 +1232,12 @@ export default function MainBoard() {
           {tab === 3 && (
             <div id="menu3">
               <DataTable
-                columns={dealsColumns}
+                columns={dealsColumns({
+                  isEdit,
+                  handleEdit,
+                  handleEditOrder,
+                  handleCloseOrder,
+                })}
                 data={openOrders}
                 highlightOnHover
                 pointerOnHover
