@@ -33,6 +33,7 @@ import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import moment from "moment";
 import dealsColumns from "./columns/dealsColumns";
+import overviewColumns from "./columns/overviewColumns";
 
 const newDate = (date) => {
   const jsDate = new Date(date.seconds * 1000 + date.nanoseconds / 1000000);
@@ -61,11 +62,11 @@ export default function MainBoard() {
   const [isEdit, setIsEdit] = useState(false);
   const [isEditProfit, setIsEditProfit] = useState(false);
   const [newUserData, setNewUserData] = useState();
-  const [userProfit, setUserProfit] = useState(0);
+  const [userProfit, setUserProfit] = useState(0.0);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
-  const [userOrderData, setUserOrderData] = useState();
+  const [userOrderData, setUserOrderData] = useState(userOrders);
   const [userBonus, setUserBonus] = useState(0);
   const [isUserEdit, setIsUserEdit] = useState(false);
   const handleKeyPress = (event) => {
@@ -277,7 +278,7 @@ export default function MainBoard() {
     });
   };
   const calulateProfit = () => {
-    let totalProfit = 0;
+    let totalProfit = 0.0;
     userOrders?.map((el) => {
       if (
         el.status.toLocaleLowerCase() == "success" ||
@@ -293,22 +294,21 @@ export default function MainBoard() {
     calulateProfit();
   }, []);
 
-  const save = async () => {
+  const saveOrders = async () => {
     console.log("updated data", userOrderData);
-
-    userOrderData.forEach(async (object) => {
-      const { id, index, ...rest } = object;
-      console.log("rest------>", rest);
-
-      const docRef = doc(db, "orders", id);
+    let status = "success";
+    userOrderData.forEach(async (order) => {
+      const docRef = doc(db, "orders", order.id);
       try {
-        await updateDoc(docRef, rest);
-        console.log(`Document with ID ${id} updated successfully`);
+        await updateDoc(docRef, order);
+        console.log(`Document with ID ${order.id} updated successfully`);
       } catch (error) {
-        console.error(`Error updating document with ID ${id}:`, error);
+        status = "error";
+        console.error(`Error updating document with ID ${order.id}:`, error);
       }
     });
-    setIsEdit(false);
+    toast[status]("Orders Updated");
+    setIsEditProfit(false);
   };
 
   const handleSaveVerification = async () => {
@@ -337,6 +337,14 @@ export default function MainBoard() {
     const updatedData = userOrders?.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
     );
+    setUserOrderData(updatedData);
+  };
+  const handleEditProfit = (id, field, value) => {
+    console.log("id field value = ", id, field, value);
+
+    const updatedData = userOrderData
+      .filter(({ status }) => status !== "Pending")
+      .map((item) => (item.id === id ? { ...item, [field]: value } : item));
     setUserOrderData(updatedData);
   };
   const handleEditOrder = (row) => {
@@ -451,19 +459,10 @@ export default function MainBoard() {
     id: i + 1,
   }));
 
-  const processedOrders = userOrders.map((order, i) => ({
-    ...order,
-    index: i + 1,
-    id: i + 1,
-    sum: order?.volume,
-    price: order?.symbolValue,
-    docId: order?.id,
-  }));
-
-  const openOrders = processedOrders.filter(
+  const openOrders = userOrderData?.filter(
     ({ status }) => status === "Pending"
   );
-  const closedOrders = processedOrders.filter(
+  const closedOrders = userOrderData?.filter(
     ({ status }) => status !== "Pending"
   );
 
@@ -1200,22 +1199,29 @@ export default function MainBoard() {
                 <button
                   id="menu3-edit"
                   className="btn btn-secondary"
-                  onClick={() => setIsEditProfit(true)}
+                  onClick={() => {
+                    if (isEditProfit) {
+                      setUserOrderData(userOrders);
+                      setIsEditProfit(false);
+                    } else {
+                      setIsEditProfit(true);
+                    }
+                  }}
                 >
-                  Edit
+                  {isEditProfit ? "Cancel" : "Edit"}
                 </button>
                 <button
                   id="menu3-save"
                   className="btn btn-secondary"
-                  // onClick={updateProfit}
+                  onClick={saveOrders}
                 >
                   Save
                 </button>
               </div>
               <DataTable
-                columns={dealsColumns({
-                  isEdit,
-                  handleEdit,
+                columns={overviewColumns({
+                  isEditProfit,
+                  handleEditProfit,
                   handleEditOrder,
                   handleCloseOrder,
                 })}
@@ -1233,8 +1239,6 @@ export default function MainBoard() {
             <div id="menu3">
               <DataTable
                 columns={dealsColumns({
-                  isEdit,
-                  handleEdit,
                   handleEditOrder,
                   handleCloseOrder,
                 })}

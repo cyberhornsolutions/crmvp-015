@@ -1,15 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faEdit } from "@fortawesome/free-solid-svg-icons";
 
-const dealsColumns = ({
-  isEdit,
-  handleEdit,
-  handleEditOrder,
-  handleCloseOrder,
-}) => [
+const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   {
     name: "ID",
-    selector: (row) => row.index,
+    selector: (row, i) => i,
     sortable: true,
   },
   {
@@ -26,15 +21,13 @@ const dealsColumns = ({
   },
   {
     name: "Sum",
-    selector: (row) => row.sum,
+    selector: (row) => row.volume,
     sortable: true,
-    cell: (row) => row.sum,
   },
   {
     name: "Price",
-    selector: (row) => row.price,
+    selector: (row) => row.symbolValue,
     sortable: true,
-    cell: (row) => row.price,
   },
   {
     name: "Status",
