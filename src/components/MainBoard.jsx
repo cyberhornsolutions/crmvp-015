@@ -33,11 +33,18 @@ import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
 import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
+import moment from "moment";
+
+const newDate = (date) => {
+  const jsDate = new Date(date.seconds * 1000 + date.nanoseconds / 1000000);
+  return moment(jsDate).format("MM/DD/YYYY hh:mm:ss A");
+};
 
 export default function MainBoard() {
   const dispatch = useDispatch();
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const dbSymbols = useSelector((state) => state?.symbols?.symbols);
+  const [deposits, setDeposits] = useState([]);
   const [tab, setTab] = useState(0);
   const [users, setUsers] = useState([]);
   const { state } = useLocation();
@@ -196,6 +203,7 @@ export default function MainBoard() {
             depositsData.push({ id: doc.id, ...doc.data() });
           });
 
+          setDeposits(depositsData);
           depositsData?.map((el) => {
             totalBonus = totalBonus + parseFloat(el.amount);
           });
@@ -479,6 +487,14 @@ export default function MainBoard() {
       ),
       sortable: false,
     },
+  ];
+  const depositColumns = [
+    {
+      name: "Date",
+      selector: (row) => newDate(row.createdAt),
+    },
+    { name: "Sum", selector: (row) => row.amount },
+    { name: "Type", selector: (row) => row.type },
   ];
   const handleClose = () => {
     setIsBalOpen(false);
@@ -1348,39 +1364,17 @@ export default function MainBoard() {
           )}
 
           {tab === 4 && (
-            <div id="menu4">
-              <table className="table table-hover table-striped">
-                <thead>
-                  <tr>
-                    <th className="text-center" scope="col">
-                      Player
-                    </th>
-                    <th className="text-center" scope="col">
-                      Date
-                    </th>
-                    <th className="text-center" scope="col">
-                      Sum
-                    </th>
-                    <th className="text-center" scope="col">
-                      Transaction ID
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Test</td>
-                    <td>05-05-2023</td>
-                    <td>$100</td>
-                    <td>ID001</td>
-                  </tr>
-                  <tr>
-                    <td>Test</td>
-                    <td>01-12-2023</td>
-                    <td>$50</td>
-                    <td>ID002</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div id="menu">
+              <DataTable
+                columns={depositColumns}
+                data={deposits}
+                highlightOnHover
+                pointerOnHover
+                pagination
+                paginationPerPage={10}
+                paginationRowsPerPageOptions={[10, 20, 50]}
+                // responsive
+              />
             </div>
           )}
 
