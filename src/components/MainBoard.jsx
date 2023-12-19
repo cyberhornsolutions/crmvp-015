@@ -32,10 +32,19 @@ import EditOrder from "./EditOrder";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
 import EditUserModal from "./EditUserModal";
+import AddBalanceModal from "./AddBalanceModal";
+import moment from "moment";
+
+const newDate = (date) => {
+  const jsDate = new Date(date.seconds * 1000 + date.nanoseconds / 1000000);
+  return moment(jsDate).format("MM/DD/YYYY hh:mm:ss A");
+};
 
 export default function MainBoard() {
   const dispatch = useDispatch();
   const userOrders = useSelector((state) => state?.userOrders?.orders);
+  const dbSymbols = useSelector((state) => state?.symbols?.symbols);
+  const [deposits, setDeposits] = useState([]);
   const [tab, setTab] = useState(0);
   const [users, setUsers] = useState([]);
   const { state } = useLocation();
@@ -44,7 +53,6 @@ export default function MainBoard() {
   const mapInputRef = useRef(null);
   const placeInputRef = useRef(null);
   const [isBalOpen, setIsBalOpen] = useState(false);
-  const [newBalance, setNewBalance] = useState(0);
   const [idFiles, setIdFiles] = useState([]);
   const [locationFiles, setLocationFiles] = useState([]);
   const [mapFiles, setMapFiles] = useState([]);
@@ -195,6 +203,7 @@ export default function MainBoard() {
             depositsData.push({ id: doc.id, ...doc.data() });
           });
 
+          setDeposits(depositsData);
           depositsData?.map((el) => {
             totalBonus = totalBonus + parseFloat(el.amount);
           });
@@ -479,6 +488,14 @@ export default function MainBoard() {
       sortable: false,
     },
   ];
+  const depositColumns = [
+    {
+      name: "Date",
+      selector: (row) => newDate(row.createdAt),
+    },
+    { name: "Sum", selector: (row) => row.amount },
+    { name: "Type", selector: (row) => row.type },
+  ];
   const handleClose = () => {
     setIsBalOpen(false);
     setIsDelModalOpen(false);
@@ -574,28 +591,37 @@ export default function MainBoard() {
     id: i + 1,
   }));
 
-  const openOrders = userOrders.filter(
-    ({ status }) => status === "Pending"
-  ).length;
-  const closedOrders = userOrders.length - openOrders;
-  const data1 = userOrders?.map((order, i) => ({
+  const processedOrders = userOrders.map((order, i) => ({
+    ...order,
     index: i + 1,
     id: i + 1,
-    type: order?.type,
-    symbol: order?.symbol,
-    sl: order?.sl,
     sum: order?.volume,
     price: order?.symbolValue,
-    tp: order?.tp,
-    status: order?.status,
-    profit: order?.profit,
-    userId: order?.userId,
-    createdAt: order?.createdAt,
     docId: order?.id,
-    createdTime: order?.createdTime,
-    closedPrice: order?.closedPrice,
-    closedDate: order?.closedDate,
   }));
+
+  const openOrders = processedOrders.filter(
+    ({ status }) => status === "Pending"
+  );
+  const closedOrders = processedOrders.filter(
+    ({ status }) => status !== "Pending"
+  );
+
+  const freeMargin = () => {
+    let freeMarginOpened = 0;
+    let newBal = parseFloat(state?.user?.totalBalance) + parseFloat(userProfit);
+
+    userOrders?.map((el) => {
+      const latestPrice = dbSymbols?.find((sym) => sym.symbol == el.symbol);
+      const dealSum = parseFloat(el.volume) * parseFloat(latestPrice?.price);
+      if (el.status == "Pending") {
+        freeMarginOpened = newBal - parseFloat(dealSum);
+      }
+    });
+    return freeMarginOpened;
+  };
+  const freeMarginData = freeMargin();
+
   return (
     <div id="mainboard">
       <ToastContainer />
@@ -633,7 +659,7 @@ export default function MainBoard() {
                 className="f-s-inherit  f-w-inherit "
                 style={{ lineHeight: 1.1 }}
               >
-                {openOrders}
+                {openOrders.length}
               </h5>
               <h5
                 className="f-s-inherit  f-w-inherit "
@@ -648,7 +674,7 @@ export default function MainBoard() {
                 className="f-s-inherit  f-w-inherit "
                 style={{ lineHeight: 1.1 }}
               >
-                {closedOrders}
+                {closedOrders.length}
               </h5>
               <h5
                 className="f-s-inherit  f-w-inherit "
@@ -735,10 +761,10 @@ export default function MainBoard() {
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
                 {/* Уровень маржи */}
-                Margin level
+                Free margin
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                88.05%
+                {freeMarginData}
               </h4>
             </div>
             <div>
@@ -1310,157 +1336,23 @@ export default function MainBoard() {
 
           {tab === 2 && (
             <div id="menu2">
-              <div id="menu2-filter" className="dropdown">
-                <button
-                  className="btn dropdown-toggle"
-                  type="button"
-                  id="menu2Dropdown"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Filter
-                </button>
-                <div className="dropdown-menu" aria-labelledby="menu2Dropdown">
-                  <a
-                    className="dropdown-item text-center"
-                    href="#"
-                    data-option="All operations"
-                  >
-                    All operations
-                  </a>
-                  <a
-                    className="dropdown-item text-center"
-                    href="#"
-                    data-option="Extra"
-                  >
-                    Extra
-                  </a>
-                  <a
-                    className="dropdown-item text-center"
-                    href="#"
-                    data-option="Trading"
-                  >
-                    Trading operations
-                  </a>
-                </div>
-                <input
-                  type="text"
-                  id="leadsSearchInput"
-                  onkeyup="leadsSearch()"
-                  placeholder="Search.."
-                />
-              </div>
-              <table
-                id="lead-transactions-table"
-                className="table table-hover table-striped"
-              >
-                <thead>
-                  <tr>
-                    <th scope="col" className="text-center">
-                      ID
-                    </th>
-                    <th scope="col" className="text-center">
-                      Type
-                    </th>
-                    <th scope="col" className="text-center">
-                      Sum
-                    </th>
-                    <th scope="col" className="text-center">
-                      Method
-                    </th>
-                    <th scope="col" className="text-center">
-                      Card
-                    </th>
-                    <th scope="col" className="text-center">
-                      Status
-                    </th>
-                    <th scope="col" className="text-center">
-                      Date
-                    </th>
-                    <th scope="col" className="text-center">
-                      FTD
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>Deposit</td>
-                    <td>100</td>
-                    <td>VISA</td>
-                    <td>0000111100001111</td>
-                    <td>Success</td>
-                    <td>21/08/2023</td>
-                    <td>Yes</td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>Withdrawal</td>
-                    <td>200</td>
-                    <td>MasterCard</td>
-                    <td>1111000022223333</td>
-                    <td>Pending</td>
-                    <td>22/08/2023</td>
-                    <td>No</td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>Transfer</td>
-                    <td>150</td>
-                    <td>PayPal</td>
-                    <td>5555666677778888</td>
-                    <td>Success</td>
-                    <td>23/08/2023</td>
-                    <td>Yes</td>
-                  </tr>
-                  <tr>
-                    <td>4</td>
-                    <td>Withdrawal</td>
-                    <td>300</td>
-                    <td>Bitcoin</td>
-                    <td>0101010101010101</td>
-                    <td>Failed</td>
-                    <td>24/08/2023</td>
-                    <td>No</td>
-                  </tr>
-                  <tr>
-                    <td>5</td>
-                    <td>Deposit</td>
-                    <td>75</td>
-                    <td>Bank Transfer</td>
-                    <td>1001100010011000</td>
-                    <td>Success</td>
-                    <td>25/08/2023</td>
-                    <td>Yes</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {tab === 3 && (
-            <div id="menu3">
-              <div id="menu3-buttons">
-                <button
-                  id="menu3-edit"
-                  className="btn btn-secondary"
-                  onClick={() => setIsEdit(true)}
-                >
-                  Edit
-                </button>
-                <button
-                  id="menu3-save"
-                  className="btn btn-secondary"
-                  onClick={save}
-                >
-                  Save
-                </button>
-              </div>
-
               <DataTable
                 columns={dealsColumns}
-                data={data1}
+                data={closedOrders}
+                highlightOnHover
+                pointerOnHover
+                pagination
+                paginationPerPage={10}
+                paginationRowsPerPageOptions={[10, 20, 50]}
+                // responsive
+              />
+            </div>
+          )}
+          {tab === 3 && (
+            <div id="menu3">
+              <DataTable
+                columns={dealsColumns}
+                data={openOrders}
                 highlightOnHover
                 pointerOnHover
                 pagination
@@ -1472,39 +1364,17 @@ export default function MainBoard() {
           )}
 
           {tab === 4 && (
-            <div id="menu4">
-              <table className="table table-hover table-striped">
-                <thead>
-                  <tr>
-                    <th className="text-center" scope="col">
-                      Player
-                    </th>
-                    <th className="text-center" scope="col">
-                      Date
-                    </th>
-                    <th className="text-center" scope="col">
-                      Sum
-                    </th>
-                    <th className="text-center" scope="col">
-                      Transaction ID
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Test</td>
-                    <td>05-05-2023</td>
-                    <td>$100</td>
-                    <td>ID001</td>
-                  </tr>
-                  <tr>
-                    <td>Test</td>
-                    <td>01-12-2023</td>
-                    <td>$50</td>
-                    <td>ID002</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div id="menu">
+              <DataTable
+                columns={depositColumns}
+                data={deposits}
+                highlightOnHover
+                pointerOnHover
+                pagination
+                paginationPerPage={10}
+                paginationRowsPerPageOptions={[10, 20, 50]}
+                // responsive
+              />
             </div>
           )}
 
@@ -1548,40 +1418,14 @@ export default function MainBoard() {
           )}
         </div>
       </div>
-      <Modal show={isBalOpen} onHide={handleClose}>
-        <Modal.Header closeButton>Add Balance</Modal.Header>
-        <Modal.Body>
-          <input
-            type="number"
-            className="form-control "
-            placeholder="Enter new balance"
-            value={newBalance}
-            onChange={(e) => {
-              setNewBalance(e.target.value);
-            }}
-          />
-          <button
-            className="btn btn-primary mt-3"
-            onClick={() => {
-              if (!newBalance) {
-                toast.error("Please enter amount");
-              } else {
-                addNewBalance(newBalance);
-              }
-            }}
-          >
-            Add Balance
-          </button>
-        </Modal.Body>
-      </Modal>
-      {isDelModalOpen && (
-        <DelOrderModal
-          selectedOrder={selectedOrder}
-          onClose={handleClose}
-          show={isDelModalOpen}
-          updateOrderState={updateOrderState}
-          isMain={true}
+      {isBalOpen && (
+        <AddBalanceModal
+          setShowModal={setIsBalOpen}
+          selectedUser={state?.user}
         />
+      )}
+      {isDelModalOpen && (
+        <DelOrderModal selectedOrder={selectedOrder} onClose={handleClose} />
       )}
       {isDealEdit && (
         <EditOrder

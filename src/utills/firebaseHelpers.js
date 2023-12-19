@@ -83,7 +83,7 @@ export const removeDuplicateSymbol = async (selectedSymbol, duplicate) => {
   }
 };
 
-export const addUserNewBalance = async (userId, amount) => {
+export const addUserNewBalance = async (userId, amount, balanceType) => {
   try {
     const userDocRef = doc(db, "users", userId);
     const userDocSnapshot = await getDoc(userDocRef);
@@ -92,7 +92,12 @@ export const addUserNewBalance = async (userId, amount) => {
       const userData = userDocSnapshot.data();
       const currentBalanceString = userData.totalBalance || 0;
       const currentBalance = parseFloat(currentBalanceString);
-      const updatedBalance = currentBalance + parseFloat(amount);
+      let updatedBalance;
+      if (balanceType === "Withdraw") {
+        updatedBalance = currentBalance - parseFloat(amount);
+      } else {
+        updatedBalance = currentBalance + parseFloat(amount);
+      }
 
       // Update the balance in the database directly
       await setDoc(
@@ -106,7 +111,8 @@ export const addUserNewBalance = async (userId, amount) => {
       await addDoc(depositRef, {
         userId: userId,
         amount: parseFloat(amount),
-        comment: "Bonus",
+        type: balanceType,
+        // comment: "Bonus",
         createdAt: serverTimestamp(),
       });
 
