@@ -32,10 +32,11 @@ function AddBalanceModal({
           <Form.Label>Balance</Form.Label>
           <Form.Control
             type="number"
-            placeholder="Enter new balance"
+            placeholder="Enter balance"
             value={newBalance}
             onChange={(e) => {
-              setNewBalance(e.target.value);
+              const { value } = e.target;
+              if (value >= 0) setNewBalance(value);
             }}
           />
         </Form.Group>

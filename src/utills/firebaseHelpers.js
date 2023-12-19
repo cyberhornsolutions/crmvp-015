@@ -92,7 +92,12 @@ export const addUserNewBalance = async (userId, amount, balanceType) => {
       const userData = userDocSnapshot.data();
       const currentBalanceString = userData.totalBalance || 0;
       const currentBalance = parseFloat(currentBalanceString);
-      const updatedBalance = currentBalance + parseFloat(amount);
+      let updatedBalance;
+      if (balanceType === "Withdraw") {
+        updatedBalance = currentBalance - parseFloat(amount);
+      } else {
+        updatedBalance = currentBalance + parseFloat(amount);
+      }
 
       // Update the balance in the database directly
       await setDoc(
