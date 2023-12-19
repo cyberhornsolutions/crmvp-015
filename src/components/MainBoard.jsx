@@ -25,8 +25,6 @@ import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
 import Sidebar from "./Sidebar";
 import { ToastContainer, toast } from "react-toastify";
-import { faClose, faEdit } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DelOrderModal from "./DelOrderModal";
 import EditOrder from "./EditOrder";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
@@ -34,6 +32,8 @@ import { useDispatch, useSelector } from "react-redux";
 import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import moment from "moment";
+import dealsColumns from "./columns/dealsColumns";
+import overviewColumns from "./columns/overviewColumns";
 
 const newDate = (date) => {
   const jsDate = new Date(date.seconds * 1000 + date.nanoseconds / 1000000);
@@ -60,12 +60,13 @@ export default function MainBoard() {
   const [modalShow, setModalShow] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
+  const [isEditProfit, setIsEditProfit] = useState(false);
   const [newUserData, setNewUserData] = useState();
-  const [userProfit, setUserProfit] = useState(0);
+  const [userProfit, setUserProfit] = useState(0.0);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
-  const [userOrderData, setUserOrderData] = useState();
+  const [userOrderData, setUserOrderData] = useState(userOrders);
   const [userBonus, setUserBonus] = useState(0);
   const [isUserEdit, setIsUserEdit] = useState(false);
   const handleKeyPress = (event) => {
@@ -277,7 +278,7 @@ export default function MainBoard() {
     });
   };
   const calulateProfit = () => {
-    let totalProfit = 0;
+    let totalProfit = 0.0;
     userOrders?.map((el) => {
       if (
         el.status.toLocaleLowerCase() == "success" ||
@@ -293,22 +294,21 @@ export default function MainBoard() {
     calulateProfit();
   }, []);
 
-  const save = async () => {
+  const saveOrders = async () => {
     console.log("updated data", userOrderData);
-
-    userOrderData.forEach(async (object) => {
-      const { id, index, ...rest } = object;
-      console.log("rest------>", rest);
-
-      const docRef = doc(db, "orders", id);
+    let status = "success";
+    userOrderData.forEach(async (order) => {
+      const docRef = doc(db, "orders", order.id);
       try {
-        await updateDoc(docRef, rest);
-        console.log(`Document with ID ${id} updated successfully`);
+        await updateDoc(docRef, order);
+        console.log(`Document with ID ${order.id} updated successfully`);
       } catch (error) {
-        console.error(`Error updating document with ID ${id}:`, error);
+        status = "error";
+        console.error(`Error updating document with ID ${order.id}:`, error);
       }
     });
-    setIsEdit(false);
+    toast[status]("Orders Updated");
+    setIsEditProfit(false);
   };
 
   const handleSaveVerification = async () => {
@@ -339,155 +339,23 @@ export default function MainBoard() {
     );
     setUserOrderData(updatedData);
   };
-  const dealsColumns = [
-    {
-      name: "ID",
-      selector: (row) => row.index,
-      sortable: true,
-    },
-    {
-      name: "Transaction Type",
-      selector: (row) => row.type,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.type}
-            onChange={(e) => {
-              handleEdit(row.id, "type", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.type
-        ),
-    },
-    {
-      name: "Symbol",
-      selector: (row) => row.symbol,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.symbol}
-            onChange={(e) => {
-              handleEdit(row.id, "symbol", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.symbol
-        ),
-    },
-    {
-      name: "Sum",
-      selector: (row) => row.sum,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.sum}
-            onChange={(e) => {
-              handleEdit(row.id, "sum", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.sum
-        ),
-    },
-    {
-      name: "Price",
-      selector: (row) => row.price,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.price}
-            onChange={(e) => {
-              handleEdit(row.id, "price", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.price
-        ),
-    },
-    {
-      name: "Status",
-      selector: (row) => row.status,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.status}
-            onChange={(e) => {
-              handleEdit(row.id, "status", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.status
-        ),
-    },
-    {
-      name: "Profit",
-      selector: (row) => row.profit,
-      sortable: true,
-      cell: (row) =>
-        isEdit ? (
-          <input
-            type="text"
-            value={row.profit}
-            onChange={(e) => {
-              handleEdit(row.id, "profit", e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        ) : (
-          row.profit
-        ),
-    },
-    {
-      name: "Date",
-      selector: (row) => row.createdAt,
-      sortable: true,
-    },
-    {
-      name: "Action",
-      selector: (row) => row.id,
-      cell: (row) => (
-        <div className="order-actions">
-          <div
-            className="custom-edit-icon"
-            onClick={() => {
-              setSelectedOrder(row);
-              setIsDealEdit(true);
-            }}
-          >
-            <FontAwesomeIcon icon={faEdit} />
-          </div>
-          <div className="ml-5">
-            <FontAwesomeIcon
-              icon={faClose}
-              onClick={() => {
-                setSelectedOrder(row);
-                setIsDelModalOpen(true);
-                // updateOrderStatus(row.id, "Closed");
-                // updateOrderState(row.id);
-              }}
-            />
-          </div>
-        </div>
-      ),
-      sortable: false,
-    },
-  ];
+  const handleEditProfit = (id, field, value) => {
+    console.log("id field value = ", id, field, value);
+
+    const updatedData = userOrderData
+      .filter(({ status }) => status !== "Pending")
+      .map((item) => (item.id === id ? { ...item, [field]: value } : item));
+    setUserOrderData(updatedData);
+  };
+  const handleEditOrder = (row) => {
+    setSelectedOrder(row);
+    setIsDealEdit(true);
+  };
+  const handleCloseOrder = (row) => {
+    setSelectedOrder(row);
+    setIsDelModalOpen(true);
+  };
+
   const depositColumns = [
     {
       name: "Date",
@@ -591,19 +459,10 @@ export default function MainBoard() {
     id: i + 1,
   }));
 
-  const processedOrders = userOrders.map((order, i) => ({
-    ...order,
-    index: i + 1,
-    id: i + 1,
-    sum: order?.volume,
-    price: order?.symbolValue,
-    docId: order?.id,
-  }));
-
-  const openOrders = processedOrders.filter(
+  const openOrders = userOrderData?.filter(
     ({ status }) => status === "Pending"
   );
-  const closedOrders = processedOrders.filter(
+  const closedOrders = userOrderData?.filter(
     ({ status }) => status !== "Pending"
   );
 
@@ -1336,8 +1195,36 @@ export default function MainBoard() {
 
           {tab === 2 && (
             <div id="menu2">
+              <div id="menu3-buttons">
+                <button
+                  id="menu3-edit"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    if (isEditProfit) {
+                      setUserOrderData(userOrders);
+                      setIsEditProfit(false);
+                    } else {
+                      setIsEditProfit(true);
+                    }
+                  }}
+                >
+                  {isEditProfit ? "Cancel" : "Edit"}
+                </button>
+                <button
+                  id="menu3-save"
+                  className="btn btn-secondary"
+                  onClick={saveOrders}
+                >
+                  Save
+                </button>
+              </div>
               <DataTable
-                columns={dealsColumns}
+                columns={overviewColumns({
+                  isEditProfit,
+                  handleEditProfit,
+                  handleEditOrder,
+                  handleCloseOrder,
+                })}
                 data={closedOrders}
                 highlightOnHover
                 pointerOnHover
@@ -1351,7 +1238,10 @@ export default function MainBoard() {
           {tab === 3 && (
             <div id="menu3">
               <DataTable
-                columns={dealsColumns}
+                columns={dealsColumns({
+                  handleEditOrder,
+                  handleCloseOrder,
+                })}
                 data={openOrders}
                 highlightOnHover
                 pointerOnHover
