@@ -395,8 +395,8 @@ export default function MainBoard() {
       name: "Status",
       cell: (row) => (
         <ProgressBar
-          variant={progressBarConfig[row.status].variant}
-          now={progressBarConfig[row.status].now}
+          variant={progressBarConfig[row.status]?.variant}
+          now={progressBarConfig[row.status]?.now}
           className="progressbar"
         />
       ),
