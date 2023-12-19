@@ -1207,7 +1207,7 @@ export default function MainBoard() {
                 <button
                   id="menu3-save"
                   className="btn btn-secondary"
-                  onClick={updateProfit}
+                  // onClick={updateProfit}
                 >
                   Save
                 </button>

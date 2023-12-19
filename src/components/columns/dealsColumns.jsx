@@ -16,109 +16,37 @@ const dealsColumns = ({
     name: "Transaction Type",
     selector: (row) => row.type,
     sortable: true,
-    cell: (row) =>
-      isEdit ? (
-        <input
-          type="text"
-          value={row.type}
-          onChange={(e) => {
-            handleEdit(row.id, "type", e.target.value);
-          }}
-          style={{ width: "100%" }}
-        />
-      ) : (
-        row.type
-      ),
+    cell: (row) => row.type,
   },
   {
     name: "Symbol",
     selector: (row) => row.symbol,
     sortable: true,
-    cell: (row) =>
-      isEdit ? (
-        <input
-          type="text"
-          value={row.symbol}
-          onChange={(e) => {
-            handleEdit(row.id, "symbol", e.target.value);
-          }}
-          style={{ width: "100%" }}
-        />
-      ) : (
-        row.symbol
-      ),
+    cell: (row) => row.symbol,
   },
   {
     name: "Sum",
     selector: (row) => row.sum,
     sortable: true,
-    cell: (row) =>
-      isEdit ? (
-        <input
-          type="text"
-          value={row.sum}
-          onChange={(e) => {
-            handleEdit(row.id, "sum", e.target.value);
-          }}
-          style={{ width: "100%" }}
-        />
-      ) : (
-        row.sum
-      ),
+    cell: (row) => row.sum,
   },
   {
     name: "Price",
     selector: (row) => row.price,
     sortable: true,
-    cell: (row) =>
-      isEdit ? (
-        <input
-          type="text"
-          value={row.price}
-          onChange={(e) => {
-            handleEdit(row.id, "price", e.target.value);
-          }}
-          style={{ width: "100%" }}
-        />
-      ) : (
-        row.price
-      ),
+    cell: (row) => row.price,
   },
   {
     name: "Status",
     selector: (row) => row.status,
     sortable: true,
-    cell: (row) =>
-      isEdit ? (
-        <input
-          type="text"
-          value={row.status}
-          onChange={(e) => {
-            handleEdit(row.id, "status", e.target.value);
-          }}
-          style={{ width: "100%" }}
-        />
-      ) : (
-        row.status
-      ),
+    cell: (row) => row.status,
   },
   {
     name: "Profit",
     selector: (row) => row.profit,
     sortable: true,
-    cell: (row) =>
-      isEdit ? (
-        <input
-          type="text"
-          value={row.profit}
-          onChange={(e) => {
-            handleEdit(row.id, "profit", e.target.value);
-          }}
-          style={{ width: "100%" }}
-        />
-      ) : (
-        row.profit
-      ),
+    cell: (row) => row.profit,
   },
   {
     name: "Date",
