@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Nav, Navbar, Form } from "react-bootstrap";
 import { auth, db } from "../firebase";
-import { addDoc, collection, query, onSnapshot } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import DataTable from "react-data-table-component";
 import { toast } from "react-toastify";
+import administratorsColumns from "./columns/administratorsColumns";
+import {
+  fetchManagers,
+  getManagerByUsername,
+  updateManager,
+} from "../utills/firebaseHelpers";
 
 export default function Users() {
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState("All");
+  const [managers, setManagers] = useState([]);
+  const [processedManagers, setProcessedManagers] = useState([]);
+
   const [user, setUser] = useState({
     name: "",
     username: "",
@@ -14,11 +23,34 @@ export default function Users() {
     team: "",
   });
 
-  const handleUserChange = (e) =>
+  const handleChangeUser = (e) =>
     setUser((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  const [managers, setManagers] = useState([]);
-  const [originalManagers, setOriginalManagers] = useState([]);
+  const handleChangeManager = (id, key, value) =>
+    setProcessedManagers((p) =>
+      p.map((m) => (m.id === id ? { ...m, [key]: value } : m))
+    );
+
+  const handleEditSave = async (manager) => {
+    const isUserNameEdited =
+      managers.find(({ id }) => id === manager.id).username !==
+      manager.username;
+    try {
+      if (isUserNameEdited) {
+        const alreadyExist = await getManagerByUsername(manager.username);
+        if (alreadyExist) {
+          toast.error("Username already exist");
+          return;
+        }
+      }
+      delete manager.isEdit;
+      await updateManager(manager);
+      toast.success("Manager updated successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating manager");
+    }
+  };
 
   const addUser = async () => {
     try {
@@ -39,91 +71,7 @@ export default function Users() {
       console.log("Error While Adding The Manager Record : ", error);
     }
   };
-  const fetchManagers = async () => {
-    try {
-      const q = query(collection(db, "managers"));
 
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const managerData = [];
-        let index = 0;
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          index += 1;
-          managerData.push({
-            index,
-            id: doc.id,
-            ...data,
-          });
-        });
-        setManagers(managerData);
-        setOriginalManagers(managerData);
-      });
-      return () => {
-        unsubscribe();
-      };
-    } catch (error) {
-      console.error("Error fetching managers:", error);
-    }
-  };
-  const columns = [
-    {
-      name: "ID",
-      selector: (row) => row.index,
-    },
-    {
-      name: "Name", // Translate the header using your t function
-      selector: (row) => row.name,
-      sortable: true,
-    },
-    {
-      name: "Username",
-      selector: (row) => row.username,
-      sortable: true,
-    },
-    {
-      name: "Role",
-      selector: (row) => row.role,
-      sortable: true,
-    },
-    {
-      name: "Team",
-      selector: (row) => row.team,
-      sortable: true,
-    },
-    {
-      name: "Date",
-      selector: (row) => row.date,
-      sortable: true,
-    },
-  ];
-  const filterManagers = (role, tab) => {
-    let filteredManagersArray;
-
-    if (role === "All") {
-      filteredManagersArray = originalManagers;
-    } else {
-      filteredManagersArray = originalManagers.filter(
-        (manager) => manager.role === role
-      );
-    }
-
-    setManagers(filteredManagersArray);
-    setTab(tab);
-  };
-  const dataTable = () => {
-    return (
-      <DataTable
-        columns={columns}
-        data={managers}
-        pagination
-        paginationPerPage={5}
-        paginationRowsPerPageOptions={[5, 10, 20, 50]}
-        highlightOnHover
-        pointerOnHover
-        responsive
-      />
-    );
-  };
   const deleteUser = () => {
     var table = document.getElementById("users-table");
     var checkboxes = table.querySelectorAll(
@@ -134,8 +82,13 @@ export default function Users() {
       row.remove();
     });
   };
+
   useEffect(() => {
-    fetchManagers();
+    setProcessedManagers(managers);
+  }, [managers]);
+
+  useEffect(() => {
+    return fetchManagers(setManagers);
   }, []);
 
   return (
@@ -147,26 +100,14 @@ export default function Users() {
         <Navbar className="nav nav-tabs p-0">
           <Nav className="me-auto" style={{ gap: "2px" }}>
             <Nav.Link
-              className={tab === 0 && "active"}
-              onClick={() => filterManagers("All", 0)}
+              className={tab === "All" && "active"}
+              onClick={() => setTab("All")}
             >
               All
             </Nav.Link>
             <Nav.Link
-              className={tab === 1 && "active"}
-              onClick={() => filterManagers("Sale", 1)}
-            >
-              Sale
-            </Nav.Link>
-            <Nav.Link
-              className={tab === 2 && "active"}
-              onClick={() => filterManagers("Reten", 2)}
-            >
-              Reten
-            </Nav.Link>
-            <Nav.Link
-              className={tab === 3 && "active"}
-              onClick={() => filterManagers("Teams", 3)}
+              className={tab === "Teams" && "active"}
+              onClick={() => setTab("Teams")}
             >
               Teams
             </Nav.Link>
@@ -201,13 +142,33 @@ export default function Users() {
           />
         </div>
         <div className="tab-content">
-          {tab === 0 && <div>{dataTable()}</div>}
-
-          {tab === 1 && <div>{dataTable()}</div>}
-
-          {tab === 2 && <div>{dataTable()}</div>}
-
-          {tab === 3 && <div>{dataTable()}</div>}
+          {tab === "All" && (
+            <DataTable
+              columns={administratorsColumns({
+                handleChangeManager,
+                handleEditSave,
+              })}
+              data={processedManagers}
+              pagination
+              paginationPerPage={5}
+              paginationRowsPerPageOptions={[5, 10, 20, 50]}
+              highlightOnHover
+              pointerOnHover
+              responsive
+            />
+          )}
+          {tab === "Teams" && (
+            <DataTable
+              columns={administratorsColumns({ isEdit })}
+              data={[]}
+              pagination
+              paginationPerPage={5}
+              paginationRowsPerPageOptions={[5, 10, 20, 50]}
+              highlightOnHover
+              pointerOnHover
+              responsive
+            />
+          )}
         </div>
       </div>
       <div
@@ -221,14 +182,14 @@ export default function Users() {
               type="text"
               name="name"
               value={user.name}
-              onChange={handleUserChange}
+              onChange={handleChangeUser}
               placeholder="Name"
             />
             <Form.Control
               type="text"
               name="username"
               value={user.username}
-              onChange={handleUserChange}
+              onChange={handleChangeUser}
               placeholder="Username"
             />
 
@@ -237,21 +198,27 @@ export default function Users() {
               name="role"
               value={user.role}
               placeholder="Role"
-              onChange={handleUserChange}
+              onChange={handleChangeUser}
             >
               <option value="" disabled>
-                -- Role --
+                Role
               </option>
               <option value="Sale">Sale</option>
               <option value="Reten">Reten</option>
             </Form.Select>
-            <Form.Control
+            <Form.Select
               type="text"
               name="team"
               value={user.team}
-              onChange={handleUserChange}
               placeholder="Team"
-            />
+              onChange={handleChangeUser}
+            >
+              <option value="" disabled>
+                Team
+              </option>
+              <option value="Main">Main</option>
+              <option value="Demo">Demo</option>
+            </Form.Select>
           </div>
         </form>
         <div className="d-flex gap-2">
@@ -281,14 +248,14 @@ export default function Users() {
               type="text"
               name="name"
               value={user.name}
-              onChange={handleUserChange}
+              onChange={handleChangeUser}
               placeholder="Name"
             />
             <Form.Control
               type="text"
               name="team"
               value={user.team}
-              onChange={handleUserChange}
+              onChange={handleChangeUser}
               placeholder="Team"
             />
           </div>

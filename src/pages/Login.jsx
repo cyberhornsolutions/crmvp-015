@@ -3,7 +3,7 @@ import logo from "../logo.png";
 import { useNavigate } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
-import { getManagerByUsername } from "../utills/firebaseHelpers";
+import { getManagerByUsernameAndRole } from "../utills/firebaseHelpers";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ export default function Login() {
         break;
       default:
         setLoading(true);
-        const manager = await getManagerByUsername(user.username, role);
+        const manager = await getManagerByUsernameAndRole(user.username, role);
         console.log("manager = ", manager);
         if (!manager) {
           toast.error("Manager not found");

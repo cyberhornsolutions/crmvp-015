@@ -28,7 +28,43 @@ export const getData = async (collectionName) => {
   }
 };
 
-export const getManagerByUsername = async (username, role) => {
+export const fetchManagers = (setState) => {
+  try {
+    const q = query(collection(db, "managers"));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const managerData = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        managerData.push({ ...data, id: doc.id });
+      });
+      setState(managerData);
+    });
+    return () => {
+      unsubscribe();
+    };
+  } catch (error) {
+    console.error("Error fetching managers:", error);
+  }
+};
+
+export const getManagerByUsername = async (username) => {
+  try {
+    const q = query(
+      collection(db, "managers"),
+      where("username", "==", username),
+      limit(1)
+    );
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs[0].data();
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getManagerByUsernameAndRole = async (username, role) => {
   try {
     const q = query(
       collection(db, "managers"),
@@ -43,6 +79,11 @@ export const getManagerByUsername = async (username, role) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const updateManager = async (manager) => {
+  const docRef = doc(db, "managers", manager.id);
+  return await setDoc(docRef, manager);
 };
 
 export const addDuplicateSymbol = async (selectedSymbol, duplicate) => {
