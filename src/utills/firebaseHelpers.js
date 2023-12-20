@@ -6,6 +6,7 @@ import {
   where,
   query,
   doc,
+  limit,
   setDoc,
   onSnapshot,
   addDoc,
@@ -22,6 +23,23 @@ export const getData = async (collectionName) => {
       result.push(doc.data());
     });
     return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getManagerByUsername = async (username, role) => {
+  try {
+    const q = query(
+      collection(db, "managers"),
+      where("username", "==", username),
+      where("role", "==", role),
+      limit(1)
+    );
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs[0].data();
+    }
   } catch (error) {
     console.log(error);
   }

@@ -3,26 +3,42 @@ import logo from "../logo.png";
 import { useNavigate } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
+import { getManagerByUsername } from "../utills/firebaseHelpers";
 
 export default function Login() {
   const navigate = useNavigate();
-
   const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({
     username: "",
     password: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!role) {
       toast.error("Please select a role");
-    } else if (role !== "Admin") {
-      toast.error("Sale or Reten Manager does not exist yet.");
-    } else if (user.username === "admin" && user.password === "admin") {
-      navigate("/home");
-    } else {
-      toast.error("Username or password is incorrect");
+      return;
+    }
+    switch (role) {
+      case "Admin":
+        if (user.username === "admin" && user.password === "admin") {
+          navigate("/home");
+        } else {
+          toast.error("Username or password is incorrect");
+        }
+        break;
+      default:
+        setLoading(true);
+        const manager = await getManagerByUsername(user.username, role);
+        console.log("manager = ", manager);
+        if (!manager) {
+          toast.error("Manager not found");
+          setLoading(false);
+        } else {
+          navigate("/home");
+        }
+        break;
     }
   };
 
@@ -98,7 +114,7 @@ export default function Login() {
             />
           </div>
         </div>
-        <button className="button" type="submit">
+        <button className="button" type="submit" disabled={loading}>
           Enter
         </button>
       </Form>

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Nav, Navbar } from "react-bootstrap";
+import { Nav, Navbar, Form } from "react-bootstrap";
 import { auth, db } from "../firebase";
 import { addDoc, collection, query, onSnapshot } from "firebase/firestore";
 import DataTable from "react-data-table-component";
+import { toast } from "react-toastify";
 
 export default function Users() {
   const [tab, setTab] = useState(0);
@@ -22,19 +23,19 @@ export default function Users() {
   const addUser = async () => {
     try {
       const formattedDate = new Date().toLocaleDateString("en-US");
-      const docRef = await addDoc(collection(db, "managers"), {
-        name,
-        email: username,
-        role,
-        desk: team,
+      await addDoc(collection(db, "managers"), {
+        ...user,
         date: formattedDate,
       });
-      console.log("Manager Record Added Successfully.!", docRef);
-      setName("");
-      setUsername("");
-      setTeam("");
-      setRole("");
+      toast.success("Manager Record Added Successfully.");
+      setUser({
+        name: "",
+        username: "",
+        role: "",
+        team: "",
+      });
     } catch (error) {
+      toast.success(error.message);
       console.log("Error While Adding The Manager Record : ", error);
     }
   };
@@ -76,7 +77,7 @@ export default function Users() {
     },
     {
       name: "Username",
-      selector: (row) => row.email,
+      selector: (row) => row.username,
       sortable: true,
     },
     {
@@ -86,7 +87,7 @@ export default function Users() {
     },
     {
       name: "Team",
-      selector: (row) => row.desk,
+      selector: (row) => row.team,
       sortable: true,
     },
     {
@@ -215,29 +216,36 @@ export default function Users() {
       >
         <h5>Manage</h5>
         <form id="addNewUser">
-          <div id="new-user-fields" className="px-2">
-            <input
+          <div id="new-user-fields" className="d-flex gap-1">
+            <Form.Control
               type="text"
               name="name"
               value={user.name}
               onChange={handleUserChange}
               placeholder="Name"
             />
-            <input
+            <Form.Control
               type="text"
               name="username"
               value={user.username}
               onChange={handleUserChange}
               placeholder="Username"
             />
-            <input
+
+            <Form.Select
               type="text"
               name="role"
               value={user.role}
-              onChange={handleUserChange}
               placeholder="Role"
-            />
-            <input
+              onChange={handleUserChange}
+            >
+              <option value="" disabled>
+                -- Role --
+              </option>
+              <option value="Sale">Sale</option>
+              <option value="Reten">Reten</option>
+            </Form.Select>
+            <Form.Control
               type="text"
               name="team"
               value={user.team}
@@ -246,9 +254,9 @@ export default function Users() {
             />
           </div>
         </form>
-        <div className="mt-3">
+        <div className="d-flex gap-2">
           <button
-            className="btn btn-secondary me-2"
+            className="btn btn-outline-secondary"
             id="new-user-del"
             type="button"
             onClick={deleteUser}
@@ -268,15 +276,15 @@ export default function Users() {
       <div id="newUser-form">
         <h5>Team</h5>
         <form id="addNewUser">
-          <div id="new-user-fields" className="px-2">
-            <input
+          <div id="new-user-fields" className="d-flex gap-1">
+            <Form.Control
               type="text"
               name="name"
               value={user.name}
               onChange={handleUserChange}
               placeholder="Name"
             />
-            <input
+            <Form.Control
               type="text"
               name="team"
               value={user.team}
@@ -285,12 +293,12 @@ export default function Users() {
             />
           </div>
         </form>
-        <div className="mt-3">
+        <div className="d-flex gap-2">
           <button
-            className="btn btn-secondary me-2"
+            className="btn btn-outline-secondary"
             id="new-user-del"
             type="button"
-            onClick={deleteUser}
+            // onClick={deleteUser}
           >
             Delete
           </button>
@@ -298,7 +306,7 @@ export default function Users() {
             className="btn btn-secondary"
             id="new-user-add"
             type="button"
-            onClick={addUser}
+            // onClick={addUser}
           >
             Add
           </button>
