@@ -284,7 +284,7 @@ export default function MainBoard() {
         el.status.toLocaleLowerCase() == "success" ||
         el.status.toLocaleLowerCase() == "closed"
       ) {
-        totalProfit = totalProfit + el.profit;
+        totalProfit = totalProfit + parseFloat(el.profit);
       }
     });
     setUserProfit(totalProfit);
@@ -1214,6 +1214,7 @@ export default function MainBoard() {
                   id="menu3-save"
                   className="btn btn-secondary"
                   onClick={saveOrders}
+                  disabled={!isEditProfit}
                 >
                   Save
                 </button>
