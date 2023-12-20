@@ -63,10 +63,10 @@ export default function Home() {
           {tab === "Dashboard" && <Dashboard />}
           {tab === "Players" && <Leads setTab={setTab} />}
           {tab === "Transactions" && <Transactions />}
-          {tab === "Managers" && <Users />}
           {tab === "Symbols" && <Symbols />}
           {tab === "Affiliates" && <Symbols />}
           {tab === "Calendar" && <Calendar />}
+          {tab === "Administrator" && <Users />}
           {tab === "MainBoard" && <MainBoard />}
         </div>
       </div>

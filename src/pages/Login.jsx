@@ -17,8 +17,12 @@ export default function Login() {
     e.preventDefault();
     if (!role) {
       toast.error("Please select a role");
-    } else {
+    } else if (role !== "Admin") {
+      toast.error("Sale or Reten Manager does not exist yet.");
+    } else if (user.username === "admin" && user.password === "admin") {
       navigate("/home");
+    } else {
+      toast.error("Username or password is incorrect");
     }
   };
 
@@ -49,7 +53,7 @@ export default function Login() {
           id="admin_role"
           className="text-light"
           checked={role === "Admin"}
-          onClick={() => setRole("Admin")}
+          onChange={() => setRole("Admin")}
         />
         <div className="w-75">
           <input
@@ -80,7 +84,7 @@ export default function Login() {
               id="sale_role"
               className="text-light"
               checked={role === "Sale"}
-              onClick={() => setRole("Sale")}
+              onChange={() => setRole("Sale")}
             />
           </div>
           <div className="col">
@@ -90,7 +94,7 @@ export default function Login() {
               id="Reten_role"
               className="text-light"
               checked={role === "Reten"}
-              onClick={() => setRole("Reten")}
+              onChange={() => setRole("Reten")}
             />
           </div>
         </div>

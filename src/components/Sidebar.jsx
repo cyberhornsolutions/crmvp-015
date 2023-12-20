@@ -64,16 +64,6 @@ export default function Sidebar({ setTab, tab }) {
           </li>
           <li
             id="menu-users"
-            className={tab === "Managers" && "active"}
-            onClick={() => {
-              setTab("Managers");
-              navigate("/home");
-            }}
-          >
-            Managers
-          </li>
-          <li
-            id="menu-users"
             className={tab === "Symbols" && "active"}
             onClick={() => {
               setTab("Symbols");
@@ -91,6 +81,16 @@ export default function Sidebar({ setTab, tab }) {
             }}
           >
             Calendar
+          </li>
+          <li
+            id="menu-users"
+            className={tab === "Administrator" && "active"}
+            onClick={() => {
+              setTab("Administrator");
+              navigate("/home");
+            }}
+          >
+            Administrator
           </li>
           <li
             id="menu-affiliates"

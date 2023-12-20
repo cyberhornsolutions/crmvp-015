@@ -6,10 +6,16 @@ import DataTable from "react-data-table-component";
 
 export default function Users() {
   const [tab, setTab] = useState(0);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("");
-  const [desk, setDesk] = useState("");
+  const [user, setUser] = useState({
+    name: "",
+    username: "",
+    role: "",
+    team: "",
+  });
+
+  const handleUserChange = (e) =>
+    setUser((p) => ({ ...p, [e.target.name]: e.target.value }));
+
   const [managers, setManagers] = useState([]);
   const [originalManagers, setOriginalManagers] = useState([]);
 
@@ -18,15 +24,15 @@ export default function Users() {
       const formattedDate = new Date().toLocaleDateString("en-US");
       const docRef = await addDoc(collection(db, "managers"), {
         name,
-        email,
+        email: username,
         role,
-        desk,
+        desk: team,
         date: formattedDate,
       });
       console.log("Manager Record Added Successfully.!", docRef);
       setName("");
-      setEmail("");
-      setDesk("");
+      setUsername("");
+      setTeam("");
       setRole("");
     } catch (error) {
       console.log("Error While Adding The Manager Record : ", error);
@@ -69,17 +75,17 @@ export default function Users() {
       sortable: true,
     },
     {
-      name: "Email",
+      name: "Username",
       selector: (row) => row.email,
       sortable: true,
     },
     {
-      name: "Position",
+      name: "Role",
       selector: (row) => row.role,
       sortable: true,
     },
     {
-      name: "Desk",
+      name: "Team",
       selector: (row) => row.desk,
       sortable: true,
     },
@@ -130,6 +136,7 @@ export default function Users() {
   useEffect(() => {
     fetchManagers();
   }, []);
+
   return (
     <div id="users" className="active">
       <div
@@ -211,31 +218,70 @@ export default function Users() {
           <div id="new-user-fields" className="px-2">
             <input
               type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
+              name="name"
+              value={user.name}
+              onChange={handleUserChange}
               placeholder="Name"
-              id="newUserName"
-            />
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="Email"
-              id="newUserEmail"
             />
             <input
               type="text"
-              value={role}
-              onChange={(event) => setRole(event.target.value)}
-              placeholder="Position"
-              id="newUserPosition"
+              name="username"
+              value={user.username}
+              onChange={handleUserChange}
+              placeholder="Username"
             />
             <input
               type="text"
-              value={desk}
-              onChange={(event) => setDesk(event.target.value)}
-              placeholder="Desk"
-              id="newUserDesk"
+              name="role"
+              value={user.role}
+              onChange={handleUserChange}
+              placeholder="Role"
+            />
+            <input
+              type="text"
+              name="team"
+              value={user.team}
+              onChange={handleUserChange}
+              placeholder="Team"
+            />
+          </div>
+        </form>
+        <div className="mt-3">
+          <button
+            className="btn btn-secondary me-2"
+            id="new-user-del"
+            type="button"
+            onClick={deleteUser}
+          >
+            Delete
+          </button>
+          <button
+            className="btn btn-secondary"
+            id="new-user-add"
+            type="button"
+            onClick={addUser}
+          >
+            Add
+          </button>
+        </div>
+      </div>
+      <div id="newUser-form">
+        <h5>Team</h5>
+        <form id="addNewUser">
+          <div id="new-user-fields" className="px-2">
+            <input
+              type="text"
+              name="name"
+              value={user.name}
+              onChange={handleUserChange}
+              placeholder="Name"
+            />
+            <input
+              type="text"
+              name="team"
+              value={user.team}
+              onChange={handleUserChange}
+              placeholder="Team"
             />
           </div>
         </form>
