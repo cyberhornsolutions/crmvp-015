@@ -805,22 +805,13 @@ td.editing {
 
 /* CHECK */
 .form-check-input:checked {
-  background-color: var(--main-lightgreen);
-  border-color: var(--main-numbersc);
-}
-.form-check {
-  display: flex !important;
-  margin: 0px;
-  justify-content: flex-start;
-  margin-bottom: 30px;
-}
-.form-check-label {
-  width: 300px;
-  text-align: left;
-  margin-left: 20px;
+  /* background-color: var(--main-lightgreen) !important; */
+  border-color: var(--main-numbersc) !important;
 }
 .form-check-input {
-  margin-right: 50px;
+  width: 0.85em !important;
+  height: 0.85em !important;
+  background-color: unset !important;
 }
 
 /* MENUS */

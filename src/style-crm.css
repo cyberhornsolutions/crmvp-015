@@ -26,35 +26,11 @@ body {
 }
 
 .login_form {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: absolute;
-  margin: auto;
-  padding: 0 30px 20px;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
   background-color: var(--main-elc2);
   width: 300px;
   height: 500px;
   border-radius: 5px;
   box-shadow: 0px 0px 5px var(--main-elc2);
-}
-.login_form .admin_role span,
-.login_form .other_role span {
-  color: #fff !important;
-}
-.login_form .other_roles {
-  display: flex;
-  justify-content: space-evenly;
-  margin-top: 10px;
-}
-.login_form .admin_role input[type="radio"],
-.login_form .other_role input[type="radio"] {
-  accent-color: #232323;
 }
 
 .logo_wrapper {
