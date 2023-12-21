@@ -5,8 +5,11 @@ import { addDoc, collection } from "firebase/firestore";
 import DataTable from "react-data-table-component";
 import { toast } from "react-toastify";
 import administratorsColumns from "./columns/administratorsColumns";
+import teamsColumns from "./columns/teamsColumns";
 import {
+  addTeam,
   fetchManagers,
+  fetchTeams,
   getManagerByUsername,
   updateManager,
 } from "../utills/firebaseHelpers";
@@ -15,6 +18,7 @@ export default function Users() {
   const [tab, setTab] = useState("All");
   const [loading, setLoading] = useState(true);
   const [managers, setManagers] = useState([]);
+  const [teams, setTeams] = useState([]);
   const [processedManagers, setProcessedManagers] = useState([]);
 
   const [user, setUser] = useState({
@@ -24,15 +28,23 @@ export default function Users() {
     team: "",
   });
 
+  const [team, setTeam] = useState({
+    name: "",
+    desk: "",
+  });
+
   const handleChangeUser = (e) =>
     setUser((p) => ({ ...p, [e.target.name]: e.target.value }));
+
+  const handleChangeTeam = (e) =>
+    setTeam((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleChangeManager = (id, key, value) =>
     setProcessedManagers((p) =>
       p.map((m) => (m.id === id ? { ...m, [key]: value } : m))
     );
 
-  const handleEditSave = async (manager) => {
+  const handleSaveManager = async (manager) => {
     const originalManager = managers.find(({ id }) => id === manager.id);
     const unChanged = Object.keys(originalManager).every(
       (key) => originalManager[key] === manager[key]
@@ -79,6 +91,21 @@ export default function Users() {
     }
   };
 
+  const handleAddNewTeam = async () => {
+    try {
+      const res = await addTeam(team);
+      console.log("new team res = ", res);
+      toast.success("Team added successfully");
+      setTeam({
+        name: "",
+        desk: "",
+      });
+    } catch (error) {
+      toast.error("Error while adding the team");
+      console.error("Error while adding the team:", error);
+    }
+  };
+
   const deleteUser = () => {
     var table = document.getElementById("users-table");
     var checkboxes = table.querySelectorAll(
@@ -96,6 +123,10 @@ export default function Users() {
 
   useEffect(() => {
     return fetchManagers(setManagers, setLoading);
+  }, []);
+
+  useEffect(() => {
+    return fetchTeams(setTeams, setLoading);
   }, []);
 
   return (
@@ -153,7 +184,7 @@ export default function Users() {
             <DataTable
               columns={administratorsColumns({
                 handleChangeManager,
-                handleEditSave,
+                handleSaveManager,
               })}
               data={processedManagers}
               pagination
@@ -167,9 +198,10 @@ export default function Users() {
           )}
           {tab === "Teams" && (
             <DataTable
-              columns={administratorsColumns({ isEdit })}
-              data={[]}
+              columns={teamsColumns}
+              data={teams}
               pagination
+              progressPending={loading}
               paginationPerPage={5}
               paginationRowsPerPageOptions={[5, 10, 20, 50]}
               highlightOnHover
@@ -224,8 +256,9 @@ export default function Users() {
               <option value="" disabled>
                 Team
               </option>
-              <option value="Main">Main</option>
-              <option value="Demo">Demo</option>
+              {teams.map((team) => (
+                <option value={team.name}>{team.name}</option>
+              ))}
             </Form.Select>
           </div>
         </form>
@@ -255,17 +288,23 @@ export default function Users() {
             <Form.Control
               type="text"
               name="name"
-              value={user.name}
-              onChange={handleChangeUser}
+              value={team.name}
+              onChange={handleChangeTeam}
               placeholder="Name"
             />
-            <Form.Control
+            <Form.Select
               type="text"
-              name="team"
-              value={user.team}
-              onChange={handleChangeUser}
-              placeholder="Team"
-            />
+              name="desk"
+              value={team.desk}
+              placeholder="Desk"
+              onChange={handleChangeTeam}
+            >
+              <option value="" disabled>
+                Desk
+              </option>
+              <option value="Main">Main</option>
+              <option value="Demo">Demo</option>
+            </Form.Select>
           </div>
         </form>
         <div className="d-flex gap-2">
@@ -281,7 +320,7 @@ export default function Users() {
             className="btn btn-secondary"
             id="new-user-add"
             type="button"
-            // onClick={addUser}
+            onClick={handleAddNewTeam}
           >
             Add
           </button>

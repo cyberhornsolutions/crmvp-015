@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
 import { Form } from "react-bootstrap";
 
-const administratorsColumns = ({ handleChangeManager, handleEditSave }) => [
+const administratorsColumns = ({ handleChangeManager, handleSaveManager }) => [
   {
     name: "ID",
     selector: (row, i) => i + 1,
@@ -98,7 +98,7 @@ const administratorsColumns = ({ handleChangeManager, handleEditSave }) => [
           <FontAwesomeIcon
             icon={faSave}
             className="btn btn-secondary btn-sm"
-            onClick={() => handleEditSave(row)}
+            onClick={() => handleSaveManager(row)}
           />
         ) : (
           <FontAwesomeIcon

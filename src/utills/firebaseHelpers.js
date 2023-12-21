@@ -29,6 +29,7 @@ export const getData = async (collectionName) => {
 };
 
 export const fetchManagers = (setState, setLoading) => {
+  setLoading(true);
   try {
     const q = query(collection(db, "managers"));
 
@@ -48,6 +49,36 @@ export const fetchManagers = (setState, setLoading) => {
     console.error("Error fetching managers:", error);
     setLoading(false);
   }
+};
+
+export const fetchTeams = (setState, setLoading) => {
+  try {
+    const q = query(collection(db, "teams"));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const teamsData = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        teamsData.push({ ...data, id: doc.id });
+      });
+      setLoading(false);
+      setState(teamsData);
+    });
+    return () => {
+      unsubscribe();
+    };
+  } catch (error) {
+    console.error("Error fetching teams:", error);
+    setLoading(false);
+  }
+};
+
+export const addTeam = async (team) => {
+  const formattedDate = new Date().toLocaleDateString("en-US");
+  return await addDoc(collection(db, "teams"), {
+    ...team,
+    date: formattedDate,
+  });
 };
 
 export const getManagerByUsername = async (username) => {

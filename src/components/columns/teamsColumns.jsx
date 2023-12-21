@@ -1,0 +1,24 @@
+const teamsColumns = [
+  {
+    name: "ID",
+    selector: (row, i) => i + 1,
+  },
+  {
+    name: "Name", // Translate the header using your t function
+    selector: (row) => row.name,
+
+    sortable: true,
+  },
+  {
+    name: "Desk",
+    selector: (row) => row.desk,
+    sortable: true,
+  },
+  {
+    name: "Date",
+    selector: (row) => row.date,
+    sortable: true,
+  },
+];
+
+export default teamsColumns;

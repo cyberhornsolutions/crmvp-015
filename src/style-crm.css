@@ -164,3 +164,8 @@ body {
 .dropdown-toggle {
   border: none;
 }
+
+.form-control:focus,
+.form-select:focus {
+  box-shadow: none !important;
+}
