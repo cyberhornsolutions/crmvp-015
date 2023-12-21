@@ -72,6 +72,10 @@ export default function Users() {
   };
 
   const addUser = async () => {
+    if (!(user.name && user.username && user.role && user.team)) {
+      toast.error("Please fill all field");
+      return;
+    }
     try {
       const formattedDate = new Date().toLocaleDateString("en-US");
       await addDoc(collection(db, "managers"), {
@@ -92,6 +96,10 @@ export default function Users() {
   };
 
   const handleAddNewTeam = async () => {
+    if (!(team.name && team.desk)) {
+      toast.error("Please fill all field");
+      return;
+    }
     try {
       const res = await addTeam(team);
       console.log("new team res = ", res);
@@ -256,8 +264,10 @@ export default function Users() {
               <option value="" disabled>
                 Team
               </option>
-              {teams.map((team) => (
-                <option value={team.name}>{team.name}</option>
+              {teams.map((team, i) => (
+                <option key={i} value={team.name}>
+                  {team.name}
+                </option>
               ))}
             </Form.Select>
           </div>
@@ -267,7 +277,7 @@ export default function Users() {
             className="btn btn-outline-secondary"
             id="new-user-del"
             type="button"
-            onClick={deleteUser}
+            // onClick={deleteUser}
           >
             Delete
           </button>
