@@ -7,7 +7,6 @@ import { doc, updateDoc } from "firebase/firestore";
 import { useSelector } from "react-redux";
 
 const EditOrder = ({ onClose, show, selectedOrder, fetchOrders, isMain }) => {
-  console.log(selectedOrder, 89898989);
   const [record, setRecord] = useState({
     sl: selectedOrder.sl,
     tp: selectedOrder.tp,
@@ -23,31 +22,31 @@ const EditOrder = ({ onClose, show, selectedOrder, fetchOrders, isMain }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const symbol = symbols.find((sm) => sm.symbol === selectedOrder.symbol);
-
-    // if (
-    //   selectedOrder.type === "Buy" &&
-    //   (parseFloat(symbol.price) >= sl || parseFloat(symbol.price) <= tp)
-    // ) {
-    //   toast.error(
-    //     "In buy case SL should be less than current price and TP should be greater than current price"
-    //   );
-    // } else if (
-    //   selectedOrder.type === "Sell" &&
-    //   (parseFloat(symbol.price) <= sl || parseFloat(symbol.price) >= tp)
-    // ) {
-    //   toast.error(
-    //     "In buy case TP should be less than current price and SL should be greater than current price"
-    //   );
-    // } else {
-    const updatedData = doc(db, "orders", selectedOrder.docId);
-    try {
-      await updateDoc(updatedData, record);
-      onClose();
-    } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong");
+    if (
+      selectedOrder.type === "Buy" &&
+      (parseFloat(symbol.price) >= sl || parseFloat(symbol.price) <= tp)
+    ) {
+      toast.error(
+        "In buy case SL should be less than current price and TP should be greater than current price"
+      );
+    } else if (
+      selectedOrder.type === "Sell" &&
+      (parseFloat(symbol.price) <= sl || parseFloat(symbol.price) >= tp)
+    ) {
+      toast.error(
+        "In buy case TP should be less than current price and SL should be greater than current price"
+      );
+    } else {
+      toast.success("done");
+      try {
+        const updatedData = doc(db, "orders", selectedOrder.id);
+        await updateDoc(updatedData, record);
+        onClose();
+      } catch (error) {
+        console.log(error);
+        toast.error("Something went wrong");
+      }
     }
-    // }
   };
 
   return (
