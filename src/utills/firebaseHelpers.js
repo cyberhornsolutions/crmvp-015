@@ -28,7 +28,7 @@ export const getData = async (collectionName) => {
   }
 };
 
-export const fetchManagers = (setState) => {
+export const fetchManagers = (setState, setLoading) => {
   try {
     const q = query(collection(db, "managers"));
 
@@ -38,6 +38,7 @@ export const fetchManagers = (setState) => {
         const data = doc.data();
         managerData.push({ ...data, id: doc.id });
       });
+      setLoading(false);
       setState(managerData);
     });
     return () => {
@@ -45,6 +46,7 @@ export const fetchManagers = (setState) => {
     };
   } catch (error) {
     console.error("Error fetching managers:", error);
+    setLoading(false);
   }
 };
 

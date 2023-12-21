@@ -13,6 +13,7 @@ import {
 
 export default function Users() {
   const [tab, setTab] = useState("All");
+  const [loading, setLoading] = useState(true);
   const [managers, setManagers] = useState([]);
   const [processedManagers, setProcessedManagers] = useState([]);
 
@@ -32,9 +33,15 @@ export default function Users() {
     );
 
   const handleEditSave = async (manager) => {
-    const isUserNameEdited =
-      managers.find(({ id }) => id === manager.id).username !==
-      manager.username;
+    const originalManager = managers.find(({ id }) => id === manager.id);
+    const unChanged = Object.keys(originalManager).every(
+      (key) => originalManager[key] === manager[key]
+    );
+    if (unChanged) {
+      handleChangeManager(manager.id, "isEdit", false);
+      return;
+    }
+    const isUserNameEdited = originalManager.username !== manager.username;
     try {
       if (isUserNameEdited) {
         const alreadyExist = await getManagerByUsername(manager.username);
@@ -88,7 +95,7 @@ export default function Users() {
   }, [managers]);
 
   useEffect(() => {
-    return fetchManagers(setManagers);
+    return fetchManagers(setManagers, setLoading);
   }, []);
 
   return (
@@ -150,6 +157,7 @@ export default function Users() {
               })}
               data={processedManagers}
               pagination
+              progressPending={loading}
               paginationPerPage={5}
               paginationRowsPerPageOptions={[5, 10, 20, 50]}
               highlightOnHover
