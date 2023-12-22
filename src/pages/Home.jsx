@@ -16,40 +16,30 @@ import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 
 export default function Home() {
   const [tab, setTab] = useState("Dashboard");
-  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
-  const getAllSymbols = async () => {
-    try {
-      setIsLoading(true);
 
-      const symbolsRef = collection(db, "symbols");
+  const getAllSymbols = () => {
+    const symbolsRef = collection(db, "symbols");
 
-      const unsubscribe = onSnapshot(
-        symbolsRef,
-        (snapshot) => {
-          const symbolsData = [];
-          snapshot.forEach((doc) => {
-            symbolsData.push({ id: doc.id, ...doc.data() });
-          });
+    const unsubscribe = onSnapshot(
+      symbolsRef,
+      (snapshot) => {
+        const symbolsData = [];
+        snapshot.forEach((doc) => {
+          symbolsData.push({ id: doc.id, ...doc.data() });
+        });
 
-          dispatch(setSymbolsState(symbolsData));
-          setIsLoading(false);
-        },
-        (error) => {
-          console.error("Error fetching data:", error);
-          setIsLoading(false);
-        }
-      );
-
-      // Optionally returning unsubscribe function for cleanup if needed
-      // return unsubscribe;
-    } catch (error) {
-      console.error("Error:", error);
-    }
+        dispatch(setSymbolsState(symbolsData));
+      },
+      (error) => {
+        console.error("Error fetching data:", error);
+      }
+    );
+    return () => unsubscribe();
   };
 
   useEffect(() => {
-    getAllSymbols();
+    return getAllSymbols();
   }, []);
 
   return (

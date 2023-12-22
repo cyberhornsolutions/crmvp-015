@@ -80,6 +80,7 @@ export default function Users() {
       const formattedDate = new Date().toLocaleDateString("en-US");
       await addDoc(collection(db, "managers"), {
         ...user,
+        password: "manager",
         date: formattedDate,
       });
       toast.success("Manager Record Added Successfully.");
