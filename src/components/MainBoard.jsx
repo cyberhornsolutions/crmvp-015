@@ -152,7 +152,7 @@ export default function MainBoard() {
   };
 
   const addNewBalance = async (amount) => {
-    await addUserNewBalance(newUserData.id, amount);
+    await addUserNewBalance(user.id, amount);
     setNewBalance(0);
     setIsBalOpen(false);
   };
@@ -276,7 +276,7 @@ export default function MainBoard() {
 
   const handleSaveVerification = async () => {
     try {
-      const userDocRef = doc(db, "users", newUserData.id);
+      const userDocRef = doc(db, "users", user.id);
       await updateDoc(userDocRef, { allowTrading: newUserData.allowTrading });
       toast.success("User info updated");
 
