@@ -10,8 +10,6 @@ import {
   updateDoc,
   orderBy,
 } from "firebase/firestore";
-import moment from "moment";
-import { useNavigate } from "react-router-dom";
 import { Dropdown, ProgressBar } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -34,14 +32,13 @@ export default function Leads({ setTab }) {
   const [selected, setSelected] = useState();
   const [users, setUsers] = useState([]);
   const [statusUpdate, setStatusUpdate] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
-  const [userProfit, setUserProfit] = useState(0);
   const [isBalanceModal, setIsBalanceModal] = useState(false);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const progressBarConfig = {
     New: { variant: "success", now: 25 },
@@ -55,6 +52,7 @@ export default function Leads({ setTab }) {
   };
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
       const querySnapshot = await getDocs(collection(db, "users"));
       const userData = [];
@@ -68,6 +66,7 @@ export default function Leads({ setTab }) {
     } catch (error) {
       console.error("Error fetching users:", error);
     }
+    setLoading(false);
   };
 
   const showOnline = async () => {
@@ -97,8 +96,6 @@ export default function Leads({ setTab }) {
           orders.push({ id: doc.id, ...doc.data() });
         });
         dispatch(setUserOrders(orders));
-        // setOrdersData(orders);
-        console.log("SET ORDER DATA HAS BEEN CALLED");
         let profit = 0;
         orders?.map((el) => {
           if (
@@ -107,10 +104,7 @@ export default function Leads({ setTab }) {
           ) {
             profit = profit + parseFloat(el.profit);
           }
-
-          setUserProfit(profit);
         });
-        // setOrdersData(orders);
         if (isOk === true) {
           setTab("MainBoard");
         }
@@ -118,7 +112,6 @@ export default function Leads({ setTab }) {
       setSelectedUser(row);
       setSelected(row?.id);
 
-      // Return a cleanup function to unsubscribe when the component unmounts
       return () => {
         unsubscribe();
       };
@@ -471,6 +464,7 @@ export default function Leads({ setTab }) {
               data={users}
               highlightOnHover
               pointerOnHover
+              progressPending={loading}
               pagination
               paginationPerPage={5}
               paginationRowsPerPageOptions={[5, 10, 20, 50]}
