@@ -62,7 +62,6 @@ export default function MainBoard() {
   const [isEdit, setIsEdit] = useState(false);
   const [isEditProfit, setIsEditProfit] = useState(false);
   const [newUserData, setNewUserData] = useState();
-  const [userProfit, setUserProfit] = useState(0.0);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
@@ -277,22 +276,13 @@ export default function MainBoard() {
       }
     });
   };
-  const calulateProfit = () => {
-    let totalProfit = 0.0;
-    userOrders?.map((el) => {
-      if (
-        el.status.toLocaleLowerCase() == "success" ||
-        el.status.toLocaleLowerCase() == "closed"
-      ) {
-        totalProfit = totalProfit + parseFloat(el.profit);
-      }
-    });
-    setUserProfit(totalProfit);
-  };
   useEffect(() => {
     getSelectedUserData();
-    calulateProfit();
   }, []);
+
+  useEffect(() => {
+    setUserOrderData(userOrders);
+  }, [userOrders]);
 
   const saveOrders = async () => {
     console.log("updated data", userOrderData);
@@ -466,6 +456,20 @@ export default function MainBoard() {
     ({ status }) => status !== "Pending"
   );
 
+  const calculateProfit = () => {
+    let totalProfit = 0.0;
+    userOrders?.map((el) => {
+      if (
+        el.status.toLocaleLowerCase() == "success" ||
+        el.status.toLocaleLowerCase() == "closed"
+      ) {
+        totalProfit = totalProfit + parseFloat(el.profit);
+      }
+    });
+    return totalProfit.toFixed(6);
+  };
+  const userProfit = calculateProfit();
+
   const freeMargin = () => {
     let freeMarginOpened = 0;
     let newBal = parseFloat(state?.user?.totalBalance) + parseFloat(userProfit);
@@ -477,7 +481,7 @@ export default function MainBoard() {
         freeMarginOpened = newBal - parseFloat(dealSum);
       }
     });
-    return freeMarginOpened;
+    return freeMarginOpened || 0;
   };
   const freeMarginData = freeMargin();
 
@@ -576,7 +580,7 @@ export default function MainBoard() {
                 {/* Профит */}Profit
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {userProfit.toFixed(6)}
+                {userProfit}
               </h4>
             </div>
             <div>
