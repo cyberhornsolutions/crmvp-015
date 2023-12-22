@@ -24,23 +24,23 @@ const EditOrder = ({ onClose, show, selectedOrder, fetchOrders, isMain }) => {
     const symbol = symbols.find((sm) => sm.symbol === selectedOrder.symbol);
     if (
       selectedOrder.type === "Buy" &&
-      (parseFloat(symbol.price) >= sl || parseFloat(symbol.price) <= tp)
+      (sl >= parseFloat(symbol.price) || tp <= parseFloat(symbol.price))
     ) {
       toast.error(
         "In buy case SL should be less than current price and TP should be greater than current price"
       );
     } else if (
       selectedOrder.type === "Sell" &&
-      (parseFloat(symbol.price) <= sl || parseFloat(symbol.price) >= tp)
+      (sl <= parseFloat(symbol.price) || tp >= parseFloat(symbol.price))
     ) {
       toast.error(
-        "In buy case TP should be less than current price and SL should be greater than current price"
+        "In sell case TP should be less than current price and SL should be greater than current price"
       );
     } else {
-      toast.success("done");
       try {
         const updatedData = doc(db, "orders", selectedOrder.id);
         await updateDoc(updatedData, record);
+        toast.success("Order updated successfully");
         onClose();
       } catch (error) {
         console.log(error);
@@ -124,22 +124,6 @@ const EditOrder = ({ onClose, show, selectedOrder, fetchOrders, isMain }) => {
 
             <hr /> */}
 
-            <div className="form-group row">
-              <label className="col-md-3 col-form-label d-flex justify-content-between align-items-center">
-                <div className="">{/* <input type="checkbox" /> */}</div>
-                Take Profit
-              </label>
-              <div className="col-md-7">
-                <input
-                  type="text"
-                  placeholder="Enter price"
-                  className="form-control"
-                  value={tp}
-                  name="tp"
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
             {/* <div className="form-group row">
               <label className="col-md-3 col-form-label d-flex justify-content-end align-items-center"></label>
               <div className="col-md-7">
@@ -165,6 +149,22 @@ const EditOrder = ({ onClose, show, selectedOrder, fetchOrders, isMain }) => {
                   type="text"
                   placeholder="Enter stop loss"
                   className="form-control"
+                />
+              </div>
+            </div>
+            <div className="form-group row">
+              <label className="col-md-3 col-form-label d-flex justify-content-between align-items-center">
+                <div className="">{/* <input type="checkbox" /> */}</div>
+                Take Profit
+              </label>
+              <div className="col-md-7">
+                <input
+                  type="text"
+                  placeholder="Enter price"
+                  className="form-control"
+                  value={tp}
+                  name="tp"
+                  onChange={handleChange}
                 />
               </div>
             </div>
