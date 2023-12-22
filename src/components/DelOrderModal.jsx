@@ -15,94 +15,115 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 const DelOrderModal = ({ onClose, selectedOrder }) => {
-  const [volume, setVolume] = useState(selectedOrder.sum);
+  const [volume, setVolume] = useState(selectedOrder?.volume);
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState("Full");
   const symbols = useSelector((state) => state?.symbols?.symbols);
   const price = symbols?.find((el) => el.symbol == selectedOrder?.symbol);
-  const profit = calculateProfit(
-    selectedOrder.type,
-    price?.price,
-    selectedOrder?.price,
-    selectedOrder?.sum
-  );
 
   const updateOrderStatus = async (orderId, newStatus, volume1) => {
-    setIsLoading(true);
-    try {
-      const orderRef = doc(db, "orders", orderId);
-      const docSnapshot = await getDoc(orderRef);
-      let newData = {};
+    const orderRef = doc(db, "orders", orderId);
+    const docSnapshot = await getDoc(orderRef);
+    let newData = {};
 
-      if (volume1) {
-        newData = {
-          status: newStatus,
-          closedDate: serverTimestamp(),
-          closedPrice: price?.price,
-          profit: profit,
-          volume: volume1,
-        };
-      } else {
-        newData = {
-          status: newStatus,
-          closedDate: serverTimestamp(),
-          closedPrice: price?.price,
-          profit: profit,
-        };
-      }
-      if (docSnapshot.exists()) {
-        // Update the order status
-        await updateDoc(orderRef, newData);
-        toast.success("Order status updated successfully");
-        onClose(); // Close the order
-      } else {
-        toast.error("Order does not exist");
-      }
-    } catch (error) {
-      toast.error(error.message);
+    const profit = calculateProfit(
+      selectedOrder.type,
+      price?.price,
+      selectedOrder?.symbolValue,
+      selectedOrder?.volume
+    );
+
+    if (volume1) {
+      newData = {
+        status: newStatus,
+        closedDate: serverTimestamp(),
+        closedPrice: price?.price,
+        profit: profit,
+        volume: volume1,
+      };
+    } else {
+      newData = {
+        status: newStatus,
+        closedDate: serverTimestamp(),
+        closedPrice: price?.price,
+        profit: profit,
+      };
     }
-    setIsLoading(false);
+    if (docSnapshot.exists()) {
+      await updateDoc(orderRef, newData);
+      toast.success("Order status updated successfully");
+    } else {
+      toast.error("Order does not exist");
+    }
+  };
+
+  const updateUserBalance = async (orderPrice) => {
+    const userRef = doc(db, "users", selectedOrder.userId);
+    const userSnapshot = await getDoc(userRef);
+    if (userSnapshot.exists()) {
+      const userData = userSnapshot.data();
+      await updateDoc(userRef, {
+        totalBalance: userData?.totalBalance - orderPrice,
+      });
+      toast.success("Balance updated successfully");
+    } else {
+      toast.error("User not found");
+    }
+  };
+
+  const createNewOrder = async () => {
+    const formattedDate = new Date().toLocaleDateString("en-US");
+    const newOrder1 = {
+      symbol: selectedOrder.symbol,
+      symbolValue: selectedOrder.symbolValue,
+      volume: parseFloat(selectedOrder.volume) - parseFloat(volume),
+      sl: selectedOrder.sl,
+      tp: selectedOrder.tp,
+      profit: 0,
+      createdTime: serverTimestamp(),
+      type: selectedOrder.type,
+      createdAt: formattedDate,
+      status: "Pending",
+      userId: selectedOrder.userId,
+    };
+    const orderRef = collection(db, "orders");
+    await addDoc(orderRef, newOrder1);
   };
 
   const newOrder = async () => {
     if (type === "Partial") {
-      if (parseFloat(volume) >= parseFloat(selectedOrder.sum)) {
+      if (parseFloat(volume) >= parseFloat(selectedOrder.volume)) {
         toast.error(
           "Please add a volume which is less than the current volume"
         );
       } else {
         setIsLoading(true);
-
         try {
-          const formattedDate = new Date().toLocaleDateString("en-US");
-
-          const newOrder1 = {
-            symbol: selectedOrder.symbol,
-            symbolValue: selectedOrder.price,
-            volume: parseFloat(selectedOrder.sum) - parseFloat(volume),
-            sl: selectedOrder.sl,
-            tp: selectedOrder.tp,
-            profit: 0,
-            createdTime: serverTimestamp(),
-            type: selectedOrder.type,
-            createdAt: formattedDate,
-            status: "Pending",
-            userId: selectedOrder.userId,
-            closedPrice: null,
-            closedDate: null,
-          };
-          const orderRef = collection(db, "orders");
-
-          await addDoc(orderRef, newOrder1);
-          setIsLoading(false);
-
-          await updateOrderStatus(selectedOrder.docId, "Closed", volume);
+          await createNewOrder();
+          await updateOrderStatus(selectedOrder.id, "Closed", volume);
+          const orderPrice =
+            parseFloat(selectedOrder.symbolValue) * parseFloat(volume);
+          await updateUserBalance(orderPrice);
+          onClose();
         } catch (error) {
           console.log(error);
+          toast.error(error.message);
         }
+        setIsLoading(false);
       }
     } else if (type === "Full") {
-      await updateOrderStatus(selectedOrder.docId, "Closed");
+      setIsLoading(true);
+      try {
+        await updateOrderStatus(selectedOrder.id, "Closed");
+        const orderPrice =
+          parseFloat(price.price) * parseFloat(selectedOrder.volume);
+        await updateUserBalance(orderPrice);
+        onClose();
+      } catch (error) {
+        onsole.log(error);
+        toast.error(error.message);
+      }
+      setIsLoading(false);
     }
   };
 
@@ -181,7 +202,7 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
             </div>
           )}
           <div className="ps-3 fs-5">
-            Current Price: {profit}
+            Current Price:
             <span className="ms-2 text-success">{price?.price}</span>
           </div>
           <div className="w-100 text-center my-2">
