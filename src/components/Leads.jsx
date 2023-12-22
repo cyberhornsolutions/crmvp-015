@@ -112,10 +112,7 @@ export default function Leads({ setTab }) {
         });
         // setOrdersData(orders);
         if (isOk === true) {
-          isOk = false;
-          navigate("/home/mainBoard", {
-            state: { state: orders, user: row, profit: userProfit },
-          });
+          setTab("MainBoard");
         }
       });
       setSelectedUser(row);

@@ -1,14 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import placeholder from "../acc-img-placeholder.png";
-import {
-  Dropdown,
-  Modal,
-  Nav,
-  NavItem,
-  Navbar,
-  ProgressBar,
-} from "react-bootstrap";
-import { useLocation } from "react-router-dom";
+import { Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
 import { addUserNewBalance } from "../utills/firebaseHelpers";
 import {
@@ -23,7 +15,6 @@ import {
 } from "firebase/firestore";
 import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
-import Sidebar from "./Sidebar";
 import { ToastContainer, toast } from "react-toastify";
 import DelOrderModal from "./DelOrderModal";
 import EditOrder from "./EditOrder";
@@ -41,13 +32,12 @@ const newDate = (date) => {
 };
 
 export default function MainBoard() {
-  const dispatch = useDispatch();
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const dbSymbols = useSelector((state) => state?.symbols?.symbols);
+  const { user } = useSelector((state) => state?.user);
   const [deposits, setDeposits] = useState([]);
   const [tab, setTab] = useState(0);
   const [users, setUsers] = useState([]);
-  const { state } = useLocation();
   const idInputRef = useRef(null);
   const locationInputRef = useRef(null);
   const mapInputRef = useRef(null);
@@ -61,7 +51,7 @@ export default function MainBoard() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const [isEditProfit, setIsEditProfit] = useState(false);
-  const [newUserData, setNewUserData] = useState();
+  const [newUserData, setNewUserData] = useState(user);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
@@ -151,10 +141,6 @@ export default function MainBoard() {
   //   }
   // };
 
-  // console.log("Selected image", selectedImage);
-  // console.log("show modal", modalShow);
-  // console.log(9999, state);
-
   const handleImageClick = (image) => {
     console.log("Image", image);
     setSelectedImage(URL.createObjectURL(image));
@@ -166,7 +152,7 @@ export default function MainBoard() {
   };
 
   const addNewBalance = async (amount) => {
-    await addUserNewBalance(state?.user?.id, amount);
+    await addUserNewBalance(newUserData.id, amount);
     setNewBalance(0);
     setIsBalOpen(false);
   };
@@ -176,8 +162,6 @@ export default function MainBoard() {
     const fileArray = Array.from(files);
     fileStateSetter((prevFiles) => [...prevFiles, ...fileArray]);
   };
-
-  // console.log("state", state);
 
   const progressBarConfig = {
     New: { variant: "success", now: 25 },
@@ -226,7 +210,7 @@ export default function MainBoard() {
         const querySnapshot = await getDocs(
           query(
             collection(db, "users"),
-            where("useRefCode", "==", state?.user?.refCode)
+            where("useRefCode", "==", newUserData.refCode)
           )
         );
         const userData = [];
@@ -244,40 +228,29 @@ export default function MainBoard() {
     getDeposits(userOrders[0]?.userId);
 
     setIsEdit(false);
-  }, [state?.state?.length]);
+  }, [userOrders.length]);
 
-  const getSelectedUserData = async () => {
-    return new Promise((resolve, reject) => {
-      try {
-        const userDocRef = doc(db, "users", state?.user.id);
-
-        const unsubscribe = onSnapshot(
-          userDocRef,
-          (userDocSnapshot) => {
-            if (userDocSnapshot.exists()) {
-              const userData = userDocSnapshot.data();
-              resolve(setNewUserData(userData)); // Resolve with the user data
-            } else {
-              console.error("User ID does not exist in the database.");
-              resolve(null); // Resolve with null if the user doesn't exist
-            }
-          },
-          (error) => {
-            console.error("Error fetching user:", error);
-            reject(error); // Reject the Promise in case of an error
-          }
-        );
-
-        // Optionally returning unsubscribe function for cleanup if needed
-        // return unsubscribe;
-      } catch (error) {
-        console.error("Error:", error);
-        reject(error); // Reject the Promise in case of an error
+  const getSelectedUserData = () => {
+    const userDocRef = doc(db, "users", newUserData.id);
+    const unsubscribe = onSnapshot(
+      userDocRef,
+      (userDocSnapshot) => {
+        if (userDocSnapshot.exists()) {
+          const userData = userDocSnapshot.data();
+          setNewUserData(userData);
+        } else {
+          console.error("User ID does not exist in the database.");
+        }
+      },
+      (error) => {
+        console.error("Error fetching user:", error);
       }
-    });
+    );
+    return () => unsubscribe();
   };
+
   useEffect(() => {
-    getSelectedUserData();
+    return getSelectedUserData();
   }, []);
 
   useEffect(() => {
@@ -303,7 +276,7 @@ export default function MainBoard() {
 
   const handleSaveVerification = async () => {
     try {
-      const userDocRef = doc(db, "users", state?.user.id);
+      const userDocRef = doc(db, "users", newUserData.id);
       await updateDoc(userDocRef, { allowTrading: newUserData.allowTrading });
       toast.success("User info updated");
 
@@ -472,7 +445,7 @@ export default function MainBoard() {
 
   const freeMargin = () => {
     let freeMarginOpened = 0;
-    let newBal = parseFloat(state?.user?.totalBalance) + parseFloat(userProfit);
+    let newBal = parseFloat(newUserData.totalBalance) + parseFloat(userProfit);
 
     userOrders?.map((el) => {
       const latestPrice = dbSymbols?.find((sym) => sym.symbol == el.symbol);
@@ -488,19 +461,18 @@ export default function MainBoard() {
   return (
     <div id="mainboard">
       <ToastContainer />
-      <Sidebar tab={tab} setTab={setTab} />
       <div id="profile">
         <img id="profile-pic" src={placeholder} alt="" />
         <div id="profile-i">
           <h5 className="f-w-inherit f-s-inherit" style={{ lineHeight: 1.1 }}>
-            {state?.user?.id}{" "}
+            {userOrders?.id}
           </h5>
           <h4
             id="lead-name"
             className="f-w-inherit f-s-inherit"
             style={{ lineHeight: 1.1 }}
           >
-            {state?.user?.name}{" "}
+            {userOrders?.name}
           </h4>
         </div>
         <button
@@ -652,7 +624,7 @@ export default function MainBoard() {
         </div>
         <div id="profile-referral-code">
           <h5>Referral code</h5>
-          <input type="text" disabled="true" value={state?.user?.refCode} />
+          <input type="text" disabled="true" value={userOrders?.refCode} />
         </div>
       </div>
       <div id="board">
@@ -1283,13 +1255,13 @@ export default function MainBoard() {
                   <div id="" className="">
                     <input
                       type="text"
-                      value={state?.user?.name}
+                      value={userOrders?.name}
                       placeholder="John Doe"
                       className="refInput"
                     />
                     <input
                       type="text"
-                      value={state?.user?.refCode}
+                      value={userOrders?.refCode}
                       placeholder="Qc1iOSzP"
                       className="refInput"
                     />
@@ -1316,7 +1288,7 @@ export default function MainBoard() {
       {isBalOpen && (
         <AddBalanceModal
           setShowModal={setIsBalOpen}
-          selectedUser={state?.user}
+          selectedUser={newUserData}
         />
       )}
       {isDelModalOpen && (

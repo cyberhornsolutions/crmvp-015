@@ -37,7 +37,6 @@ export default function Sidebar({ setTab, tab }) {
             className={tab === "Dashboard" && "active"}
             onClick={() => {
               setTab("Dashboard");
-              navigate("/home");
             }}
           >
             Dashboard
@@ -47,7 +46,6 @@ export default function Sidebar({ setTab, tab }) {
             className={tab === "Players" && "active"}
             onClick={() => {
               setTab("Players");
-              navigate("/home");
             }}
           >
             Players
@@ -57,7 +55,6 @@ export default function Sidebar({ setTab, tab }) {
             className={tab === "Transactions" && "active"}
             onClick={() => {
               setTab("Transactions");
-              navigate("/home");
             }}
           >
             Transactions
@@ -67,7 +64,6 @@ export default function Sidebar({ setTab, tab }) {
             className={tab === "Symbols" && "active"}
             onClick={() => {
               setTab("Symbols");
-              navigate("/home");
             }}
           >
             Symbols
@@ -87,7 +83,6 @@ export default function Sidebar({ setTab, tab }) {
             className={tab === "Administrator" && "active"}
             onClick={() => {
               setTab("Administrator");
-              navigate("/home");
             }}
           >
             Administrator
@@ -101,7 +96,6 @@ export default function Sidebar({ setTab, tab }) {
             }}
             onClick={() => {
               setTab("Affiliates");
-              navigate("/home");
             }}
           >
             Affiliates

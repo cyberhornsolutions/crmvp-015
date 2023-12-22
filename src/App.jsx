@@ -25,7 +25,6 @@ const App = () => {
       <>
         <Route path="/" Component={Login} index />
         <Route path="/home" Component={Home} />
-        <Route path="/home/mainBoard" Component={MainBoard} />
       </>
     )
   );
