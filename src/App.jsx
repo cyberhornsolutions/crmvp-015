@@ -8,13 +8,11 @@ import "./main.css";
 
 import {
   Route,
-  BrowserRouter as Router,
   RouterProvider,
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
 import Home from "./pages/Home.jsx";
-import MainBoard from "./components/MainBoard.jsx";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,10 +20,10 @@ import "react-toastify/dist/ReactToastify.css";
 const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <>
-        <Route path="/" Component={Login} index />
+      <Route>
+        <Route path="/" Component={Login} />
         <Route path="/home" Component={Home} />
-      </>
+      </Route>
     )
   );
 
