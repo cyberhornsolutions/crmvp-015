@@ -1,23 +1,16 @@
 import { Modal, Form } from "react-bootstrap";
 import { addUserNewBalance } from "../utills/firebaseHelpers";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
-function AddBalanceModal({
-  setShowModal,
-  fetchUsers,
-  selectedUser,
-  setSelectedUser,
-}) {
+function AddBalanceModal({ setShowModal }) {
   const [newBalance, setNewBalance] = useState(0);
   const [balanceType, setBalanceType] = useState("Bonus");
+  const { selectedUser } = useSelector((state) => state.user);
 
   const handleAddNewBalance = async (amount) => {
     try {
       await addUserNewBalance(selectedUser.id, amount, balanceType);
-      if (fetchUsers && setSelectedUser) {
-        setSelectedUser({});
-        fetchUsers();
-      }
       setShowModal(false);
     } catch (error) {
       console.log(error);

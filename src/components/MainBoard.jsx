@@ -1281,12 +1281,7 @@ export default function MainBoard() {
           )}
         </div>
       </div>
-      {isBalOpen && (
-        <AddBalanceModal
-          setShowModal={setIsBalOpen}
-          selectedUser={newUserData}
-        />
-      )}
+      {isBalOpen && <AddBalanceModal setShowModal={setIsBalOpen} />}
       {isDelModalOpen && (
         <DelOrderModal selectedOrder={selectedOrder} onClose={handleClose} />
       )}

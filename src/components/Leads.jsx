@@ -51,22 +51,23 @@ export default function Leads({ setTab }) {
     setIsEdit(false);
   };
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(db, "users"));
-      const userData = [];
-
-      querySnapshot.forEach((doc) => {
-        userData.push({ id: doc.id, ...doc.data() });
-      });
-
-      setUsers(userData);
-      setStatusUpdate(false);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-    setLoading(false);
+  const fetchUsers = () => {
+    const usersRef = collection(db, "users");
+    const unsubscribe = onSnapshot(
+      usersRef,
+      (snapshot) => {
+        const userData = [];
+        snapshot.forEach((doc) => {
+          userData.push({ id: doc.id, ...doc.data() });
+        });
+        setUsers(userData);
+        if (statusUpdate) setStatusUpdate(false);
+      },
+      (error) => {
+        console.error("Error fetching users:", error);
+      }
+    );
+    return () => unsubscribe();
   };
 
   const showOnline = async () => {
@@ -75,11 +76,13 @@ export default function Leads({ setTab }) {
     setUsers(result);
   };
 
+  const filteredUsers = isOnline
+    ? users.filter((el) => el.onlineStatus == true)
+    : users;
+
   useEffect(() => {
-    if (isOnline == false) {
-      fetchUsers();
-    }
-  }, [statusUpdate, isOnline]);
+    return fetchUsers();
+  }, []);
 
   const fetchOrders = async (row, isOk) => {
     try {
@@ -361,7 +364,7 @@ export default function Leads({ setTab }) {
         <div
           className="text-center w-100 "
           onClick={() => {
-            setSelectedUser(row);
+            dispatch(setSelectedUser(row));
             setIsBalanceModal(true);
           }}
         >
@@ -433,10 +436,7 @@ export default function Leads({ setTab }) {
             <div className="show_all">
               <button
                 className="btn btn-secondary"
-                onClick={() => {
-                  setIsOnline(false);
-                  fetchUsers();
-                }}
+                onClick={() => setIsOnline(false)}
               >
                 Show All
               </button>
@@ -444,9 +444,7 @@ export default function Leads({ setTab }) {
             <div className="search_div">
               <button
                 className="btn btn-secondary show_online"
-                onClick={() => {
-                  showOnline();
-                }}
+                onClick={() => setIsOnline(true)}
               >
                 Show Online
               </button>
@@ -461,7 +459,7 @@ export default function Leads({ setTab }) {
           <div className="">
             <DataTable
               columns={userColumns}
-              data={users}
+              data={filteredUsers}
               highlightOnHover
               pointerOnHover
               progressPending={loading}
@@ -514,14 +512,7 @@ export default function Leads({ setTab }) {
           </div>
         </div>
       </div>
-      {isBalanceModal && (
-        <AddBalanceModal
-          setShowModal={setIsBalanceModal}
-          fetchUsers={fetchUsers}
-          selectedUser={selectedUser}
-          setSelectedUser={setSelectedUser}
-        />
-      )}
+      {isBalanceModal && <AddBalanceModal setShowModal={setIsBalanceModal} />}
 
       {isDelModalOpen && (
         <DelOrderModal
