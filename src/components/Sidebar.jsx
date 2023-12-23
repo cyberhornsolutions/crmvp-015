@@ -1,8 +1,10 @@
 import React from "react";
 import accImg from "../acc-img-placeholder.png";
 import logo from "../logo.png";
+import { useSelector } from "react-redux";
 
 export default function Sidebar({ setTab, tab }) {
+  const { user } = useSelector((state) => state.user);
   return (
     <div id="sidebar">
       <div id="logo" onClick={() => setTab("MainBoard")}>
@@ -11,7 +13,7 @@ export default function Sidebar({ setTab, tab }) {
       <div id="accpic">
         <img src={accImg} id="acc-img" />
         <h5 style={{ fontSize: 16, fontWeight: "bold", lineHeight: 1.1 }}>
-          Super Admin
+          {user.role}
         </h5>
         <h6
           style={{
@@ -24,7 +26,7 @@ export default function Sidebar({ setTab, tab }) {
             lineHeight: 1.1,
           }}
         >
-          Test Admin
+          {user.username}
         </h6>
       </div>
       <div id="menuitems">

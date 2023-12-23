@@ -21,7 +21,7 @@ export default function Login() {
     switch (role) {
       case "Admin":
         if (user.username === "admin" && user.password === "admin") {
-          const payload = { username: "admin", role: "admin" };
+          const payload = { username: "admin", role: "Super Admin" };
           localStorage.setItem("USER", JSON.stringify(payload));
           location.href = "/";
         } else {
