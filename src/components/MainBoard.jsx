@@ -34,7 +34,7 @@ const newDate = (date) => {
 export default function MainBoard() {
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const dbSymbols = useSelector((state) => state?.symbols?.symbols);
-  const { user } = useSelector((state) => state?.user);
+  const { selectedUser } = useSelector((state) => state?.user);
   const [deposits, setDeposits] = useState([]);
   const [tab, setTab] = useState(0);
   const [users, setUsers] = useState([]);
@@ -51,7 +51,7 @@ export default function MainBoard() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const [isEditProfit, setIsEditProfit] = useState(false);
-  const [newUserData, setNewUserData] = useState(user);
+  const [newUserData, setNewUserData] = useState(selectedUser);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
@@ -152,7 +152,7 @@ export default function MainBoard() {
   };
 
   const addNewBalance = async (amount) => {
-    await addUserNewBalance(user.id, amount);
+    await addUserNewBalance(selectedUser.id, amount);
     setNewBalance(0);
     setIsBalOpen(false);
   };
@@ -231,7 +231,7 @@ export default function MainBoard() {
   }, [userOrders.length]);
 
   const getSelectedUserData = () => {
-    const userDocRef = doc(db, "users", user.id);
+    const userDocRef = doc(db, "users", selectedUser.id);
     const unsubscribe = onSnapshot(
       userDocRef,
       (userDocSnapshot) => {
@@ -276,7 +276,7 @@ export default function MainBoard() {
 
   const handleSaveVerification = async () => {
     try {
-      const userDocRef = doc(db, "users", user.id);
+      const userDocRef = doc(db, "users", selectedUser.id);
       await updateDoc(userDocRef, { allowTrading: newUserData.allowTrading });
       toast.success("User info updated");
 

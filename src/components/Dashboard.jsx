@@ -195,8 +195,8 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {data?.map((e) => (
-                <tr>
+              {data?.map((e, i) => (
+                <tr key={i}>
                   <td>
                     <input type="checkbox" />
                   </td>

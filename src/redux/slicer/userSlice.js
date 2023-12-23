@@ -1,7 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const user = localStorage.getItem("USER");
+console.log("login = ", user);
+
 const initialState = {
-  user: {},
+  isLogin: user ? true : false,
+  user: user ? JSON.parse(user) : null,
+  selectedUser: null,
 };
 
 const userSlicer = createSlice({
@@ -10,10 +15,14 @@ const userSlicer = createSlice({
   reducers: {
     setUser: (state, action) => {
       state.user = action.payload;
+      state.isLogin = true;
+    },
+    setSelectedUser: (state, action) => {
+      state.selectedUser = action.payload;
     },
   },
   // extraReducers: {},
 });
 
-export const { setUser } = userSlicer.actions;
+export const { setUser, setSelectedUser } = userSlicer.actions;
 export default userSlicer.reducer;

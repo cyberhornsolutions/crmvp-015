@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import logo from "../logo.png";
-import { useNavigate } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
 import { getManagerByUsernameAndRole } from "../utills/firebaseHelpers";
 
 export default function Login() {
-  const navigate = useNavigate();
   const [role, setRole] = useState("");
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({
@@ -23,7 +21,9 @@ export default function Login() {
     switch (role) {
       case "Admin":
         if (user.username === "admin" && user.password === "admin") {
-          navigate("/home");
+          const payload = { username: "admin", role: "admin" };
+          localStorage.setItem("USER", JSON.stringify(payload));
+          location.href = "/";
         } else {
           toast.error("Username or password is incorrect");
         }
@@ -36,7 +36,8 @@ export default function Login() {
           toast.error("Manager not found");
           setLoading(false);
         } else {
-          navigate("/home");
+          localStorage.setItem("USER", JSON.stringify(manager));
+          location.href = "/";
         }
         break;
     }

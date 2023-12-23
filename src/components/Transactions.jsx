@@ -243,10 +243,10 @@ export default function Transactions() {
             />
           </div>
           <div>
-            <button class="btn btn-secondary ml-2" id="editTransactions">
+            <button className="btn btn-secondary ml-2" id="editTransactions">
               Edit
             </button>
-            <button class="btn btn-secondary ml-2" id="saveTransactions">
+            <button className="btn btn-secondary ml-2" id="saveTransactions">
               Save
             </button>
           </div>

@@ -25,15 +25,15 @@ import EditOrder from "./EditOrder";
 import { getUserById } from "../utills/firebaseHelpers";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../redux/slicer/userSlice";
+import { setSelectedUser } from "../redux/slicer/userSlice";
 import AddBalanceModal from "./AddBalanceModal";
 export default function Leads({ setTab }) {
   const userOrders = useSelector((state) => state?.userOrders?.orders);
+  const selectedUser = useSelector((state) => state.user.selectedUser);
   const [selected, setSelected] = useState();
   const [users, setUsers] = useState([]);
   const [statusUpdate, setStatusUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedUser, setSelectedUser] = useState({});
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -109,7 +109,7 @@ export default function Leads({ setTab }) {
           setTab("MainBoard");
         }
       });
-      setSelectedUser(row);
+      dispatch(setSelectedUser(row));
       setSelected(row?.id);
 
       return () => {
@@ -218,7 +218,7 @@ export default function Leads({ setTab }) {
 
   const onUserDoubleClick = async (row) => {
     const u = await getUserById(row.id);
-    dispatch(setUser(u));
+    dispatch(setSelectedUser(u));
     await fetchOrders(row, true);
   };
   const userColumns = [

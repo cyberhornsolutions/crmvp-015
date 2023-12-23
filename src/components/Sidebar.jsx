@@ -1,11 +1,8 @@
 import React from "react";
 import accImg from "../acc-img-placeholder.png";
 import logo from "../logo.png";
-import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ setTab, tab }) {
-  const navigate = useNavigate();
-
   return (
     <div id="sidebar">
       <div id="logo" onClick={() => setTab("MainBoard")}>
@@ -73,7 +70,6 @@ export default function Sidebar({ setTab, tab }) {
             className={tab === "Calendar" && "active"}
             onClick={() => {
               setTab("Calendar");
-              navigate("/home");
             }}
           >
             Calendar
@@ -110,7 +106,10 @@ export default function Sidebar({ setTab, tab }) {
         <button
           id="logout-button"
           className="transparent-background"
-          onClick={() => navigate("/")}
+          onClick={() => {
+            localStorage.clear();
+            location.href = "/";
+          }}
         >
           Logout
         </button>
