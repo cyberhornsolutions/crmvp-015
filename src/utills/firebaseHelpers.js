@@ -277,3 +277,19 @@ export const getAllSymbols = (setState, setLoading) => {
   );
   return () => unsubscribe();
 };
+
+export const getSymbolByName = async (symbol) => {
+  try {
+    const q = query(
+      collection(db, "symbols"),
+      where("symbol", "==", symbol),
+      limit(1)
+    );
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs[0].data();
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};

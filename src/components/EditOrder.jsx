@@ -1,18 +1,16 @@
-import moment from "moment";
 import React, { useState } from "react";
-import { Button, Modal, Toast } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { db } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
-import { useSelector } from "react-redux";
+import { getSymbolByName } from "../utills/firebaseHelpers";
 
-const EditOrder = ({ onClose, show, selectedOrder, fetchOrders, isMain }) => {
+const EditOrder = ({ onClose, show, selectedOrder }) => {
   const [record, setRecord] = useState({
     sl: selectedOrder.sl,
     tp: selectedOrder.tp,
   });
   const { tp, sl } = record;
-  const symbols = useSelector((state) => state.symbols.symbols);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,7 +19,7 @@ const EditOrder = ({ onClose, show, selectedOrder, fetchOrders, isMain }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const symbol = symbols.find((sm) => sm.symbol === selectedOrder.symbol);
+    const symbol = await getSymbolByName(selectedOrder.symbol);
     if (
       selectedOrder.type === "Buy" &&
       (sl >= parseFloat(symbol.price) || tp <= parseFloat(symbol.price))
