@@ -28,6 +28,25 @@ export const getData = async (collectionName) => {
   }
 };
 
+export const fetchPlayers = (setState, setLoading) => {
+  const usersRef = collection(db, "users");
+  const unsubscribe = onSnapshot(
+    usersRef,
+    (snapshot) => {
+      const userData = [];
+      snapshot.forEach((doc) => {
+        userData.push({ id: doc.id, ...doc.data() });
+      });
+      setState(userData);
+      setLoading(false);
+    },
+    (error) => {
+      console.error("Error fetching users:", error);
+    }
+  );
+  return () => unsubscribe();
+};
+
 export const fetchManagers = (setState, setLoading) => {
   setLoading(true);
   try {

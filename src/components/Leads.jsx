@@ -22,7 +22,7 @@ import {
 import DelOrderModal from "./DelOrderModal";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditOrder from "./EditOrder";
-import { getUserById } from "../utills/firebaseHelpers";
+import { getUserById, fetchPlayers } from "../utills/firebaseHelpers";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
@@ -33,7 +33,7 @@ export default function Leads({ setTab }) {
   const [selected, setSelected] = useState();
   const [users, setUsers] = useState([]);
   const [statusUpdate, setStatusUpdate] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -51,37 +51,12 @@ export default function Leads({ setTab }) {
     setIsEdit(false);
   };
 
-  const fetchUsers = () => {
-    const usersRef = collection(db, "users");
-    const unsubscribe = onSnapshot(
-      usersRef,
-      (snapshot) => {
-        const userData = [];
-        snapshot.forEach((doc) => {
-          userData.push({ id: doc.id, ...doc.data() });
-        });
-        setUsers(userData);
-        if (statusUpdate) setStatusUpdate(false);
-      },
-      (error) => {
-        console.error("Error fetching users:", error);
-      }
-    );
-    return () => unsubscribe();
-  };
-
-  const showOnline = async () => {
-    setIsOnline(true);
-    const result = users.filter((el) => el.onlineStatus == true);
-    setUsers(result);
-  };
-
   const filteredUsers = isOnline
     ? users.filter((el) => el.onlineStatus == true)
     : users;
 
   useEffect(() => {
-    return fetchUsers();
+    return fetchPlayers(setUsers, setLoading);
   }, []);
 
   const fetchOrders = async (row, isOk) => {
@@ -135,7 +110,7 @@ export default function Leads({ setTab }) {
   const columns = [
     {
       name: "ID",
-      selector: (row) => row.id,
+      selector: (row, i) => i + 1,
       sortable: true,
     },
     {
@@ -197,27 +172,15 @@ export default function Leads({ setTab }) {
     },
   ];
 
-  const data = userOrders?.map((order, i) => ({
-    ...order,
-    id: i + 1,
-    index: i + 1,
-    docId: order.id,
-    sum: order?.volume,
-    price: order?.symbolValue,
-    orderId: order.id,
-  }));
-
-  const onUserRowClick = (row) => {
-    fetchOrders(row, false);
-    const newUsers = users.map((el) => {
-      if (el.id == row.id) {
-        return { ...el, isSelected: true };
-      } else {
-        return { ...el, isSelected: false };
-      }
-    });
-    setUsers(newUsers);
-  };
+  const deals = userOrders
+    .filter(({ status }) => status === "Pending")
+    .map((order) => ({
+      ...order,
+      docId: order.id,
+      sum: order?.volume,
+      price: order?.symbolValue,
+      orderId: order.id,
+    }));
 
   const onUserDoubleClick = async (row) => {
     const u = await getUserById(row.id);
@@ -381,7 +344,7 @@ export default function Leads({ setTab }) {
 
   const conditionalRowStyles = [
     {
-      when: (row) => row.isSelected,
+      when: (row) => row.id === selectedUser?.id,
       style: {
         backgroundColor: "#D1FFBD",
         userSelect: "none",
@@ -467,7 +430,7 @@ export default function Leads({ setTab }) {
               paginationPerPage={5}
               paginationRowsPerPageOptions={[5, 10, 20, 50]}
               conditionalRowStyles={conditionalRowStyles}
-              onRowClicked={onUserRowClick}
+              onRowClicked={(row) => fetchOrders(row, false)}
               onRowDoubleClicked={onUserDoubleClick}
               // responsive
             />
@@ -502,7 +465,7 @@ export default function Leads({ setTab }) {
           <div>
             <DataTable
               columns={columns}
-              data={data}
+              data={loading ? [] : deals}
               pagination
               paginationPerPage={10}
               paginationRowsPerPageOptions={[10, 20, 50]}
