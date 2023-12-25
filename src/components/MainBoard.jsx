@@ -53,7 +53,6 @@ export default function MainBoard() {
   const [modalShow, setModalShow] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
-  const [isEditProfit, setIsEditProfit] = useState(false);
   const [newUserData, setNewUserData] = useState(selectedUser);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
@@ -231,7 +230,7 @@ export default function MainBoard() {
     fetchUsers();
     getDeposits(userOrders[0]?.userId);
 
-    setIsEdit(false);
+    // setIsEdit(false);
   }, [userOrders.length]);
 
   const getSelectedUserData = () => {
@@ -272,7 +271,6 @@ export default function MainBoard() {
   }, []);
 
   const saveOrders = async () => {
-    console.log("updated data", userOrderData);
     let status = "success";
     userOrderData.forEach(async (order) => {
       const docRef = doc(db, "orders", order.id);
@@ -285,7 +283,7 @@ export default function MainBoard() {
       }
     });
     toast[status]("Orders Updated");
-    setIsEditProfit(false);
+    setIsEdit(false);
   };
 
   const handleSaveVerification = async () => {
@@ -316,9 +314,7 @@ export default function MainBoard() {
     );
     setUserOrderData(updatedData);
   };
-  const handleEditProfit = (id, field, value) => {
-    console.log("id field value = ", id, field, value);
-
+  const handleEditOverviewOrders = (id, field, value) => {
     const updatedData = userOrderData
       .filter(({ status }) => status !== "Pending")
       .map((item) => (item.id === id ? { ...item, [field]: value } : item));
@@ -442,6 +438,8 @@ export default function MainBoard() {
   const closedOrders = userOrderData?.filter(
     ({ status }) => status !== "Pending"
   );
+
+  console.log("closedOrders", closedOrders);
 
   const calculateProfit = () => {
     let totalProfit = 0.0;
@@ -1186,31 +1184,29 @@ export default function MainBoard() {
                   id="menu3-edit"
                   className="btn btn-secondary"
                   onClick={() => {
-                    if (isEditProfit) {
+                    if (isEdit) {
                       setUserOrderData(userOrders);
-                      setIsEditProfit(false);
+                      setIsEdit(false);
                     } else {
-                      setIsEditProfit(true);
+                      setIsEdit(true);
                     }
                   }}
                 >
-                  {isEditProfit ? "Cancel" : "Edit"}
+                  {isEdit ? "Cancel" : "Edit"}
                 </button>
                 <button
                   id="menu3-save"
                   className="btn btn-secondary"
                   onClick={saveOrders}
-                  disabled={!isEditProfit}
+                  disabled={!isEdit}
                 >
                   Save
                 </button>
               </div>
               <DataTable
                 columns={overviewColumns({
-                  isEditProfit,
-                  handleEditProfit,
-                  handleEditOrder,
-                  handleCloseOrder,
+                  isEdit,
+                  handleEditOrder: handleEditOverviewOrders,
                 })}
                 data={closedOrders}
                 highlightOnHover

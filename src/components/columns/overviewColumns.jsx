@@ -1,14 +1,16 @@
-const overviewColumns = ({ isEditProfit, handleEditProfit }) => [
+import moment from "moment/moment";
+const overviewColumns = ({ isEdit, handleEditOrder }) => [
   {
     name: "ID",
     selector: (row, i) => i + 1,
     sortable: true,
+    grow: 0.5,
   },
   {
     name: "Transaction Type",
     selector: (row) => row.type,
     sortable: true,
-    cell: (row) => row.type,
+    compact: true,
   },
   {
     name: "Symbol",
@@ -18,13 +20,39 @@ const overviewColumns = ({ isEditProfit, handleEditProfit }) => [
   },
   {
     name: "Sum",
-    selector: (row) => row.volume,
+    selector: (row) =>
+      isEdit ? (
+        <input
+          type="number"
+          className="form-control"
+          value={row.sum}
+          onChange={(e) => {
+            handleEditOrder(row.id, "sum", e.target.value);
+          }}
+        />
+      ) : (
+        row.sum
+      ),
     sortable: true,
   },
   {
-    name: "Price",
-    selector: (row) => row.symbolValue,
+    name: "Open Price",
+    selector: (row) =>
+      isEdit ? (
+        <input
+          type="number"
+          className="form-control"
+          value={row.symbolValue}
+          onChange={(e) => {
+            handleEditOrder(row.id, "symbolValue", e.target.value);
+          }}
+        />
+      ) : (
+        row.symbolValue
+      ),
     sortable: true,
+    grow: 1.5,
+    compact: true,
   },
   {
     name: "Status",
@@ -37,15 +65,14 @@ const overviewColumns = ({ isEditProfit, handleEditProfit }) => [
     selector: (row) => row.profit,
     sortable: true,
     cell: (row) =>
-      isEditProfit ? (
+      isEdit ? (
         <input
           type="number"
           className="form-control"
           value={row.profit}
           onChange={(e) => {
-            handleEditProfit(row.id, "profit", e.target.value);
+            handleEditOrder(row.id, "profit", e.target.value);
           }}
-          style={{ width: "100%" }}
         />
       ) : (
         row.profit
@@ -53,8 +80,26 @@ const overviewColumns = ({ isEditProfit, handleEditProfit }) => [
   },
   {
     name: "Date",
-    selector: (row) => row.createdAt,
+    selector: (row) =>
+      isEdit ? (
+        <input
+          type="date"
+          className="form-control"
+          value={moment(row.createdAt).format("YYYY-MM-DD")}
+          onChange={(e) => {
+            handleEditOrder(
+              row.id,
+              "createdAt",
+              moment(e.target.value).format("MM/DD/YYYY")
+            );
+          }}
+        />
+      ) : (
+        row.createdAt
+      ),
     sortable: true,
+    grow: 2,
+    compact: true,
   },
 ];
 
