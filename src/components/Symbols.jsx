@@ -1,48 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { getData, removeDuplicateSymbol } from "../utills/firebaseHelpers";
+import {
+  getAllSymbols,
+  removeDuplicateSymbol,
+} from "../utills/firebaseHelpers";
 import DataTable from "react-data-table-component";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faClose } from "@fortawesome/free-solid-svg-icons";
+import symbolsColumns from "./columns/symbolsColumns";
 import EditSymbol from "./EditSymbol";
-import { useSelector } from "react-redux";
 import { Button, Modal, Toast } from "react-bootstrap";
 import { toast } from "react-toastify";
 
 const Symbols = () => {
-  const { symbols } = useSelector((state) => state.symbols);
+  const [symbols, setSymbols] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedSymbol, setSelectedSymbol] = useState(false);
   const [deleteDuplicate, setDeleteDuplicate] = useState(false);
 
-  const columns = [
-    { name: "Symbol", selector: (row) => row.symbol },
-    { name: "Price", selector: (row) => row.price },
-    {
-      name: "Action",
-      selector: (row) => (
-        <div className="order-actions">
-          {!row.duplicate && (
-            <div
-              className="custom-edit-icon"
-              onClick={() => setSelectedSymbol(row)}
-            >
-              <FontAwesomeIcon icon={faEdit} />
-            </div>
-          )}
-          {row.duplicate && (
-            <div
-              style={{ marginLeft: "10px" }}
-              className="custom-delete-icon"
-              onClick={() => setDeleteDuplicate(row)}
-            >
-              <FontAwesomeIcon icon={faClose} />
-            </div>
-          )}
-        </div>
-      ),
-    },
-  ];
+  useEffect(() => {
+    return getAllSymbols(setSymbols, setLoading);
+  }, []);
+
+  console.log("symbols = ", symbols.slice(0, 5));
 
   const symbolData = symbols
+    .filter(({ symbol }) => symbol.endsWith("USDT"))
     .map((s) => {
       return s.duplicates?.length
         ? [
@@ -59,7 +39,15 @@ const Symbols = () => {
 
   return (
     <div>
-      <DataTable data={symbolData} columns={columns} pagination />
+      <DataTable
+        data={symbolData}
+        columns={symbolsColumns({
+          setSelectedSymbol,
+          setDeleteDuplicate,
+        })}
+        progressPending={loading}
+        pagination
+      />
       {selectedSymbol && (
         <EditSymbol
           selectedSymbol={selectedSymbol}

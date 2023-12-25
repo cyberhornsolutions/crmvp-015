@@ -237,3 +237,24 @@ export const getUserById = async (userId) => {
     return null; // Handle errors
   }
 };
+
+export const getAllSymbols = (setState, setLoading) => {
+  const symbolsRef = collection(db, "symbols");
+
+  const unsubscribe = onSnapshot(
+    symbolsRef,
+    (snapshot) => {
+      const symbolsData = [];
+      snapshot.forEach((doc) => {
+        symbolsData.push({ id: doc.id, ...doc.data() });
+      });
+
+      setState(symbolsData);
+      setLoading(false);
+    },
+    (error) => {
+      console.error("Error fetching data:", error);
+    }
+  );
+  return () => unsubscribe();
+};
