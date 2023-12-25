@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   getAllSymbols,
   removeDuplicateSymbol,
@@ -8,15 +8,24 @@ import symbolsColumns from "./columns/symbolsColumns";
 import EditSymbol from "./EditSymbol";
 import { Button, Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 
 const Symbols = () => {
-  const [symbols, setSymbols] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const symbols = useSelector((state) => state.symbols);
+  const [loading, setLoading] = useState(false);
   const [selectedSymbol, setSelectedSymbol] = useState(false);
   const [deleteDuplicate, setDeleteDuplicate] = useState(false);
 
+  const setSymbols = useCallback((symbolsData) => {
+    dispatch(setSymbolsState(symbolsData));
+  }, []);
+
   useEffect(() => {
-    return getAllSymbols(setSymbols, setLoading);
+    if (!symbols.length) {
+      return getAllSymbols(setSymbols, setLoading);
+    }
   }, []);
 
   const symbolData = symbols

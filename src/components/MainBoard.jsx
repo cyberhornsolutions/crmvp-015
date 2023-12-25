@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import placeholder from "../acc-img-placeholder.png";
 import { Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
-import { addUserNewBalance } from "../utills/firebaseHelpers";
+import { addUserNewBalance, getAllSymbols } from "../utills/firebaseHelpers";
 import {
   getDocs,
   collection,
@@ -18,8 +18,9 @@ import DataTable from "react-data-table-component";
 import { ToastContainer, toast } from "react-toastify";
 import DelOrderModal from "./DelOrderModal";
 import EditOrder from "./EditOrder";
-import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
+import { setUserOrders } from "../redux/slicer/orderSlicer";
+import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import moment from "moment";
@@ -32,10 +33,12 @@ const newDate = (date) => {
 };
 
 export default function MainBoard() {
+  const dispatch = useDispatch();
   const userOrders = useSelector((state) => state?.userOrders?.orders);
-  const dbSymbols = useSelector((state) => state?.symbols?.symbols);
+  const symbols = useSelector((state) => state?.symbols);
   const { selectedUser } = useSelector((state) => state?.user);
   const [deposits, setDeposits] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState(0);
   const [users, setUsers] = useState([]);
   const idInputRef = useRef(null);
@@ -58,6 +61,7 @@ export default function MainBoard() {
   const [userOrderData, setUserOrderData] = useState(userOrders);
   const [userBonus, setUserBonus] = useState(0);
   const [isUserEdit, setIsUserEdit] = useState(false);
+
   const handleKeyPress = (event) => {
     const keyCode = event.keyCode || event.which;
     const keyValue = String.fromCharCode(keyCode);
@@ -257,6 +261,16 @@ export default function MainBoard() {
     setUserOrderData(userOrders);
   }, [userOrders]);
 
+  const setSymbols = useCallback((symbolsData) => {
+    dispatch(setSymbolsState(symbolsData));
+  }, []);
+
+  useEffect(() => {
+    if (!symbols.length) {
+      return getAllSymbols(setSymbols, setLoading);
+    }
+  }, []);
+
   const saveOrders = async () => {
     console.log("updated data", userOrderData);
     let status = "success";
@@ -444,17 +458,17 @@ export default function MainBoard() {
   const userProfit = calculateProfit();
 
   const freeMargin = () => {
-    let freeMarginOpened = 0;
     let newBal = parseFloat(newUserData.totalBalance) + parseFloat(userProfit);
+    let freeMarginOpened = newBal;
 
-    userOrders?.map((el) => {
-      const latestPrice = dbSymbols?.find((sym) => sym.symbol == el.symbol);
-      const dealSum = parseFloat(el.volume) * parseFloat(latestPrice?.price);
+    userOrders?.forEach((el) => {
       if (el.status == "Pending") {
-        freeMarginOpened = newBal - parseFloat(dealSum);
+        const latestPrice = symbols?.find((sym) => sym.symbol == el.symbol);
+        const dealSum = parseFloat(el.volume) * parseFloat(latestPrice?.price);
+        freeMarginOpened -= parseFloat(dealSum);
       }
     });
-    return freeMarginOpened || 0;
+    return freeMarginOpened < 0 ? 0.0 : freeMarginOpened;
   };
   const freeMarginData = freeMargin();
 

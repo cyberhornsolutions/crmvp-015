@@ -18,7 +18,7 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
   const [volume, setVolume] = useState(selectedOrder?.volume);
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState("Full");
-  const symbols = useSelector((state) => state?.symbols?.symbols);
+  const symbols = useSelector((state) => state?.symbols);
   const price = symbols?.find((el) => el.symbol == selectedOrder?.symbol);
 
   const updateOrderStatus = async (orderId, newStatus, volume1) => {
@@ -101,9 +101,7 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
         try {
           await createNewOrder();
           await updateOrderStatus(selectedOrder.id, "Closed", volume);
-          const orderPrice =
-            parseFloat(selectedOrder.symbolValue) * parseFloat(volume);
-          await updateUserBalance(orderPrice);
+          await updateUserBalance(selectedOrder.sum);
           onClose();
         } catch (error) {
           console.log(error);
@@ -115,12 +113,10 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
       setIsLoading(true);
       try {
         await updateOrderStatus(selectedOrder.id, "Closed");
-        const orderPrice =
-          parseFloat(price.price) * parseFloat(selectedOrder.volume);
-        await updateUserBalance(orderPrice);
+        await updateUserBalance(selectedOrder.sum);
         onClose();
       } catch (error) {
-        onsole.log(error);
+        console.log(error);
         toast.error(error.message);
       }
       setIsLoading(false);

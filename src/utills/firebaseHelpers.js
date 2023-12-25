@@ -258,6 +258,7 @@ export const getUserById = async (userId) => {
 };
 
 export const getAllSymbols = (setState, setLoading) => {
+  setLoading(true);
   const symbolsRef = collection(db, "symbols");
 
   const unsubscribe = onSnapshot(
@@ -273,6 +274,7 @@ export const getAllSymbols = (setState, setLoading) => {
     },
     (error) => {
       console.error("Error fetching data:", error);
+      setLoading(false);
     }
   );
   return () => unsubscribe();
