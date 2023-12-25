@@ -6,7 +6,7 @@ import {
 import DataTable from "react-data-table-component";
 import symbolsColumns from "./columns/symbolsColumns";
 import EditSymbol from "./EditSymbol";
-import { Button, Modal, Toast } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
 
 const Symbols = () => {
@@ -18,8 +18,6 @@ const Symbols = () => {
   useEffect(() => {
     return getAllSymbols(setSymbols, setLoading);
   }, []);
-
-  console.log("symbols = ", symbols.slice(0, 5));
 
   const symbolData = symbols
     .filter(({ symbol }) => symbol.endsWith("USDT"))
