@@ -4,7 +4,7 @@ import { faClose, faEdit } from "@fortawesome/free-solid-svg-icons";
 const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   {
     name: "ID",
-    selector: (row, i) => i,
+    selector: (row, i) => i + 1,
     sortable: true,
   },
   {
@@ -21,7 +21,7 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   },
   {
     name: "Sum",
-    selector: (row) => row.volume,
+    selector: (row) => row.sum,
     sortable: true,
   },
   {

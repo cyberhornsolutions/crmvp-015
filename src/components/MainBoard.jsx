@@ -354,10 +354,10 @@ export default function MainBoard() {
     setIsUserEdit(false);
   };
 
-  const userColumns = [
+  const referralUserColumns = [
     {
       name: "ID",
-      selector: (row) => row.id,
+      selector: (row, i) => i + 1,
       sortable: true,
       width: "6%",
     },
@@ -1287,8 +1287,8 @@ export default function MainBoard() {
               <div className="ref-table">
                 <p className="text-center my-3">Referred</p>
                 <DataTable
-                  columns={userColumns}
-                  data={mappedData}
+                  columns={referralUserColumns}
+                  data={userOrders}
                   highlightOnHover
                   pointerOnHover
                   pagination
