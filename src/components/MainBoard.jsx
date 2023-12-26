@@ -436,12 +436,6 @@ export default function MainBoard() {
     },
   ];
 
-  const mappedData = userOrders?.map((user, i) => ({
-    ...user,
-    status: user?.status,
-    id: i + 1,
-  }));
-
   const openOrders = userOrderData?.filter(
     ({ status }) => status === "Pending"
   );
