@@ -10,11 +10,14 @@ import { Button, Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
+import { filterSearchObjects } from "../utills/helpers";
 
 const Symbols = () => {
   const dispatch = useDispatch();
   const symbols = useSelector((state) => state.symbols);
   const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [searchBy, setSearchBy] = useState("");
   const [selectedSymbol, setSelectedSymbol] = useState(false);
   const [deleteDuplicate, setDeleteDuplicate] = useState(false);
 
@@ -44,10 +47,41 @@ const Symbols = () => {
     })
     .flat();
 
+  const filteredSymbols = searchText
+    ? filterSearchObjects(searchText, symbolData)
+    : symbolData;
+
   return (
     <div>
+      <div className="input-group input-group-sm gap-1">
+        <select
+          className="input-group-text"
+          value={searchBy}
+          onChange={(e) => setSearchBy(e.target.value)}
+        >
+          <option className="d-none" disabled value="">
+            Search By
+          </option>
+          <option className="dropdown-item" value="All">
+            All
+          </option>
+          {symbolsColumns()
+            .slice(0, -1)
+            .map(({ name }) => (
+              <option className="dropdown-item">{name}</option>
+            ))}
+        </select>
+        <input
+          className="form-control-sm w-25"
+          type="search"
+          autoComplete="off"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          placeholder="Search.."
+        />
+      </div>
       <DataTable
-        data={symbolData}
+        data={filteredSymbols}
         columns={symbolsColumns({
           setSelectedSymbol,
           setDeleteDuplicate,

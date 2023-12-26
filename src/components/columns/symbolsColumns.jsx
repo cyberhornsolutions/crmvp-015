@@ -1,9 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faClose } from "@fortawesome/free-solid-svg-icons";
 
-const symbolsColumns = ({ setSelectedSymbol, setDeleteDuplicate }) => [
+const symbolsColumns = (
+  { setSelectedSymbol, setDeleteDuplicate } = {
+    setSelectedSymbol: () => {},
+    setDeleteDuplicate: () => {},
+  }
+) => [
   { name: "Symbol", selector: (row) => row.symbol },
-  { name: "Price", selector: (row) => row.price },
+  { name: "Price", selector: (row) => row.price, right: true },
   {
     name: "Action",
     selector: (row) => (
@@ -26,6 +31,9 @@ const symbolsColumns = ({ setSelectedSymbol, setDeleteDuplicate }) => [
         )}
       </div>
     ),
+    center: true,
+    grow: 2,
+    compact: true,
   },
 ];
 
