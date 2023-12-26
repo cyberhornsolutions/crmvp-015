@@ -27,11 +27,15 @@ import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import AddBalanceModal from "./AddBalanceModal";
+import { filterSearchObjects } from "../utills/helpers";
+
 export default function Leads({ setTab }) {
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const selectedUser = useSelector((state) => state.user.selectedUser);
   const [selected, setSelected] = useState();
   const [users, setUsers] = useState([]);
+  const [searchBy, setSearchBy] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [statusUpdate, setStatusUpdate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState();
@@ -51,9 +55,11 @@ export default function Leads({ setTab }) {
     setIsEdit(false);
   };
 
-  const filteredUsers = isOnline
+  let filteredUsers = isOnline
     ? users.filter((el) => el.onlineStatus == true)
     : users;
+  if (searchText)
+    filteredUsers = filterSearchObjects(searchText, filteredUsers);
 
   useEffect(() => {
     return fetchPlayers(setUsers, setLoading);
@@ -367,8 +373,17 @@ export default function Leads({ setTab }) {
         <div id="leads-div">
           <div className="d-flex align-items-center justify-content-between">
             <div className="input-group input-group-sm w-auto gap-1">
-              <select className="input-group-text">
-                <option className="d-none">Search</option>
+              <select
+                className="input-group-text"
+                value={searchBy}
+                onChange={(e) => setSearchBy(e.target.value)}
+              >
+                <option className="d-none" disabled value="">
+                  Search By
+                </option>
+                <option className="dropdown-item" value="All">
+                  All
+                </option>
                 {userColumns.slice(1).map(({ name }) => (
                   <option className="dropdown-item">{name}</option>
                 ))}
@@ -376,6 +391,8 @@ export default function Leads({ setTab }) {
               <input
                 className="form-control-sm"
                 type="search"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
                 placeholder="Search.."
               />
             </div>
