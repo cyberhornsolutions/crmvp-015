@@ -204,6 +204,9 @@ export default function Leads({ setTab }) {
           // onChange={() => handleCheckboxChange(row.id)}
         />
       ),
+      grow: 0.25,
+      compact: true,
+      center: true,
     },
     {
       name: "ID",
@@ -218,6 +221,7 @@ export default function Leads({ setTab }) {
         </div>
       ),
       sortable: false,
+      compact: true,
     },
     {
       name: "Registered",
@@ -372,7 +376,7 @@ export default function Leads({ setTab }) {
       <div id="leads" className="active">
         <div id="leads-div">
           <div className="d-flex align-items-center justify-content-between">
-            <div className="input-group input-group-sm w-auto gap-1">
+            <div className="input-group input-group-sm gap-1">
               <select
                 className="input-group-text"
                 value={searchBy}
@@ -396,7 +400,7 @@ export default function Leads({ setTab }) {
                 placeholder="Search.."
               />
             </div>
-            <div className="show_all d-flex gap-2">
+            <div className="show_all d-flex gap-2 flex-wrap flex-sm-nowrap">
               <button
                 className="btn btn-secondary btn-sm"
                 onClick={() => setIsOnline(false)}
