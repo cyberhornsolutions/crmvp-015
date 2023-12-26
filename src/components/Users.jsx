@@ -13,10 +13,13 @@ import {
   getManagerByUsername,
   updateManager,
 } from "../utills/firebaseHelpers";
+import { filterSearchObjects } from "../utills/helpers";
 
 export default function Users() {
   const [tab, setTab] = useState("All");
   const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState("");
+  const [searchBy, setSearchBy] = useState("");
   const [managers, setManagers] = useState([]);
   const [teams, setTeams] = useState([]);
   const [processedManagers, setProcessedManagers] = useState([]);
@@ -115,28 +118,28 @@ export default function Users() {
     }
   };
 
-  const deleteUser = () => {
-    var table = document.getElementById("users-table");
-    var checkboxes = table.querySelectorAll(
-      'tbody input[type="checkbox"]:checked'
-    );
-    checkboxes.forEach(function (checkbox) {
-      var row = checkbox.closest("tr");
-      row.remove();
-    });
-  };
-
   useEffect(() => {
     setProcessedManagers(managers);
   }, [managers]);
 
   useEffect(() => {
-    return fetchManagers(setManagers, setLoading);
+    const unsubManagers = fetchManagers(setManagers, setLoading);
+    const unsubTeams = fetchTeams(setTeams, setLoading);
+
+    return () => {
+      unsubManagers();
+      unsubTeams();
+    };
   }, []);
 
-  useEffect(() => {
-    return fetchTeams(setTeams, setLoading);
-  }, []);
+  const filteredManagers = searchText
+    ? filterSearchObjects(searchText, processedManagers)
+    : processedManagers;
+  const filteredTeams = searchText
+    ? filterSearchObjects(searchText, teams)
+    : teams;
+
+  const searchOptions = tab === "All" ? administratorsColumns() : teamsColumns;
 
   return (
     <div id="users" className="active">
@@ -160,32 +163,29 @@ export default function Users() {
             </Nav.Link>
           </Nav>
         </Navbar>
-        <div
-          className="dropdown"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            margin: 10,
-            // height: 25,
-          }}
-        >
-          <select className="btn dropdown-toggle">
-            <option
-              className="dropdown-item text-left"
-              style={{ display: "none" }}
-            >
-              Search
+        <div className="input-group input-group-sm w-auto gap-1">
+          <select
+            className="input-group-text"
+            value={searchBy}
+            onChange={(e) => setSearchBy(e.target.value)}
+          >
+            <option className="d-none" disabled value="">
+              Search By
             </option>
-            <option className="dropdown-item text-left">By name</option>
-            <option className="dropdown-item text-left">By email</option>
-            <option className="dropdown-item text-left">By position</option>
-            <option className="dropdown-item text-left">By desk</option>
+            <option className="dropdown-item" value="All">
+              All
+            </option>
+            {searchOptions.map(({ name }) => (
+              <option className="dropdown-item">{name}</option>
+            ))}
           </select>
           <input
-            type="text"
-            id="usersSearchInput"
-            onkeyup="usersSearch()"
-            placeholder="Поиск.."
+            className="form-control-sm"
+            type="search"
+            autoComplete="off"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search.."
           />
         </div>
         <div className="tab-content">
@@ -195,7 +195,7 @@ export default function Users() {
                 handleChangeManager,
                 handleSaveManager,
               })}
-              data={processedManagers}
+              data={filteredManagers}
               pagination
               progressPending={loading}
               paginationPerPage={5}
@@ -208,7 +208,7 @@ export default function Users() {
           {tab === "Teams" && (
             <DataTable
               columns={teamsColumns}
-              data={teams}
+              data={filteredTeams}
               pagination
               progressPending={loading}
               paginationPerPage={5}

@@ -61,9 +61,7 @@ export const fetchManagers = (setState, setLoading) => {
       setLoading(false);
       setState(managerData);
     });
-    return () => {
-      unsubscribe();
-    };
+    return unsubscribe;
   } catch (error) {
     console.error("Error fetching managers:", error);
     setLoading(false);
@@ -83,9 +81,7 @@ export const fetchTeams = (setState, setLoading) => {
       setLoading(false);
       setState(teamsData);
     });
-    return () => {
-      unsubscribe();
-    };
+    return unsubscribe;
   } catch (error) {
     console.error("Error fetching teams:", error);
     setLoading(false);
