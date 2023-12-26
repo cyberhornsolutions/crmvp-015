@@ -2,45 +2,22 @@ import React, { useEffect, useState } from "react";
 import transactionsColumns from "./columns/transactionsColumns";
 import DataTable from "react-data-table-component";
 import { filterSearchObjects } from "../utills/helpers";
-
-const transactionData = [
-  {
-    id: 1,
-    player: "Mark Otto",
-    type: "Deposit",
-    sum: 100,
-    method: "VISA",
-    card: "0000111100001111",
-    status: "Success",
-    manager: "Manager #1",
-    team: "Test",
-    desk: "Desk #1",
-    date: new Date(),
-    ftd: "Yes",
-  },
-  {
-    id: 1,
-    player: "John Doe",
-    type: "Withdrawal",
-    sum: 100,
-    method: "VISA",
-    card: "0000111100001111",
-    status: "Success",
-    manager: "Manager #1",
-    team: "Test",
-    desk: "Desk #1",
-    date: new Date(),
-    ftd: "No",
-  },
-];
+import { getAllDeposits } from "../utills/firebaseHelpers";
 
 export default function Transactions() {
   const [searchText, setSearchText] = useState("");
   const [searchBy, setSearchBy] = useState("");
+  const [deposits, setDeposits] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    return getAllDeposits(setDeposits, setLoading);
+  }, []);
 
   const filteredTransactions = searchText
-    ? filterSearchObjects(searchText, transactionData)
-    : transactionData;
+    ? filterSearchObjects(searchText, deposits)
+    : deposits;
+
   return (
     <div id="transactions" className="active">
       <div id="transactions-div">
@@ -56,8 +33,10 @@ export default function Transactions() {
             <option className="dropdown-item" value="All">
               All
             </option>
-            {transactionsColumns.map(({ name }) => (
-              <option className="dropdown-item">{name}</option>
+            {transactionsColumns.map(({ name }, i) => (
+              <option key={i} className="dropdown-item">
+                {name}
+              </option>
             ))}
           </select>
           <input
@@ -73,6 +52,7 @@ export default function Transactions() {
           data={filteredTransactions}
           columns={transactionsColumns}
           pagination
+          progressPending={loading}
         />
       </div>
     </div>

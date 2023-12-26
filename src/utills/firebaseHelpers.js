@@ -11,6 +11,7 @@ import {
   onSnapshot,
   addDoc,
   serverTimestamp,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -190,45 +191,34 @@ export const removeDuplicateSymbol = async (selectedSymbol, duplicate) => {
   }
 };
 
-export const addUserNewBalance = async (userId, amount, balanceType) => {
-  try {
-    const userDocRef = doc(db, "users", userId);
-    const userDocSnapshot = await getDoc(userDocRef);
+export const addUserNewBalance = async (userId, newDeposit) => {
+  const userDocRef = doc(db, "users", userId);
+  const userDocSnapshot = await getDoc(userDocRef);
 
-    if (userDocSnapshot.exists()) {
-      const userData = userDocSnapshot.data();
-      const currentBalanceString = userData.totalBalance || 0;
-      const currentBalance = parseFloat(currentBalanceString);
-      let updatedBalance;
-      if (balanceType === "Withdraw") {
-        updatedBalance = currentBalance - parseFloat(amount);
-      } else {
-        updatedBalance = currentBalance + parseFloat(amount);
-      }
-
-      // Update the balance in the database directly
-      await setDoc(
-        userDocRef,
-        { totalBalance: updatedBalance },
-        { merge: true }
-      );
-
-      const depositRef = collection(db, "deposits");
-
-      await addDoc(depositRef, {
-        userId: userId,
-        amount: parseFloat(amount),
-        type: balanceType,
-        // comment: "Bonus",
-        createdAt: serverTimestamp(),
-      });
-
-      console.log("Balance updated successfully!");
+  if (userDocSnapshot.exists()) {
+    const userData = userDocSnapshot.data();
+    const currentBalanceString = userData.totalBalance || 0;
+    const currentBalance = parseFloat(currentBalanceString);
+    let updatedBalance;
+    if (newDeposit.type === "Withdraw") {
+      updatedBalance = currentBalance - parseFloat(newDeposit.sum);
     } else {
-      console.error("User ID does not exist in the database.");
+      updatedBalance = currentBalance + parseFloat(newDeposit.sum);
     }
-  } catch (error) {
-    console.error("Error updating balance:", error);
+
+    // Update the balance in the database directly
+    await setDoc(userDocRef, { totalBalance: updatedBalance }, { merge: true });
+
+    const depositRef = collection(db, "deposits");
+
+    await addDoc(depositRef, {
+      ...newDeposit,
+      createdAt: serverTimestamp(),
+    });
+
+    console.log("Balance updated successfully!");
+  } else {
+    console.error("User ID does not exist in the database.");
   }
 };
 
@@ -290,4 +280,32 @@ export const getSymbolByName = async (symbol) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const getAllDeposits = (setState, setLoading) => {
+  setLoading(true);
+  try {
+    const depositsRef = collection(db, "deposits");
+    const userDepositsQuery = query(depositsRef, orderBy("createdAt", "desc"));
+
+    const unsubscribe = onSnapshot(
+      userDepositsQuery,
+      (snapshot) => {
+        const depositsData = [];
+        snapshot.forEach((doc) => {
+          depositsData.push({ id: doc.id, ...doc.data() });
+        });
+        setState(depositsData);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error fetching data:", error);
+      }
+    );
+
+    return () => unsubscribe();
+  } catch (error) {
+    console.error("Error:", error);
+  }
+  setLoading(false);
 };

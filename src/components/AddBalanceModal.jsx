@@ -2,17 +2,30 @@ import { Modal, Form } from "react-bootstrap";
 import { addUserNewBalance } from "../utills/firebaseHelpers";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 function AddBalanceModal({ setShowModal }) {
   const [newBalance, setNewBalance] = useState(0);
   const [balanceType, setBalanceType] = useState("Bonus");
-  const { selectedUser } = useSelector((state) => state.user);
+  const { selectedUser, user } = useSelector((state) => state.user);
 
   const handleAddNewBalance = async (amount) => {
+    const newDeposit = {
+      player: selectedUser.name,
+      type: balanceType,
+      sum: amount,
+      method: "VISA",
+      manager: user.username,
+      team: user.team,
+      // desk: user.desk,
+    };
+
     try {
-      await addUserNewBalance(selectedUser.id, amount, balanceType);
+      await addUserNewBalance(selectedUser.id, newDeposit);
+      toast.success("Balance added successfully");
       setShowModal(false);
     } catch (error) {
+      toast.error("Failed");
       console.log(error);
     }
   };

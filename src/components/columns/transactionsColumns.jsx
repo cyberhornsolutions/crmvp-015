@@ -5,11 +5,14 @@ const transactionsColumns = [
     name: "ID",
     selector: (row, i) => i + 1,
     sortable: true,
+    grow: 0.5,
   },
   {
     name: "Player",
     selector: (row) => row.player,
     sortable: true,
+    grow: 2,
+    compact: true,
   },
   {
     name: "Type",
@@ -30,6 +33,7 @@ const transactionsColumns = [
     name: "Manager",
     selector: (row) => row.manager,
     sortable: true,
+    compact: true,
   },
   {
     name: "Team",
@@ -46,6 +50,7 @@ const transactionsColumns = [
     selector: (row) => moment(row.date).format("MM/DD/YYYY hh:mm A"),
     sortable: true,
     grow: 2,
+    compact: true,
   },
 ];
 
