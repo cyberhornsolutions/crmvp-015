@@ -271,6 +271,16 @@ export default function MainBoard() {
   }, []);
 
   const saveOrders = async () => {
+    for (let i = 0; i < userOrderData.length; i++) {
+      if (userOrderData[i].sum <= 0) {
+        toast.error("Sum value should be greater than 0");
+        return;
+      }
+      if (userOrderData[i].symbolValue <= 0) {
+        toast.error("Open Price value should be greater than 0");
+        return;
+      }
+    }
     let status = "success";
     userOrderData.forEach(async (order) => {
       const docRef = doc(db, "orders", order.id);
