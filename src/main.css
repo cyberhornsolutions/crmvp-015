@@ -490,30 +490,15 @@ td:hover {
   border: 2px solid white;
 }
 #leads-div {
-  flex: 2;
-  width: 98%;
   margin: 10px;
   background-color: whitesmoke;
   border-radius: 5px;
-  max-height: 50vh;
-  overflow-y: auto;
-  min-height: 50vh;
-  overflow-y: auto;
-}
-#leads-div .search_div .show_online {
-  font-size: 14px !important;
-  width: 120px !important;
-  padding: 2px !important;
-  border: 1px solid lightgray;
-  margin-right: 20px;
+  height: 50vh;
+  overflow: auto;
 }
 #leads-div .show_all button {
   font-size: 14px !important;
   width: 120px !important;
-  height: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   border: 1px solid lightgray;
 }
 #lead-transactions {
@@ -695,7 +680,6 @@ td.editing {
   cursor: pointer;
   font-weight: bold;
 }
-#leads-div .dropdown,
 #transactions-div .dropdown {
   display: flex;
   flex-direction: row;

@@ -365,58 +365,33 @@ export default function Leads({ setTab }) {
     <>
       <div id="leads" className="active">
         <div id="leads-div">
-          <div className="dropdown">
-            <select className="btn dropdown-toggle">
-              <option
-                className="dropdown-item text-center"
-                style={{ display: "none" }}
-              >
-                Search
-              </option>
-
-              <option
-                className="dropdown-item text-center"
-                href="#"
-                data-option="By name"
-              >
-                By name
-              </option>
-              <option
-                className="dropdown-item text-center"
-                href="#"
-                data-option="By phone"
-              >
-                By phone
-              </option>
-              <option
-                className="dropdown-item text-center"
-                href="#"
-                data-option="By email"
-              >
-                By email
-              </option>
-            </select>
-            <div className="show_all">
+          <div className="d-flex align-items-center justify-content-between">
+            <div className="input-group input-group-sm w-auto gap-1">
+              <select className="input-group-text">
+                <option className="d-none">Search</option>
+                {userColumns.slice(1).map(({ name }) => (
+                  <option className="dropdown-item">{name}</option>
+                ))}
+              </select>
+              <input
+                className="form-control-sm"
+                type="search"
+                placeholder="Search.."
+              />
+            </div>
+            <div className="show_all d-flex gap-2">
               <button
-                className="btn btn-secondary"
+                className="btn btn-secondary btn-sm"
                 onClick={() => setIsOnline(false)}
               >
                 Show All
               </button>
-            </div>
-            <div className="search_div">
               <button
-                className="btn btn-secondary show_online"
+                className="btn btn-secondary btn-sm"
                 onClick={() => setIsOnline(true)}
               >
                 Show Online
               </button>
-              <input
-                type="text"
-                id="leadsSearchInput"
-                onKeyUp="leadsSearch()"
-                placeholder="Search.."
-              />
             </div>
           </div>
           <div className="">
