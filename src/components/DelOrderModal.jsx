@@ -21,10 +21,9 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
   const symbols = useSelector((state) => state?.symbols);
   const price = symbols?.find((el) => el.symbol == selectedOrder?.symbol);
 
-  const updateOrderStatus = async (orderId, newStatus, volume1) => {
+  const updateOrderStatus = async (orderId, newStatus, newVolume) => {
     const orderRef = doc(db, "orders", orderId);
     const docSnapshot = await getDoc(orderRef);
-    let newData = {};
 
     const profit = calculateProfit(
       selectedOrder.type,
@@ -33,21 +32,16 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
       selectedOrder?.volume
     );
 
-    if (volume1) {
-      newData = {
-        status: newStatus,
-        closedDate: serverTimestamp(),
-        closedPrice: price?.price,
-        profit: profit,
-        volume: volume1,
-      };
-    } else {
-      newData = {
-        status: newStatus,
-        closedDate: serverTimestamp(),
-        closedPrice: price?.price,
-        profit: profit,
-      };
+    const newData = {
+      status: newStatus,
+      closedDate: serverTimestamp(),
+      closedPrice: price?.price,
+      profit: profit,
+    };
+
+    if (newVolume) {
+      newData.volume = newVolume;
+      newData.sum = newVolume * selectedOrder.symbolValue;
     }
     if (docSnapshot.exists()) {
       await updateDoc(orderRef, newData);
@@ -73,19 +67,18 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
 
   const createNewOrder = async () => {
     const formattedDate = new Date().toLocaleDateString("en-US");
+    const newVolume = parseFloat(selectedOrder.volume) - parseFloat(volume);
     const newOrder1 = {
-      symbol: selectedOrder.symbol,
-      symbolValue: selectedOrder.symbolValue,
-      volume: parseFloat(selectedOrder.volume) - parseFloat(volume),
-      sl: selectedOrder.sl,
-      tp: selectedOrder.tp,
+      ...selectedOrder,
+      volume: newVolume,
+      sum: newVolume * selectedOrder.symbolValue,
       profit: 0,
       createdTime: serverTimestamp(),
-      type: selectedOrder.type,
       createdAt: formattedDate,
       status: "Pending",
-      userId: selectedOrder.userId,
     };
+    delete newOrder1.id;
+    delete newOrder1.sltp;
     const orderRef = collection(db, "orders");
     await addDoc(orderRef, newOrder1);
   };
@@ -101,7 +94,8 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
         try {
           await createNewOrder();
           await updateOrderStatus(selectedOrder.id, "Closed", volume);
-          await updateUserBalance(selectedOrder.sum);
+          const orderPrice = volume * selectedOrder.symbolValue;
+          await updateUserBalance(orderPrice);
           onClose();
         } catch (error) {
           console.log(error);

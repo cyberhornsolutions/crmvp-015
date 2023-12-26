@@ -443,8 +443,6 @@ export default function MainBoard() {
     ({ status }) => status !== "Pending"
   );
 
-  console.log("closedOrders", closedOrders);
-
   const calculateProfit = () => {
     let totalProfit = 0.0;
     userOrders?.map((el) => {
