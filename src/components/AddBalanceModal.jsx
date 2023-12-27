@@ -12,6 +12,7 @@ function AddBalanceModal({ setShowModal }) {
   const handleAddNewBalance = async (amount) => {
     const newDeposit = {
       player: selectedUser.name,
+      userId: selectedUser.id,
       type: balanceType,
       sum: amount,
       method: "VISA",
