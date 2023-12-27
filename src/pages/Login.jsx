@@ -31,7 +31,6 @@ export default function Login() {
       default:
         setLoading(true);
         const manager = await getManagerByUsernameAndRole(user.username, role);
-        console.log("manager = ", manager);
         if (!manager) {
           toast.error("Manager not found");
           setLoading(false);
