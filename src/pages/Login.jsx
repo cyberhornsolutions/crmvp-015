@@ -35,6 +35,12 @@ export default function Login() {
         if (!manager) {
           toast.error("Manager not found");
           setLoading(false);
+        } else if (!manager.isActive) {
+          toast.error("Manager is disabled");
+          setLoading(false);
+        } else if (manager.password !== user.password) {
+          toast.error("Username or password is incorrect");
+          setLoading(false);
         } else {
           localStorage.setItem("USER", JSON.stringify(manager));
           location.href = "/";
