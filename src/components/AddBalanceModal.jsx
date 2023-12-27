@@ -16,8 +16,8 @@ function AddBalanceModal({ setShowModal }) {
       sum: amount,
       method: "VISA",
       manager: user.username,
-      team: user.team,
-      // desk: user.desk,
+      team: user.team || "",
+      desk: user.desk || "",
     };
 
     try {
