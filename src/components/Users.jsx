@@ -74,6 +74,17 @@ export default function Users() {
     }
   };
 
+  const toggleActiveManager = async (manager) => {
+    try {
+      delete manager.isEdit;
+      await updateManager(manager);
+      toast.success("Manager updated successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating manager");
+    }
+  };
+
   const addUser = async () => {
     if (!(user.name && user.username && user.role && user.team)) {
       toast.error("Please fill all field");
@@ -84,6 +95,7 @@ export default function Users() {
       await addDoc(collection(db, "managers"), {
         ...user,
         password: "manager",
+        isActive: true,
         date: formattedDate,
       });
       toast.success("Manager Record Added Successfully.");
@@ -194,6 +206,7 @@ export default function Users() {
               columns={administratorsColumns({
                 handleChangeManager,
                 handleSaveManager,
+                toggleActiveManager,
               })}
               data={filteredManagers}
               pagination

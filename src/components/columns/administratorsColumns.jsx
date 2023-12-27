@@ -3,9 +3,10 @@ import { faClose, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
 import { Form } from "react-bootstrap";
 
 const administratorsColumns = (
-  { handleChangeManager, handleSaveManager } = {
+  { handleChangeManager, handleSaveManager, toggleActiveManager } = {
     handleChangeManager: () => {},
     handleSaveManager: () => {},
+    toggleActiveManager: () => {},
   }
 ) => [
   {
@@ -112,9 +113,12 @@ const administratorsColumns = (
             onClick={() => handleChangeManager(row.id, "isEdit", true)}
           />
         )}
-        <FontAwesomeIcon
-          icon={faClose}
-          className="btn btn-outline-secondary btn-sm"
+        <Form.Check
+          type="switch"
+          checked={row.isActive}
+          onChange={(e) =>
+            toggleActiveManager({ ...row, isActive: e.target.checked })
+          }
         />
       </div>
     ),
