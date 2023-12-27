@@ -23,14 +23,9 @@ import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
-import moment from "moment";
 import dealsColumns from "./columns/dealsColumns";
 import overviewColumns from "./columns/overviewColumns";
-
-const newDate = (date) => {
-  const jsDate = new Date(date.seconds * 1000 + date.nanoseconds / 1000000);
-  return moment(jsDate).format("MM/DD/YYYY hh:mm:ss A");
-};
+import { convertTimestamptToDate } from "../utills/helpers";
 
 export default function MainBoard() {
   const dispatch = useDispatch();
@@ -342,7 +337,7 @@ export default function MainBoard() {
   const depositColumns = [
     {
       name: "Date",
-      selector: (row) => newDate(row.createdAt),
+      selector: (row) => convertTimestamptToDate(row.createdAt),
     },
     { name: "Sum", selector: (row) => row.amount },
     { name: "Type", selector: (row) => row.type },

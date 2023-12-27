@@ -1,4 +1,4 @@
-import moment from "moment";
+import { convertTimestamptToDate } from "../../utills/helpers";
 
 const transactionsColumns = [
   {
@@ -47,7 +47,7 @@ const transactionsColumns = [
   },
   {
     name: "Date",
-    selector: (row) => moment(row.date).format("MM/DD/YYYY hh:mm A"),
+    selector: (row) => convertTimestamptToDate(row.createdAt),
     sortable: true,
     grow: 2,
     compact: true,
