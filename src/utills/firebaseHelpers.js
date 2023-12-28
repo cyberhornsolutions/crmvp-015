@@ -14,6 +14,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
+import { convertTimestamptToDate } from "./helpers";
 
 export const getData = async (collectionName) => {
   try {
@@ -293,7 +294,12 @@ export const getAllDeposits = (setState, setLoading) => {
       (snapshot) => {
         const depositsData = [];
         snapshot.forEach((doc) => {
-          depositsData.push({ id: doc.id, ...doc.data() });
+          const docData = doc.data();
+          depositsData.push({
+            id: doc.id,
+            ...docData,
+            createdAt: convertTimestamptToDate(docData.createdAt),
+          });
         });
         setState(depositsData);
         setLoading(false);

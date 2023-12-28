@@ -210,18 +210,19 @@ export default function Leads({ setTab }) {
     },
     {
       name: "ID",
-      selector: (row) => (
-        <div className="d-flex align-items-center">
+      selector: (row, i) => (
+        <div className="d-flex align-items-center gap-1">
           {row.onlineStatus ? (
             <CircleIcon className="onlineGreen" />
           ) : (
             <CircleIcon className="onlineRed" />
           )}
-          {row.id}
+          {i + 1}
         </div>
       ),
       sortable: false,
       compact: true,
+      width: "50px",
     },
     {
       name: "Registered",

@@ -1,5 +1,3 @@
-import { convertTimestamptToDate } from "../../utills/helpers";
-
 const transactionsColumns = [
   {
     name: "ID",
@@ -47,7 +45,7 @@ const transactionsColumns = [
   },
   {
     name: "Date",
-    selector: (row) => convertTimestamptToDate(row.createdAt),
+    selector: (row) => row.createdAt,
     sortable: true,
     grow: 2,
     compact: true,

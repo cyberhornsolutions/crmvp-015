@@ -13,7 +13,10 @@ export const calculateProfit = (type, currentPrice, symbolPrice, volume) => {
 
 export const filterSearchObjects = (search = "", data = []) =>
   data.filter(
-    (obj) => Object.values(obj).toString().search(RegExp(search, "i")) > -1
+    (obj, i) =>
+      Object.values({ ...obj, id: i })
+        .toString()
+        .search(RegExp(search, "i")) > -1
   );
 
 export const convertTimestamptToDate = (date) => {
