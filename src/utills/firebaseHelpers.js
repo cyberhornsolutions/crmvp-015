@@ -246,10 +246,15 @@ export const getUserById = async (userId) => {
 
 export const getAllSymbols = (setState, setLoading) => {
   setLoading(true);
-  const symbolsRef = collection(db, "symbols");
+  const q = query(
+    collection(db, "symbols"),
+    where("symbol", "in", ["BTCUSDT", "ETHUSDT", "DOGEUSDT"])
+  );
+  // const symbolsRef = collection(db, "symbols");
 
   const unsubscribe = onSnapshot(
-    symbolsRef,
+    // symbolsRef,
+    q,
     (snapshot) => {
       const symbolsData = [];
       snapshot.forEach((doc) => {
