@@ -1205,7 +1205,11 @@ export default function MainBoard() {
                   isEdit,
                   handleEditOrder: handleEditOverviewOrders,
                 })}
-                data={closedOrders}
+                data={closedOrders.concat(
+                  closedOrders.length < 5
+                    ? new Array(5 - closedOrders.length).fill("")
+                    : []
+                )}
                 highlightOnHover
                 pointerOnHover
                 pagination

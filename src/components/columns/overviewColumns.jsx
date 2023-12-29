@@ -2,7 +2,7 @@ import moment from "moment/moment";
 const overviewColumns = ({ isEdit, handleEditOrder }) => [
   {
     name: "ID",
-    selector: (row, i) => i + 1,
+    selector: (row, i) => row && i + 1,
     sortable: true,
     grow: 0.5,
   },
@@ -21,7 +21,7 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
   {
     name: "Sum",
     selector: (row) =>
-      isEdit ? (
+      row && isEdit ? (
         <input
           type="number"
           className="form-control"
@@ -38,7 +38,7 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
   {
     name: "Open Price",
     selector: (row) =>
-      isEdit ? (
+      row && isEdit ? (
         <input
           type="number"
           className="form-control"
@@ -65,7 +65,7 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
     selector: (row) => row.profit,
     sortable: true,
     cell: (row) =>
-      isEdit ? (
+      row && isEdit ? (
         <input
           type="number"
           className="form-control"
@@ -81,7 +81,7 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
   {
     name: "Date",
     selector: (row) =>
-      isEdit ? (
+      row && isEdit ? (
         <input
           type="date"
           className="form-control"
