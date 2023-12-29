@@ -4,20 +4,18 @@ import { faClose, faEdit } from "@fortawesome/free-solid-svg-icons";
 const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   {
     name: "ID",
-    selector: (row, i) => i + 1,
+    selector: (row, i) => row && i + 1,
     sortable: true,
   },
   {
     name: "Transaction Type",
     selector: (row) => row.type,
     sortable: true,
-    cell: (row) => row.type,
   },
   {
     name: "Symbol",
     selector: (row) => row.symbol,
     sortable: true,
-    cell: (row) => row.symbol,
   },
   {
     name: "Sum",
@@ -33,13 +31,11 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     name: "Status",
     selector: (row) => row.status,
     sortable: true,
-    cell: (row) => row.status,
   },
   {
     name: "Profit",
     selector: (row) => row.profit,
     sortable: true,
-    cell: (row) => row.profit,
   },
   {
     name: "Date",
@@ -49,19 +45,23 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   {
     name: "Action",
     selector: (row) => row.id,
-    cell: (row) => (
-      <div className="order-actions">
-        <div className="custom-edit-icon" onClick={() => handleEditOrder(row)}>
-          <FontAwesomeIcon icon={faEdit} />
+    cell: (row) =>
+      row && (
+        <div className="order-actions">
+          <div
+            className="custom-edit-icon"
+            onClick={() => handleEditOrder(row)}
+          >
+            <FontAwesomeIcon icon={faEdit} />
+          </div>
+          <div className="ml-5">
+            <FontAwesomeIcon
+              icon={faClose}
+              onClick={() => handleCloseOrder(row)}
+            />
+          </div>
         </div>
-        <div className="ml-5">
-          <FontAwesomeIcon
-            icon={faClose}
-            onClick={() => handleCloseOrder(row)}
-          />
-        </div>
-      </div>
-    ),
+      ),
     sortable: false,
   },
 ];
