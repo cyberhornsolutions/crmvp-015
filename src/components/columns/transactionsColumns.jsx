@@ -1,7 +1,7 @@
 const transactionsColumns = [
   {
     name: "ID",
-    selector: (row, i) => i + 1,
+    selector: (row, i) => row && i + 1,
     sortable: true,
     grow: 0.5,
   },

@@ -81,12 +81,15 @@ const Symbols = () => {
         />
       </div>
       <DataTable
-        data={filteredSymbols}
+        data={filteredSymbols.concat(
+          filteredSymbols.length < 5
+            ? new Array(5 - filteredSymbols.length).fill("")
+            : []
+        )}
         columns={symbolsColumns({
           setSelectedSymbol,
           setDeleteDuplicate,
         })}
-        progressPending={loading}
         pagination
       />
       {selectedSymbol && (

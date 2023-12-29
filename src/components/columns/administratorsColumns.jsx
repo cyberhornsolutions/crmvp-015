@@ -11,7 +11,7 @@ const administratorsColumns = (
 ) => [
   {
     name: "ID",
-    selector: (row, i) => i + 1,
+    selector: (row, i) => row && i + 1,
   },
   {
     name: "Name", // Translate the header using your t function
@@ -98,30 +98,31 @@ const administratorsColumns = (
   {
     name: "Action",
     selector: (row) => row.id,
-    cell: (row) => (
-      <div className="d-flex align-items-center gap-1">
-        {row.isEdit ? (
-          <FontAwesomeIcon
-            icon={faSave}
-            className="btn btn-secondary btn-sm"
-            onClick={() => handleSaveManager(row)}
+    cell: (row) =>
+      row && (
+        <div className="d-flex align-items-center gap-1">
+          {row.isEdit ? (
+            <FontAwesomeIcon
+              icon={faSave}
+              className="btn btn-secondary btn-sm"
+              onClick={() => handleSaveManager(row)}
+            />
+          ) : (
+            <FontAwesomeIcon
+              icon={faEdit}
+              className="btn btn-outline-secondary btn-sm"
+              onClick={() => handleChangeManager(row.id, "isEdit", true)}
+            />
+          )}
+          <Form.Check
+            type="switch"
+            checked={row.isActive}
+            onChange={(e) =>
+              toggleActiveManager({ ...row, isActive: e.target.checked })
+            }
           />
-        ) : (
-          <FontAwesomeIcon
-            icon={faEdit}
-            className="btn btn-outline-secondary btn-sm"
-            onClick={() => handleChangeManager(row.id, "isEdit", true)}
-          />
-        )}
-        <Form.Check
-          type="switch"
-          checked={row.isActive}
-          onChange={(e) =>
-            toggleActiveManager({ ...row, isActive: e.target.checked })
-          }
-        />
-      </div>
-    ),
+        </div>
+      ),
     sortable: false,
   },
 ];

@@ -49,10 +49,13 @@ export default function Transactions() {
           />
         </div>
         <DataTable
-          data={filteredTransactions}
+          data={filteredTransactions.concat(
+            filteredTransactions.length < 5
+              ? new Array(5 - filteredTransactions.length).fill("")
+              : []
+          )}
           columns={transactionsColumns}
           pagination
-          progressPending={loading}
         />
       </div>
     </div>

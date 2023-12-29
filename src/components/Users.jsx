@@ -208,9 +208,12 @@ export default function Users() {
                 handleSaveManager,
                 toggleActiveManager,
               })}
-              data={filteredManagers}
+              data={filteredManagers.concat(
+                filteredManagers.length < 5
+                  ? new Array(5 - filteredManagers.length).fill("")
+                  : []
+              )}
               pagination
-              progressPending={loading}
               paginationPerPage={5}
               paginationRowsPerPageOptions={[5, 10, 20, 50]}
               highlightOnHover

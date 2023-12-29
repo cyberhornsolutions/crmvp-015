@@ -11,26 +11,27 @@ const symbolsColumns = (
   { name: "Price", selector: (row) => row.price, right: true },
   {
     name: "Action",
-    selector: (row) => (
-      <div className="order-actions">
-        {!row.duplicate && (
-          <div
-            className="custom-edit-icon"
-            onClick={() => setSelectedSymbol(row)}
-          >
-            <FontAwesomeIcon icon={faEdit} />
-          </div>
-        )}
-        {row.duplicate && (
-          <div
-            className="custom-delete-icon"
-            onClick={() => setDeleteDuplicate(row)}
-          >
-            <FontAwesomeIcon icon={faClose} />
-          </div>
-        )}
-      </div>
-    ),
+    selector: (row) =>
+      row && (
+        <div className="order-actions">
+          {!row.duplicate && (
+            <div
+              className="custom-edit-icon"
+              onClick={() => setSelectedSymbol(row)}
+            >
+              <FontAwesomeIcon icon={faEdit} />
+            </div>
+          )}
+          {row.duplicate && (
+            <div
+              className="custom-delete-icon"
+              onClick={() => setDeleteDuplicate(row)}
+            >
+              <FontAwesomeIcon icon={faClose} />
+            </div>
+          )}
+        </div>
+      ),
     center: true,
     grow: 2,
     compact: true,
