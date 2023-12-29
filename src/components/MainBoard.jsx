@@ -337,7 +337,7 @@ export default function MainBoard() {
   const depositColumns = [
     {
       name: "Date",
-      selector: (row) => convertTimestamptToDate(row.createdAt),
+      selector: (row) => row && convertTimestamptToDate(row.createdAt),
     },
     { name: "Sum", selector: (row) => row.amount },
     { name: "Type", selector: (row) => row.type },
@@ -1241,7 +1241,11 @@ export default function MainBoard() {
             <div id="menu">
               <DataTable
                 columns={depositColumns}
-                data={deposits}
+                data={deposits.concat(
+                  deposits.length < 5
+                    ? new Array(5 - deposits.length).fill("")
+                    : []
+                )}
                 highlightOnHover
                 pointerOnHover
                 pagination
