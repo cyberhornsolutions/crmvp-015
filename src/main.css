@@ -55,7 +55,6 @@ td:hover {
 
 #content {
   display: flex;
-  flex-direction: row;
   height: 100vh;
   color: var(--main-elc2);
   background-color: white;
@@ -386,6 +385,8 @@ td:hover {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  height: 100%;
+  padding: 10px;
 }
 /* Updated Modal Styling with Dark Grey Background Opacity */
 .modal-style-edit .modal-dialog-centered {
@@ -490,10 +491,9 @@ td:hover {
   border: 2px solid white;
 }
 #leads-div {
-  margin: 10px;
   background-color: whitesmoke;
   border-radius: 5px;
-  height: 50vh;
+  height: 55%;
   overflow: auto;
 }
 #leads-div .show_all button {
@@ -502,16 +502,10 @@ td:hover {
   border: 1px solid lightgray;
 }
 #lead-transactions {
-  flex: 1;
-  width: 98%;
-  margin: 10px;
-  margin-top: 5px;
   background-color: whitesmoke;
   border-radius: 5px;
-  max-height: 30vh;
-  overflow-y: auto;
-  min-height: 30vh;
-  overflow-y: auto;
+  height: 40%;
+  overflow: auto;
 }
 #lead-transactions-header {
   display: flex;

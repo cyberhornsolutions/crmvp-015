@@ -116,7 +116,7 @@ export default function Leads({ setTab }) {
   const columns = [
     {
       name: "ID",
-      selector: (row, i) => i + 1,
+      selector: (row, i) => (row ? i + 1 : ""),
       sortable: true,
     },
     {
@@ -136,7 +136,7 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Price",
-      selector: (row) => row.price,
+      selector: (row) => row.symbolValue,
       sortable: true,
     },
     {
@@ -150,43 +150,38 @@ export default function Leads({ setTab }) {
       sortable: true,
     },
     {
-      name: "",
-      selector: (row) => (
-        <div className="order-actions">
-          <div
-            className="custom-edit-icon"
-            onClick={() => {
-              setSelectedOrder(row);
-              setIsEdit(true);
-            }}
-          >
-            <FontAwesomeIcon icon={faEdit} />
+      name: "Actions",
+      selector: (row) =>
+        row ? (
+          <div className="order-actions">
+            <div
+              className="custom-edit-icon"
+              onClick={() => {
+                setSelectedOrder(row);
+                setIsEdit(true);
+              }}
+            >
+              <FontAwesomeIcon icon={faEdit} />
+            </div>
+            <div
+              style={{ marginLeft: "10px" }}
+              className="custom-delete-icon"
+              onClick={() => {
+                setSelectedOrder(row);
+                setIsDelModalOpen(true);
+              }}
+            >
+              <FontAwesomeIcon icon={faClose} />
+            </div>
           </div>
-          <div
-            style={{ marginLeft: "10px" }}
-            className="custom-delete-icon"
-            onClick={() => {
-              setSelectedOrder(row);
-              setIsDelModalOpen(true);
-            }}
-          >
-            <FontAwesomeIcon icon={faClose} />
-          </div>
-        </div>
-      ),
+        ) : (
+          ""
+        ),
       sortable: true,
     },
   ];
 
-  const deals = userOrders
-    .filter(({ status }) => status === "Pending")
-    .map((order) => ({
-      ...order,
-      docId: order.id,
-      sum: order?.volume,
-      price: order?.symbolValue,
-      orderId: order.id,
-    }));
+  const deals = userOrders.filter(({ status }) => status === "Pending");
 
   const onUserDoubleClick = async (row) => {
     const u = await getUserById(row.id);
@@ -197,29 +192,35 @@ export default function Leads({ setTab }) {
     {
       name: "",
       selector: "",
-      cell: (row) => (
-        <input
-          type="checkbox"
-          checked={row.checked}
-          // onChange={() => handleCheckboxChange(row.id)}
-        />
-      ),
+      cell: (row) =>
+        row ? (
+          <input
+            type="checkbox"
+            checked={row.checked}
+            // onChange={() => handleCheckboxChange(row.id)}
+          />
+        ) : (
+          ""
+        ),
       grow: 0.25,
       compact: true,
       center: true,
     },
     {
       name: "ID",
-      selector: (row, i) => (
-        <div className="d-flex align-items-center gap-1">
-          {row.onlineStatus ? (
-            <CircleIcon className="onlineGreen" />
-          ) : (
-            <CircleIcon className="onlineRed" />
-          )}
-          {i + 1}
-        </div>
-      ),
+      selector: (row, i) =>
+        row ? (
+          <div className="d-flex align-items-center gap-1">
+            {row.onlineStatus ? (
+              <CircleIcon className="onlineGreen" />
+            ) : (
+              <CircleIcon className="onlineRed" />
+            )}
+            {i + 1}
+          </div>
+        ) : (
+          ""
+        ),
       sortable: false,
       compact: true,
       width: "50px",
@@ -231,8 +232,7 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Name",
-      cell: (row) =>
-        row?.surname === undefined ? row.name : row.name + " " + row.surname,
+      cell: (row) => (row.surname ? row.name + " " + row.surname : row.name),
       sortable: true,
       sortFunction: (rowA, rowB) => {
         const a = rowA.name;
@@ -251,46 +251,51 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Status",
-      cell: (row) => (
-        <Dropdown data-bs-theme="light" className="custom-dropdown">
-          <Dropdown.Toggle variant="none" id="dropdown-basic">
-            {row.status && progressBarConfig[row.status] && (
-              <ProgressBar
-                variant={progressBarConfig[row.status].variant}
-                now={progressBarConfig[row.status].now}
-                className="progressbar"
-              />
-            )}
-          </Dropdown.Toggle>
-          <Dropdown.Menu className="custom-dropdown-menu" data-bs-theme="dark">
-            {Object.keys(progressBarConfig).map((status) => (
-              <Dropdown.Item
-                key={status}
-                onClick={() => handleDropdownItemClick(status, row.id)}
-                className={row.status === status ? "active-status" : ""}
-              >
-                {row.status === status ? <span>&#10004;</span> : " "} {status}
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-        </Dropdown>
-      ),
+      cell: (row) =>
+        row ? (
+          <Dropdown data-bs-theme="light" className="custom-dropdown">
+            <Dropdown.Toggle variant="none" id="dropdown-basic">
+              {row.status && progressBarConfig[row.status] && (
+                <ProgressBar
+                  variant={progressBarConfig[row.status].variant}
+                  now={progressBarConfig[row.status].now}
+                  className="progressbar"
+                />
+              )}
+            </Dropdown.Toggle>
+            <Dropdown.Menu
+              className="custom-dropdown-menu"
+              data-bs-theme="dark"
+            >
+              {Object.keys(progressBarConfig).map((status) => (
+                <Dropdown.Item
+                  key={status}
+                  onClick={() => handleDropdownItemClick(status, row.id)}
+                  className={row.status === status ? "active-status" : ""}
+                >
+                  {row.status === status ? <span>&#10004;</span> : " "} {status}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        ) : (
+          ""
+        ),
       sortable: false,
     },
     {
       name: "Sale",
-      selector: (row) => (row.sale ? row.sale : "New"),
+      selector: (row) => (row ? (row.sale ? row.sale : "New") : ""),
       sortable: false,
     },
     {
       name: "Reten",
-      selector: (row) => (row.reten ? row.reten : "New"),
+      selector: (row) => (row ? (row.reten ? row.reten : "New") : ""),
       sortable: false,
     },
     {
       name: "Phone",
-      selector: (row) => (row.phone ? row.phone : "12312321"),
-      // sortable: false,
+      selector: (row) => (row ? (row.phone ? row.phone : "12312321") : ""),
     },
     {
       name: "Email",
@@ -314,48 +319,42 @@ export default function Leads({ setTab }) {
     {
       name: "Balance",
       selector: (row) => row.totalBalance,
-      // sortable: true,
     },
     {
       name: "Deposit",
-      selector: (row) => (row.deposit ? row.deposit : "50"),
-      // sortable: true,
+      selector: (row) => (row ? (row.deposit ? row.deposit : "50") : ""),
     },
     {
       name: "Manager",
-      selector: (row) => (row.manager ? row.manager : "Jhon"),
-      // sortable: true,
+      selector: (row) => (row ? (row.manager ? row.manager : "Jhon") : ""),
     },
     {
       name: "Affiliates",
-      selector: (row) => (row.affiliates ? row.affiliates : "Candy Land"),
-      // sortable: true,
+      selector: (row) =>
+        row ? (row.affiliates ? row.affiliates : "Candy Land") : "",
     },
     {
       name: "Actions",
       selector: (row) => row.id,
-      cell: (row) => (
-        <div
-          className="text-center w-100 "
-          onClick={() => {
-            dispatch(setSelectedUser(row));
-            setIsBalanceModal(true);
-          }}
-        >
-          <FontAwesomeIcon icon={faEllipsis} />
-        </div>
-      ),
+      cell: (row) =>
+        row ? (
+          <div
+            className="text-center w-100 "
+            onClick={() => {
+              dispatch(setSelectedUser(row));
+              setIsBalanceModal(true);
+            }}
+          >
+            <FontAwesomeIcon icon={faEllipsis} />
+          </div>
+        ) : (
+          ""
+        ),
     },
   ];
-  const mappedData = users?.map((user, i) => ({
-    ...user,
-    status: user?.status,
-    id: user?.id,
-  }));
-
   const conditionalRowStyles = [
     {
-      when: (row) => row.id === selectedUser?.id,
+      when: (row) => row && row.id === selectedUser?.id,
       style: {
         backgroundColor: "#D1FFBD",
         userSelect: "none",
@@ -416,60 +415,40 @@ export default function Leads({ setTab }) {
               </button>
             </div>
           </div>
-          <div className="">
-            <DataTable
-              columns={userColumns}
-              data={filteredUsers}
-              highlightOnHover
-              pointerOnHover
-              progressPending={loading}
-              pagination
-              paginationPerPage={5}
-              paginationRowsPerPageOptions={[5, 10, 20, 50]}
-              conditionalRowStyles={conditionalRowStyles}
-              onRowClicked={(row) => fetchOrders(row, false)}
-              onRowDoubleClicked={onUserDoubleClick}
-              // responsive
-            />
-          </div>
+          <DataTable
+            columns={userColumns}
+            data={filteredUsers.concat(
+              filteredUsers.length < 5
+                ? new Array(5 - filteredUsers.length).fill("")
+                : []
+            )}
+            highlightOnHover
+            pointerOnHover
+            pagination
+            paginationPerPage={5}
+            paginationRowsPerPageOptions={[5, 10, 20, 50]}
+            conditionalRowStyles={conditionalRowStyles}
+            onRowClicked={(row) => fetchOrders(row, false)}
+            onRowDoubleClicked={onUserDoubleClick}
+            // responsive
+          />
         </div>
-        <div
-          id="lead-transactions"
-          // className="hidden"
-        >
-          <div
-            id="lead-transactions-header"
-            className="lead-transactions-header-height"
-          >
-            <div style={{ display: "flex" }}>
-              <h2>Deals</h2>
-              <h2 id="lead-transactions-name">{selected}</h2>
-            </div>
-
-            {/* <button
-              id="lead-card-button"
-              type="button"
-              className="btn btn-secondary"
-              onClick={() =>
-                navigate("/home/mainBoard", {
-                  state: { state: ordersData, user: selectedUser },
-                })
-              }
-            >
-              Player card
-            </button> */}
+        <div id="lead-transactions">
+          <div className="d-flex gap-3 pt-2">
+            <h6>Deals</h6>
+            <h6>{selected}</h6>
           </div>
-          <div>
-            <DataTable
-              columns={columns}
-              data={loading ? [] : deals}
-              pagination
-              paginationPerPage={10}
-              paginationRowsPerPageOptions={[10, 20, 50]}
-              highlightOnHover
-              pointerOnHover
-            />
-          </div>
+          <DataTable
+            columns={columns}
+            data={deals.concat(
+              deals.length < 3 ? new Array(3 - deals.length).fill("") : []
+            )}
+            pagination
+            paginationPerPage={5}
+            paginationRowsPerPageOptions={[5, 10, 20, 50]}
+            highlightOnHover
+            pointerOnHover
+          />
         </div>
       </div>
       {isBalanceModal && <AddBalanceModal setShowModal={setIsBalanceModal} />}
