@@ -56,6 +56,7 @@ td:hover {
 #content {
   display: flex;
   height: 100vh;
+  overflow: hidden;
   color: var(--main-elc2);
   background-color: white;
 }
