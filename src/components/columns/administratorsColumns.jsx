@@ -61,6 +61,7 @@ const administratorsColumns = (
             handleChangeManager(row.id, e.target.name, e.target.value)
           }
         >
+          <option value="Admin">Admin</option>
           <option value="Sale">Sale</option>
           <option value="Reten">Reten</option>
         </Form.Select>

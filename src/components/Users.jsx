@@ -268,6 +268,7 @@ export default function Users() {
               <option value="" disabled>
                 Role
               </option>
+              <option value="Admin">Admin</option>
               <option value="Sale">Sale</option>
               <option value="Reten">Reten</option>
             </Form.Select>
