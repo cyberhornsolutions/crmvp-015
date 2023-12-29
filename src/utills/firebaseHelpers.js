@@ -52,7 +52,10 @@ export const fetchPlayers = (setState, setLoading) => {
 export const fetchManagers = (setState, setLoading) => {
   setLoading(true);
   try {
-    const q = query(collection(db, "managers"));
+    const q = query(
+      collection(db, "managers"),
+      where("username", "!=", "admin")
+    );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const managerData = [];

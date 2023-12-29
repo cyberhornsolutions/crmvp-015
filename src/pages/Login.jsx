@@ -18,33 +18,20 @@ export default function Login() {
       toast.error("Please select a role");
       return;
     }
-    switch (role) {
-      case "Admin":
-        if (user.username === "admin" && user.password === "admin") {
-          const payload = { username: "admin", role: "Super Admin" };
-          localStorage.setItem("USER", JSON.stringify(payload));
-          location.href = "/";
-        } else {
-          toast.error("Username or password is incorrect");
-        }
-        break;
-      default:
-        setLoading(true);
-        const manager = await getManagerByUsernameAndRole(user.username, role);
-        if (!manager) {
-          toast.error("Manager not found");
-          setLoading(false);
-        } else if (!manager.isActive) {
-          toast.error("Manager is disabled");
-          setLoading(false);
-        } else if (manager.password !== user.password) {
-          toast.error("Username or password is incorrect");
-          setLoading(false);
-        } else {
-          localStorage.setItem("USER", JSON.stringify(manager));
-          location.href = "/";
-        }
-        break;
+    setLoading(true);
+    const manager = await getManagerByUsernameAndRole(user.username, role);
+    if (!manager) {
+      toast.error("User not found");
+      setLoading(false);
+    } else if (!manager.isActive) {
+      toast.error("User is disabled");
+      setLoading(false);
+    } else if (manager.password !== user.password) {
+      toast.error("Username or password is incorrect");
+      setLoading(false);
+    } else {
+      localStorage.setItem("USER", JSON.stringify(manager));
+      location.href = "/";
     }
   };
 
