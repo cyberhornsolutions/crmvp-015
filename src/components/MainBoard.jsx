@@ -352,7 +352,7 @@ export default function MainBoard() {
   const referralUserColumns = [
     {
       name: "ID",
-      selector: (row, i) => i + 1,
+      selector: (row, i) => row && i + 1,
       sortable: true,
       width: "6%",
     },
@@ -364,38 +364,38 @@ export default function MainBoard() {
     },
     {
       name: "Name",
-      cell: (row) =>
-        row.surname === undefined ? row.name : row.name + " " + row.surname,
+      cell: (row) => (row.surname ? row.name + " " + row.surname : row.name),
       sortable: true,
       width: "8%",
     },
     {
       name: "Status",
-      cell: (row) => (
-        <ProgressBar
-          variant={progressBarConfig[row.status]?.variant}
-          now={progressBarConfig[row.status]?.now}
-          className="progressbar"
-        />
-      ),
+      cell: (row) =>
+        row && (
+          <ProgressBar
+            variant={progressBarConfig[row.status]?.variant}
+            now={progressBarConfig[row.status]?.now}
+            className="progressbar"
+          />
+        ),
       sortable: false,
       width: "8%",
     },
     {
       name: "Sale",
-      selector: (row) => (row.sale ? row.sale : "New"),
+      selector: (row) => row && (row.sale ? row.sale : "New"),
       sortable: true,
       width: "8%",
     },
     {
       name: "Reten",
-      selector: (row) => (row.reten ? row.reten : "New"),
+      selector: (row) => row && (row.reten ? row.reten : "New"),
       sortable: true,
       width: "8%",
     },
     {
       name: "Phone",
-      selector: (row) => (row.phone ? row.phone : "12312321"),
+      selector: (row) => row && (row.phone ? row.phone : "12312321"),
       sortable: true,
       width: "8%",
     },
@@ -407,25 +407,26 @@ export default function MainBoard() {
     },
     {
       name: "Balance",
-      selector: (row) => (row.balance ? row.balance : "100"),
+      selector: (row) => row && (row.balance ? row.balance : "100"),
       sortable: true,
       width: "8%",
     },
     {
       name: "Deposit",
-      selector: (row) => (row.deposit ? row.deposit : "50"),
+      selector: (row) => row && (row.deposit ? row.deposit : "50"),
       sortable: true,
       width: "8%",
     },
     {
       name: "Manager",
-      selector: (row) => (row.manager ? row.manager : "Jhon"),
+      selector: (row) => row && (row.manager ? row.manager : "Jhon"),
       sortable: true,
       width: "8%",
     },
     {
       name: "Affiliates",
-      selector: (row) => (row.affiliates ? row.affiliates : "Candy Land"),
+      selector: (row) =>
+        row && (row.affiliates ? row.affiliates : "Candy Land"),
       sortable: true,
       width: "8%",
     },
@@ -1287,7 +1288,11 @@ export default function MainBoard() {
                 <p className="text-center my-3">Referred</p>
                 <DataTable
                   columns={referralUserColumns}
-                  data={userOrders}
+                  data={userOrders.concat(
+                    userOrders.length < 5
+                      ? new Array(5 - userOrders.length).fill("")
+                      : []
+                  )}
                   highlightOnHover
                   pointerOnHover
                   pagination
