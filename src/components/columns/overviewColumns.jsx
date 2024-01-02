@@ -1,4 +1,7 @@
 import moment from "moment/moment";
+import { convertTimestamptToDate } from "../../utills/helpers";
+import { Timestamp } from "firebase/firestore";
+
 const overviewColumns = ({ isEdit, handleEditOrder }) => [
   {
     name: "ID",
@@ -83,19 +86,21 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
     selector: (row) =>
       row && isEdit ? (
         <input
-          type="date"
+          type="datetime-local"
           className="form-control"
-          value={moment(row.createdAt).format("YYYY-MM-DD")}
+          value={moment(convertTimestamptToDate(row.createdTime)).format(
+            "YYYY-MM-DDTHH:mm"
+          )}
           onChange={(e) => {
             handleEditOrder(
               row.id,
-              "createdAt",
-              moment(e.target.value).format("MM/DD/YYYY")
+              "createdTime",
+              Timestamp.fromDate(new Date(e.target.value))
             );
           }}
         />
       ) : (
-        row.createdAt
+        row.createdTime && convertTimestamptToDate(row.createdTime)
       ),
     sortable: true,
     grow: 2,

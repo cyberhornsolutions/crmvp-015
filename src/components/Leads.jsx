@@ -27,7 +27,10 @@ import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import AddBalanceModal from "./AddBalanceModal";
-import { filterSearchObjects } from "../utills/helpers";
+import {
+  convertTimestamptToDate,
+  filterSearchObjects,
+} from "../utills/helpers";
 
 export default function Leads({ setTab }) {
   const userOrders = useSelector((state) => state?.userOrders?.orders);
@@ -123,6 +126,7 @@ export default function Leads({ setTab }) {
       name: "Type",
       selector: (row) => row.type,
       sortable: true,
+      compact: true,
     },
     {
       name: "Symbol",
@@ -146,8 +150,10 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Date",
-      selector: (row) => row.createdAt,
+      selector: (row) => row && convertTimestamptToDate(row.createdTime),
       sortable: true,
+      grow: 1.5,
+      compact: true,
     },
     {
       name: "Actions",

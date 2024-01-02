@@ -339,7 +339,7 @@ export default function MainBoard() {
       name: "Date",
       selector: (row) => row && convertTimestamptToDate(row.createdAt),
     },
-    { name: "Sum", selector: (row) => row.amount },
+    { name: "Sum", selector: (row) => row.sum },
     { name: "Type", selector: (row) => row.type },
   ];
   const handleClose = () => {

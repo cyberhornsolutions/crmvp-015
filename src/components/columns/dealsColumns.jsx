@@ -1,16 +1,19 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { convertTimestamptToDate } from "../../utills/helpers";
 
 const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   {
     name: "ID",
     selector: (row, i) => row && i + 1,
     sortable: true,
+    grow: 0.5,
   },
   {
     name: "Transaction Type",
     selector: (row) => row.type,
     sortable: true,
+    compact: true,
   },
   {
     name: "Symbol",
@@ -21,6 +24,7 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     name: "Sum",
     selector: (row) => row.sum,
     sortable: true,
+    compact: true,
   },
   {
     name: "Price",
@@ -39,8 +43,10 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   },
   {
     name: "Date",
-    selector: (row) => row.createdAt,
+    selector: (row) => row && convertTimestamptToDate(row.createdTime),
     sortable: true,
+    grow: 2,
+    compact: true,
   },
   {
     name: "Action",
