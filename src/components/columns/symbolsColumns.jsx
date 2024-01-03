@@ -8,7 +8,19 @@ const symbolsColumns = (
   }
 ) => [
   { name: "Symbol", selector: (row) => row.symbol },
-  { name: "Price", selector: (row) => row.price, right: true },
+  {
+    name: "Bid",
+    selector: (row) => parseFloat(row.price),
+    right: true,
+  },
+  {
+    name: "Ask",
+    selector: (row) => {
+      const bidValue = row.price;
+      return +bidValue + bidValue / 100;
+    },
+    right: true,
+  },
   {
     name: "Action",
     selector: (row) =>
