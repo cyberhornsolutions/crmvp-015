@@ -10,12 +10,13 @@ const symbolsColumns = (
   { name: "Symbol", selector: (row) => row.symbol },
   {
     name: "Bid",
-    selector: (row) => parseFloat(row.price),
+    selector: (row) => row && +row.price,
     right: true,
   },
   {
     name: "Ask",
     selector: (row) => {
+      if (!row) return;
       const bidValue = row.price;
       return +bidValue + bidValue / 100;
     },

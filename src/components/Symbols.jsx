@@ -6,7 +6,7 @@ import {
 import DataTable from "react-data-table-component";
 import symbolsColumns from "./columns/symbolsColumns";
 import EditSymbol from "./EditSymbol";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, Navbar, Nav } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
@@ -16,6 +16,7 @@ const Symbols = () => {
   const dispatch = useDispatch();
   const symbols = useSelector((state) => state.symbols);
   const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState("cryptoTab");
   const [searchText, setSearchText] = useState("");
   const [searchBy, setSearchBy] = useState("");
   const [selectedSymbol, setSelectedSymbol] = useState(false);
@@ -53,45 +54,107 @@ const Symbols = () => {
 
   return (
     <div>
-      <div className="input-group input-group-sm gap-1">
-        <select
-          className="input-group-text"
-          value={searchBy}
-          onChange={(e) => setSearchBy(e.target.value)}
-        >
-          <option className="d-none" disabled value="">
-            Search By
-          </option>
-          <option className="dropdown-item" value="All">
-            All
-          </option>
-          {symbolsColumns()
-            .slice(0, -1)
-            .map(({ name }) => (
-              <option className="dropdown-item">{name}</option>
-            ))}
-        </select>
-        <input
-          className="form-control-sm w-25"
-          type="search"
-          autoComplete="off"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          placeholder="Search.."
-        />
-      </div>
-      <DataTable
-        data={filteredSymbols.concat(
-          filteredSymbols.length < 5
-            ? new Array(5 - filteredSymbols.length).fill("")
-            : []
+      <Navbar className="nav nav-tabs p-0">
+        <Nav>
+          <Nav.Link
+            className={tab === "cryptoTab" && "active"}
+            onClick={() => setTab("cryptoTab")}
+          >
+            Crypto
+          </Nav.Link>
+          <Nav.Link
+            className={tab === "currenciesTab" && "active"}
+            onClick={() => setTab("currenciesTab")}
+          >
+            Currencies
+          </Nav.Link>
+          <Nav.Link
+            className={tab === "stocksTab" && "active"}
+            onClick={() => setTab("stocksTab")}
+          >
+            Stocks
+          </Nav.Link>
+          <Nav.Link
+            className={tab === "commoditiesTab" && "active"}
+            onClick={() => setTab("commoditiesTab")}
+          >
+            Commodities
+          </Nav.Link>
+        </Nav>
+      </Navbar>
+      <div className="tab-content">
+        {tab === "cryptoTab" && (
+          <>
+            <div className="input-group input-group-sm gap-1">
+              <select
+                className="input-group-text"
+                value={searchBy}
+                onChange={(e) => setSearchBy(e.target.value)}
+              >
+                <option className="d-none" disabled value="">
+                  Search By
+                </option>
+                <option className="dropdown-item" value="All">
+                  All
+                </option>
+                {symbolsColumns()
+                  .slice(0, -1)
+                  .map(({ name }) => (
+                    <option className="dropdown-item">{name}</option>
+                  ))}
+              </select>
+              <input
+                className="form-control-sm w-25"
+                type="search"
+                autoComplete="off"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                placeholder="Search.."
+              />
+            </div>
+            <DataTable
+              data={filteredSymbols.concat(
+                filteredSymbols.length < 5
+                  ? new Array(5 - filteredSymbols.length).fill("")
+                  : []
+              )}
+              columns={symbolsColumns({
+                setSelectedSymbol,
+                setDeleteDuplicate,
+              })}
+              pagination
+            />
+          </>
         )}
-        columns={symbolsColumns({
-          setSelectedSymbol,
-          setDeleteDuplicate,
-        })}
-        pagination
-      />
+        {tab === "currenciesTab" && (
+          <>
+            <DataTable
+              data={new Array(5).fill("")}
+              columns={symbolsColumns()}
+              pagination
+            />
+          </>
+        )}
+        {tab === "stocksTab" && (
+          <>
+            <DataTable
+              data={new Array(5).fill("")}
+              columns={symbolsColumns()}
+              pagination
+            />
+          </>
+        )}
+        {tab === "commoditiesTab" && (
+          <>
+            <DataTable
+              data={new Array(5).fill("")}
+              columns={symbolsColumns()}
+              pagination
+            />
+          </>
+        )}
+      </div>
+
       {selectedSymbol && (
         <EditSymbol
           selectedSymbol={selectedSymbol}
