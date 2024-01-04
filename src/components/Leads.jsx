@@ -233,8 +233,10 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Registered",
-      selector: (row) => row.createdAt,
+      selector: (row) =>
+        row.createdAt && convertTimestamptToDate(row.createdAt),
       sortable: false,
+      grow: 2,
     },
     {
       name: "Name",
