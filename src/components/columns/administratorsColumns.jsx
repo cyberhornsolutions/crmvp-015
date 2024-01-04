@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
 import { Form } from "react-bootstrap";
+import { convertTimestamptToDate } from "../../utills/helpers";
 
 const administratorsColumns = (
   { handleChangeManager, handleSaveManager, toggleActiveManager } = {
@@ -93,7 +94,7 @@ const administratorsColumns = (
   },
   {
     name: "Date",
-    selector: (row) => row.date,
+    selector: (row) => row && convertTimestamptToDate(row.date),
     sortable: true,
   },
   {

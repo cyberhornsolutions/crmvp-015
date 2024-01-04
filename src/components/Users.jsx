@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Nav, Navbar, Form } from "react-bootstrap";
 import { auth, db } from "../firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import DataTable from "react-data-table-component";
 import { toast } from "react-toastify";
 import administratorsColumns from "./columns/administratorsColumns";
@@ -91,12 +91,12 @@ export default function Users() {
       return;
     }
     try {
-      const formattedDate = new Date().toLocaleDateString("en-US");
+      // const formattedDate = new Date().toLocaleDateString("en-US");
       await addDoc(collection(db, "managers"), {
         ...user,
         password: "manager",
         isActive: true,
-        date: formattedDate,
+        date: serverTimestamp(),
       });
       toast.success("Manager Record Added Successfully.");
       setUser({
@@ -238,120 +238,118 @@ export default function Users() {
       </div>
       <div
         id="newUser-form"
-        // className="hidden"
+        className="d-flex flex-column gap-3 mx-3 py-2 rounded"
       >
-        <h5>Manage</h5>
-        <form id="addNewUser">
-          <div id="new-user-fields" className="d-flex gap-1">
-            <Form.Control
-              type="text"
-              name="name"
-              value={user.name}
-              onChange={handleChangeUser}
-              placeholder="Name"
-            />
-            <Form.Control
-              type="text"
-              name="username"
-              value={user.username}
-              onChange={handleChangeUser}
-              placeholder="Username"
-            />
+        <div className="w-75 mx-auto">
+          <h5 className="d-inline-block">Manager</h5>
+          <form>
+            <div className="d-flex gap-1">
+              <Form.Control
+                type="text"
+                name="name"
+                value={user.name}
+                onChange={handleChangeUser}
+                placeholder="Name"
+              />
+              <Form.Control
+                type="text"
+                name="username"
+                value={user.username}
+                onChange={handleChangeUser}
+                placeholder="Username"
+              />
 
-            <Form.Select
-              type="text"
-              name="role"
-              value={user.role}
-              placeholder="Role"
-              onChange={handleChangeUser}
-            >
-              <option value="" disabled>
-                Role
-              </option>
-              <option value="Admin">Admin</option>
-              <option value="Sale">Sale</option>
-              <option value="Reten">Reten</option>
-            </Form.Select>
-            <Form.Select
-              type="text"
-              name="team"
-              value={user.team}
-              placeholder="Team"
-              onChange={handleChangeUser}
-            >
-              <option value="" disabled>
-                Team
-              </option>
-              {teams.map((team, i) => (
-                <option key={i} value={team.name}>
-                  {team.name}
+              <Form.Select
+                type="text"
+                name="role"
+                value={user.role}
+                placeholder="Role"
+                onChange={handleChangeUser}
+              >
+                <option value="" disabled>
+                  Role
                 </option>
-              ))}
-            </Form.Select>
-          </div>
-        </form>
-        <div className="d-flex gap-2">
-          <button
-            className="btn btn-outline-secondary"
-            id="new-user-del"
-            type="button"
-            // onClick={deleteUser}
-          >
-            Delete
-          </button>
-          <button
-            className="btn btn-secondary"
-            id="new-user-add"
-            type="button"
-            onClick={addUser}
-          >
-            Add
-          </button>
+                <option value="Admin">Admin</option>
+                <option value="Sale">Sale</option>
+                <option value="Reten">Reten</option>
+              </Form.Select>
+              <Form.Select
+                type="text"
+                name="team"
+                value={user.team}
+                placeholder="Team"
+                onChange={handleChangeUser}
+              >
+                <option value="" disabled>
+                  Team
+                </option>
+                {teams.map((team, i) => (
+                  <option key={i} value={team.name}>
+                    {team.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </div>
+            <div className="mt-2 d-flex justify-content-center gap-1">
+              <button
+                className="btn btn-outline-secondary"
+                type="button"
+                // onClick={deleteUser}
+              >
+                Delete
+              </button>
+              <button
+                className="btn btn-secondary"
+                type="button"
+                onClick={addUser}
+              >
+                Add
+              </button>
+            </div>
+          </form>
         </div>
-      </div>
-      <div id="newUser-form">
-        <h5>Team</h5>
-        <form id="addNewUser">
-          <div id="new-user-fields" className="d-flex gap-1">
-            <Form.Control
-              type="text"
-              name="name"
-              value={team.name}
-              onChange={handleChangeTeam}
-              placeholder="Name"
-            />
-            <Form.Select
-              type="text"
-              name="desk"
-              value={team.desk}
-              placeholder="Desk"
-              onChange={handleChangeTeam}
+        <div className="w-50 mx-auto">
+          <h5 className="d-inline-block">Team</h5>
+          <form>
+            <div className="d-flex gap-1">
+              <Form.Control
+                type="text"
+                name="name"
+                value={team.name}
+                onChange={handleChangeTeam}
+                placeholder="Name"
+              />
+              <Form.Select
+                type="text"
+                name="desk"
+                value={team.desk}
+                placeholder="Desk"
+                onChange={handleChangeTeam}
+              >
+                <option value="" disabled>
+                  Desk
+                </option>
+                <option value="Main">Main</option>
+                <option value="Demo">Demo</option>
+              </Form.Select>
+            </div>
+          </form>
+          <div className="mt-2 d-flex justify-content-center gap-1">
+            <button
+              className="btn btn-outline-secondary"
+              type="button"
+              // onClick={deleteUser}
             >
-              <option value="" disabled>
-                Desk
-              </option>
-              <option value="Main">Main</option>
-              <option value="Demo">Demo</option>
-            </Form.Select>
+              Delete
+            </button>
+            <button
+              className="btn btn-secondary"
+              type="button"
+              onClick={handleAddNewTeam}
+            >
+              Add
+            </button>
           </div>
-        </form>
-        <div className="d-flex gap-2">
-          <button
-            className="btn btn-outline-secondary"
-            id="new-user-del"
-            type="button"
-            // onClick={deleteUser}
-          >
-            Delete
-          </button>
-          <button
-            className="btn btn-secondary"
-            id="new-user-add"
-            type="button"
-            onClick={handleAddNewTeam}
-          >
-            Add
-          </button>
         </div>
       </div>
     </div>

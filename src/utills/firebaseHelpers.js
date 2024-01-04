@@ -94,10 +94,9 @@ export const fetchTeams = (setState, setLoading) => {
 };
 
 export const addTeam = async (team) => {
-  const formattedDate = new Date().toLocaleDateString("en-US");
   return await addDoc(collection(db, "teams"), {
     ...team,
-    date: formattedDate,
+    date: serverTimestamp(),
   });
 };
 

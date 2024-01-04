@@ -1,3 +1,5 @@
+import { convertTimestamptToDate } from "../../utills/helpers";
+
 const teamsColumns = [
   {
     name: "ID",
@@ -16,7 +18,7 @@ const teamsColumns = [
   },
   {
     name: "Date",
-    selector: (row) => row.date,
+    selector: (row) => row && convertTimestamptToDate(row.date),
     sortable: true,
   },
 ];
