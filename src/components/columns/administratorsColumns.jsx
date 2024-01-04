@@ -4,10 +4,11 @@ import { Form } from "react-bootstrap";
 import { convertTimestamptToDate } from "../../utills/helpers";
 
 const administratorsColumns = (
-  { handleChangeManager, handleSaveManager, toggleActiveManager } = {
+  { handleChangeManager, handleSaveManager, toggleActiveManager, teams } = {
     handleChangeManager: () => {},
     handleSaveManager: () => {},
     toggleActiveManager: () => {},
+    teams: [],
   }
 ) => [
   {
@@ -84,8 +85,11 @@ const administratorsColumns = (
             handleChangeManager(row.id, e.target.name, e.target.value)
           }
         >
-          <option value="Main">Main</option>
-          <option value="Demo">Demo</option>
+          {teams.map((team, i) => (
+            <option key={i} value={team.name}>
+              {team.name}
+            </option>
+          ))}
         </Form.Select>
       ) : (
         row.team

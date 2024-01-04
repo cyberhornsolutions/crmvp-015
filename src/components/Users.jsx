@@ -207,6 +207,7 @@ export default function Users() {
                 handleChangeManager,
                 handleSaveManager,
                 toggleActiveManager,
+                teams,
               })}
               data={filteredManagers.concat(
                 filteredManagers.length < 5

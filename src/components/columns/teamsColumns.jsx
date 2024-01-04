@@ -18,7 +18,7 @@ const teamsColumns = [
   },
   {
     name: "Date",
-    selector: (row) => row && convertTimestamptToDate(row.date),
+    selector: (row) => row.date && convertTimestamptToDate(row.date),
     sortable: true,
   },
 ];
