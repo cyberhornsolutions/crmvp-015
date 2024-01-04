@@ -13,6 +13,7 @@ const administratorsColumns = (
   {
     name: "ID",
     selector: (row, i) => row && i + 1,
+    grow: 0.5,
   },
   {
     name: "Name", // Translate the header using your t function
@@ -29,7 +30,6 @@ const administratorsColumns = (
       ) : (
         row.name
       ),
-
     sortable: true,
   },
   {
@@ -94,8 +94,10 @@ const administratorsColumns = (
   },
   {
     name: "Date",
-    selector: (row) => row && convertTimestamptToDate(row.date),
+    selector: (row) => row.date && convertTimestamptToDate(row.date),
     sortable: true,
+    grow: 1.5,
+    compact: true,
   },
   {
     name: "Action",
