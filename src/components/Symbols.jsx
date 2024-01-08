@@ -10,7 +10,7 @@ import { Button, Modal, Navbar, Nav } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
-import { filterSearchObjects } from "../utills/helpers";
+import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
 
 const Symbols = () => {
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ const Symbols = () => {
 
   useEffect(() => {
     if (!symbols.length) {
-      return getAllSymbols(setSymbols, setLoading);
+      getAllSymbols(setSymbols, setLoading);
     }
   }, []);
 
@@ -113,11 +113,7 @@ const Symbols = () => {
               />
             </div>
             <DataTable
-              data={filteredSymbols.concat(
-                filteredSymbols.length < 5
-                  ? new Array(5 - filteredSymbols.length).fill("")
-                  : []
-              )}
+              data={fillArrayWithEmptyRows(filteredSymbols, 5)}
               columns={symbolsColumns({
                 setSelectedSymbol,
                 setDeleteDuplicate,

@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faClose } from "@fortawesome/free-solid-svg-icons";
+import { getAskValue, getBidValue } from "../../utills/helpers";
 
 const symbolsColumns = (
   { setSelectedSymbol, setDeleteDuplicate } = {
@@ -10,15 +11,14 @@ const symbolsColumns = (
   { name: "Symbol", selector: (row) => row.symbol },
   {
     name: "Bid",
-    selector: (row) => row && +row.price,
+    selector: (row) => row && getBidValue(row.price),
     right: true,
   },
   {
     name: "Ask",
     selector: (row) => {
       if (!row) return;
-      const bidValue = row.price;
-      return +bidValue + bidValue / 100;
+      return getAskValue(row.price);
     },
     right: true,
   },
