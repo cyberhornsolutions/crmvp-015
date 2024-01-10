@@ -19,6 +19,7 @@ import {
   faL,
   faEllipsis,
 } from "@fortawesome/free-solid-svg-icons";
+import { BsGear } from "react-icons/bs";
 import DelOrderModal from "./DelOrderModal";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditOrder from "./EditOrder";
@@ -27,6 +28,7 @@ import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import AddBalanceModal from "./AddBalanceModal";
+import TradingSettings from "./TradingSettings";
 import {
   convertTimestamptToDate,
   filterSearchObjects,
@@ -46,6 +48,7 @@ export default function Leads({ setTab }) {
   const [isEdit, setIsEdit] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
   const [isBalanceModal, setIsBalanceModal] = useState(false);
+  const [tradingSettingsModal, setTradingSettingsModal] = useState(false);
   const dispatch = useDispatch();
   const progressBarConfig = {
     New: { variant: "success", now: 25 },
@@ -345,18 +348,23 @@ export default function Leads({ setTab }) {
       name: "Actions",
       selector: (row) => row.id,
       cell: (row) =>
-        row ? (
-          <div
-            className="text-center w-100 "
-            onClick={() => {
-              dispatch(setSelectedUser(row));
-              setIsBalanceModal(true);
-            }}
-          >
-            <FontAwesomeIcon icon={faEllipsis} />
+        row && (
+          <div className="d-flex align-items-center gap-3">
+            <FontAwesomeIcon
+              icon={faEllipsis}
+              onClick={() => {
+                dispatch(setSelectedUser(row));
+                setIsBalanceModal(true);
+              }}
+            />
+            <BsGear
+              size={18}
+              onClick={() => {
+                dispatch(setSelectedUser(row));
+                setTradingSettingsModal(true);
+              }}
+            />
           </div>
-        ) : (
-          ""
         ),
     },
   ];
@@ -460,7 +468,9 @@ export default function Leads({ setTab }) {
         </div>
       </div>
       {isBalanceModal && <AddBalanceModal setShowModal={setIsBalanceModal} />}
-
+      {tradingSettingsModal && (
+        <TradingSettings setShowModal={setTradingSettingsModal} />
+      )}
       {isDelModalOpen && (
         <DelOrderModal
           onClose={handleCloseModal}

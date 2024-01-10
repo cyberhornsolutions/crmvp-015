@@ -32,7 +32,7 @@ function AddBalanceModal({ setShowModal }) {
   };
 
   return (
-    <Modal show onHide={setShowModal}>
+    <Modal show onHide={setShowModal} centered>
       <Modal.Header closeButton>Add Balance</Modal.Header>
       <Modal.Body>
         <Form.Group className="mb-3" controlId="formBasicEmail">
