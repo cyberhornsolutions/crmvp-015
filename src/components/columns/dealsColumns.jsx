@@ -1,6 +1,16 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClose, faEdit } from "@fortawesome/free-solid-svg-icons";
-import { convertTimestamptToDate } from "../../utills/helpers";
+import {
+  faClose,
+  faEdit,
+  faCaretUp,
+  faCaretDown,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  convertTimestamptToDate,
+  getBidValue,
+  getAskValue,
+  calculateProfit,
+} from "../../utills/helpers";
 
 const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   {
@@ -10,9 +20,10 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     grow: 0.5,
   },
   {
-    name: "Transaction Type",
-    selector: (row) => row.type,
+    name: "Date",
+    selector: (row) => row && convertTimestamptToDate(row.createdTime),
     sortable: true,
+    grow: 2.5,
     compact: true,
   },
   {
@@ -21,31 +32,83 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     sortable: true,
   },
   {
-    name: "Sum",
-    selector: (row) => row.sum,
+    name: "Type",
+    selector: (row) =>
+      row &&
+      (row.type == "Buy" ? (
+        <div className="d-flex align-items-center gap-1">
+          <FontAwesomeIcon icon={faCaretUp} color="lime" />
+          {row.type}
+        </div>
+      ) : (
+        <div className="d-flex align-items-center gap-1">
+          <FontAwesomeIcon icon={faCaretDown} color="red" />
+          {row.type}
+        </div>
+      )),
     sortable: true,
     compact: true,
   },
   {
-    name: "Price",
-    selector: (row) => row.symbolValue,
+    name: "Volume",
+    selector: (row) => row && (+row.volume).toFixed(6),
+    sortable: true,
+    compact: true,
+  },
+  {
+    name: "Open Price",
+    selector: (row) => row && (+row.symbolValue).toFixed(6),
+    sortable: true,
+    compact: true,
+  },
+  {
+    name: "SL / TP",
+    selector: (row) => row && `${row.sl || ""}/${row.tp || ""}`,
+    grow: 2,
+  },
+  {
+    name: "Additional parameters",
+    selector: (row) => {
+      if (!row) return;
+      let spread = row.sum / 100; // 1% of sum
+      if (!Number.isInteger(spread)) spread = spread.toFixed(4);
+      const swap = 0.0;
+      const fee = spread;
+      let pledge = row.sum - spread - swap;
+      if (!Number.isInteger(pledge)) pledge = pledge.toFixed(4);
+      return `${pledge}/${spread}/${swap}/${+fee}`;
+    },
+    grow: 3,
+    compact: true,
     sortable: true,
   },
   {
-    name: "Status",
-    selector: (row) => row.status,
+    name: "Current Price",
+    selector: (row) =>
+      row &&
+      (row.type === "Buy"
+        ? getBidValue(row.currentPrice)
+        : getAskValue(row.currentPrice)),
     sortable: true,
+    grow: 1.5,
   },
   {
     name: "Profit",
-    selector: (row) => row.profit,
+    selector: (row) => {
+      if (!row) return;
+      const profit = calculateProfit(
+        row.type,
+        row.currentPrice,
+        row.symbolValue,
+        row.volume
+      );
+      return (
+        <div style={{ color: `${profit < 0 ? "red" : "green"}` }}>
+          {profit.toFixed(6)}
+        </div>
+      );
+    },
     sortable: true,
-  },
-  {
-    name: "Date",
-    selector: (row) => row && convertTimestamptToDate(row.createdTime),
-    sortable: true,
-    grow: 2,
     compact: true,
   },
   {
@@ -53,22 +116,17 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     selector: (row) => row.id,
     cell: (row) =>
       row && (
-        <div className="order-actions">
-          <div
-            className="custom-edit-icon"
-            onClick={() => handleEditOrder(row)}
-          >
-            <FontAwesomeIcon icon={faEdit} />
-          </div>
-          <div className="ml-5">
-            <FontAwesomeIcon
-              icon={faClose}
-              onClick={() => handleCloseOrder(row)}
-            />
-          </div>
+        <div className="">
+          <FontAwesomeIcon icon={faEdit} onClick={() => handleEditOrder(row)} />
+          <FontAwesomeIcon
+            icon={faClose}
+            className="ms-2"
+            onClick={() => handleCloseOrder(row)}
+          />
         </div>
       ),
     sortable: false,
+    compact: true,
   },
 ];
 

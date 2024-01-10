@@ -25,7 +25,12 @@ import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
 import overviewColumns from "./columns/overviewColumns";
-import { convertTimestamptToDate, fillArrayWithEmptyRows } from "../utills/helpers";
+import {
+  convertTimestamptToDate,
+  fillArrayWithEmptyRows,
+  getAskValue,
+  getBidValue,
+} from "../utills/helpers";
 
 export default function MainBoard() {
   const dispatch = useDispatch();
@@ -432,9 +437,18 @@ export default function MainBoard() {
     },
   ];
 
-  const openOrders = userOrderData?.filter(
-    ({ status }) => status === "Pending"
-  );
+  const openOrders = userOrderData
+    ?.filter(({ status }) => status === "Pending")
+    .map((order) => {
+      const currentPrice = symbols.find(
+        (symbol) => symbol.symbol === order.symbol
+      )?.price;
+      return {
+        ...order,
+        currentPrice,
+      };
+    });
+
   const closedOrders = userOrderData?.filter(
     ({ status }) => status !== "Pending"
   );
@@ -453,20 +467,20 @@ export default function MainBoard() {
   };
   const userProfit = calculateProfit();
 
-  const freeMargin = () => {
-    let newBal = parseFloat(newUserData.totalBalance) + parseFloat(userProfit);
-    let freeMarginOpened = newBal;
-
-    userOrders?.forEach((el) => {
-      if (el.status == "Pending") {
-        const latestPrice = symbols?.find((sym) => sym.symbol == el.symbol);
-        const dealSum = parseFloat(el.volume) * parseFloat(latestPrice?.price);
-        freeMarginOpened -= parseFloat(dealSum);
-      }
+  const calculateFreeMargin = () => {
+    let freeMarginOpened =
+      parseFloat(newUserData.totalBalance) + parseFloat(userProfit);
+    openOrders.forEach((el) => {
+      const orderPrice =
+        el.type === "Buy"
+          ? getBidValue(el.currentPrice)
+          : getAskValue(el.currentPrice);
+      const dealSum = parseFloat(el.volume) * orderPrice;
+      freeMarginOpened -= parseFloat(dealSum);
     });
     return freeMarginOpened < 0 ? 0.0 : freeMarginOpened;
   };
-  const freeMarginData = freeMargin();
+  const freeMarginData = calculateFreeMargin();
 
   return (
     <div id="mainboard">
@@ -1206,7 +1220,7 @@ export default function MainBoard() {
                   isEdit,
                   handleEditOrder: handleEditOverviewOrders,
                 })}
-                data={fillArrayWithEmptyRows(closedOrders,5)}
+                data={fillArrayWithEmptyRows(closedOrders, 5)}
                 highlightOnHover
                 pointerOnHover
                 pagination
@@ -1223,7 +1237,7 @@ export default function MainBoard() {
                   handleEditOrder,
                   handleCloseOrder,
                 })}
-                data={fillArrayWithEmptyRows (openOrders, 5)}
+                data={fillArrayWithEmptyRows(openOrders, 5)}
                 highlightOnHover
                 pointerOnHover
                 pagination

@@ -1,7 +1,6 @@
 import moment from "moment";
 
 export const calculateProfit = (type, currentPrice, symbolPrice, volume) => {
-  //   console.log(9090, type, currentPrice, symbolPrice, volume);
   let pnl = 0;
   if (type === "Sell") {
     pnl = parseFloat(symbolPrice) - parseFloat(currentPrice);
