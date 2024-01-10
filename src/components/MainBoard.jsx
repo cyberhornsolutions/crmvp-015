@@ -25,7 +25,7 @@ import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
 import overviewColumns from "./columns/overviewColumns";
-import { convertTimestamptToDate } from "../utills/helpers";
+import { convertTimestamptToDate, fillArrayWithEmptyRows } from "../utills/helpers";
 
 export default function MainBoard() {
   const dispatch = useDispatch();
@@ -1206,11 +1206,7 @@ export default function MainBoard() {
                   isEdit,
                   handleEditOrder: handleEditOverviewOrders,
                 })}
-                data={closedOrders.concat(
-                  closedOrders.length < 5
-                    ? new Array(5 - closedOrders.length).fill("")
-                    : []
-                )}
+                data={fillArrayWithEmptyRows(closedOrders,5)}
                 highlightOnHover
                 pointerOnHover
                 pagination
@@ -1227,11 +1223,7 @@ export default function MainBoard() {
                   handleEditOrder,
                   handleCloseOrder,
                 })}
-                data={openOrders.concat(
-                  openOrders.length < 5
-                    ? new Array(5 - openOrders.length).fill("")
-                    : []
-                )}
+                data={fillArrayWithEmptyRows (openOrders, 5)}
                 highlightOnHover
                 pointerOnHover
                 pagination
@@ -1246,11 +1238,7 @@ export default function MainBoard() {
             <div id="menu">
               <DataTable
                 columns={depositColumns}
-                data={deposits.concat(
-                  deposits.length < 5
-                    ? new Array(5 - deposits.length).fill("")
-                    : []
-                )}
+                data={fillArrayWithEmptyRows(deposits, 5)}
                 highlightOnHover
                 pointerOnHover
                 pagination
@@ -1288,11 +1276,7 @@ export default function MainBoard() {
                 <p className="text-center my-3">Referred</p>
                 <DataTable
                   columns={referralUserColumns}
-                  data={userOrders.concat(
-                    userOrders.length < 5
-                      ? new Array(5 - userOrders.length).fill("")
-                      : []
-                  )}
+                  data={fillArrayWithEmptyRows(userOrders, 5)}
                   highlightOnHover
                   pointerOnHover
                   pagination
