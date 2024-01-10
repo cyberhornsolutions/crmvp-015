@@ -14,7 +14,11 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
         bidSpread,
         askSpread,
       };
-      await updateSymbolSpread(selectedSymbol.id, spread);
+      const id = selectedSymbol.duplicate
+        ? selectedSymbol.symbolId
+        : selectedSymbol.id;
+
+      await updateSymbolSpread(id, spread);
       toast.success("Symbol spread values updated successfully");
       setSelectedSymbol(false);
     } catch (error) {

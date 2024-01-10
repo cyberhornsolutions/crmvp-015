@@ -45,9 +45,12 @@ const Symbols = () => {
         ? [
             s,
             ...s.duplicates.map((m) => ({
+              symbolId: s.id,
               symbol: m,
               price: s.price,
               duplicate: s.symbol,
+              bidSpread: s.bidSpread,
+              askSpread: s.askSpread,
             })),
           ]
         : s;
@@ -103,8 +106,10 @@ const Symbols = () => {
             </option>
             {symbolsColumns()
               .slice(0, -1)
-              .map(({ name }) => (
-                <option className="dropdown-item">{name}</option>
+              .map(({ name }, i) => (
+                <option key={i} className="dropdown-item">
+                  {name}
+                </option>
               ))}
           </select>
           <input
