@@ -13,7 +13,7 @@ import {
   getManagerByUsername,
   updateManager,
 } from "../utills/firebaseHelpers";
-import { filterSearchObjects } from "../utills/helpers";
+import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
 
 export default function Users() {
   const [tab, setTab] = useState("All");
@@ -209,11 +209,7 @@ export default function Users() {
                 toggleActiveManager,
                 teams,
               })}
-              data={filteredManagers.concat(
-                filteredManagers.length < 5
-                  ? new Array(5 - filteredManagers.length).fill("")
-                  : []
-              )}
+              data={fillArrayWithEmptyRows(filteredManagers, 5)}
               pagination
               paginationPerPage={5}
               paginationRowsPerPageOptions={[5, 10, 20, 50]}

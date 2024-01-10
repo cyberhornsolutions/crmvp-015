@@ -32,7 +32,11 @@ const Symbols = () => {
     }
   }, []);
 
-  const symbolData = symbols
+  const filteredSymbols = searchText
+    ? filterSearchObjects(searchText, symbols)
+    : symbols;
+
+  const crypto = filteredSymbols
     .filter(({ symbol }) => symbol.endsWith("USDT"))
     .map((s) => {
       return s.duplicates?.length
@@ -48,9 +52,9 @@ const Symbols = () => {
     })
     .flat();
 
-  const filteredSymbols = searchText
-    ? filterSearchObjects(searchText, symbolData)
-    : symbolData;
+  const currencies = [];
+  const stocks = [];
+  const commodities = [];
 
   return (
     <div>
@@ -83,49 +87,47 @@ const Symbols = () => {
         </Nav>
       </Navbar>
       <div className="tab-content">
+        <div className="input-group input-group-sm gap-1">
+          <select
+            className="input-group-text"
+            value={searchBy}
+            onChange={(e) => setSearchBy(e.target.value)}
+          >
+            <option className="d-none" disabled value="">
+              Search By
+            </option>
+            <option className="dropdown-item" value="All">
+              All
+            </option>
+            {symbolsColumns()
+              .slice(0, -1)
+              .map(({ name }) => (
+                <option className="dropdown-item">{name}</option>
+              ))}
+          </select>
+          <input
+            className="form-control-sm w-25"
+            type="search"
+            autoComplete="off"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search.."
+          />
+        </div>
         {tab === "cryptoTab" && (
-          <>
-            <div className="input-group input-group-sm gap-1">
-              <select
-                className="input-group-text"
-                value={searchBy}
-                onChange={(e) => setSearchBy(e.target.value)}
-              >
-                <option className="d-none" disabled value="">
-                  Search By
-                </option>
-                <option className="dropdown-item" value="All">
-                  All
-                </option>
-                {symbolsColumns()
-                  .slice(0, -1)
-                  .map(({ name }) => (
-                    <option className="dropdown-item">{name}</option>
-                  ))}
-              </select>
-              <input
-                className="form-control-sm w-25"
-                type="search"
-                autoComplete="off"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder="Search.."
-              />
-            </div>
-            <DataTable
-              data={fillArrayWithEmptyRows(filteredSymbols, 5)}
-              columns={symbolsColumns({
-                setSelectedSymbol,
-                setDeleteDuplicate,
-              })}
-              pagination
-            />
-          </>
+          <DataTable
+            data={fillArrayWithEmptyRows(crypto, 5)}
+            columns={symbolsColumns({
+              setSelectedSymbol,
+              setDeleteDuplicate,
+            })}
+            pagination
+          />
         )}
         {tab === "currenciesTab" && (
           <>
             <DataTable
-              data={new Array(5).fill("")}
+              data={fillArrayWithEmptyRows(currencies, 5)}
               columns={symbolsColumns()}
               pagination
             />
@@ -134,7 +136,7 @@ const Symbols = () => {
         {tab === "stocksTab" && (
           <>
             <DataTable
-              data={new Array(5).fill("")}
+              data={fillArrayWithEmptyRows(stocks, 5)}
               columns={symbolsColumns()}
               pagination
             />
@@ -143,7 +145,7 @@ const Symbols = () => {
         {tab === "commoditiesTab" && (
           <>
             <DataTable
-              data={new Array(5).fill("")}
+              data={fillArrayWithEmptyRows(commodities, 5)}
               columns={symbolsColumns()}
               pagination
             />
