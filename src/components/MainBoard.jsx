@@ -58,7 +58,6 @@ export default function MainBoard() {
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
   const [userOrderData, setUserOrderData] = useState(userOrders);
-  const [userBonus, setUserBonus] = useState(0);
   const [isUserEdit, setIsUserEdit] = useState(false);
 
   const handleKeyPress = (event) => {
@@ -184,17 +183,12 @@ export default function MainBoard() {
       const unsubscribe = onSnapshot(
         userDepositsQuery,
         (snapshot) => {
-          let totalBonus = 0;
           const depositsData = [];
           snapshot.forEach((doc) => {
             depositsData.push({ id: doc.id, ...doc.data() });
           });
 
           setDeposits(depositsData);
-          depositsData?.map((el) => {
-            totalBonus = totalBonus + parseFloat(el.amount);
-          });
-          setUserBonus(totalBonus);
         },
         (error) => {
           console.error("Error fetching data:", error);
@@ -207,6 +201,7 @@ export default function MainBoard() {
       console.log("Error:", error);
     }
   };
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -463,13 +458,19 @@ export default function MainBoard() {
         totalProfit = totalProfit + parseFloat(el.profit);
       }
     });
-    return totalProfit.toFixed(6);
+    return totalProfit;
   };
   const userProfit = calculateProfit();
 
+  const allBonus = deposits.reduce((p, v) => p + parseFloat(v.sum), 0);
+
+  const totalBalance =
+    parseFloat(newUserData.totalBalance) + parseFloat(userProfit);
+
+  const equity = totalBalance - allBonus || 0.0;
+
   const calculateFreeMargin = () => {
-    let freeMarginOpened =
-      parseFloat(newUserData.totalBalance) + parseFloat(userProfit);
+    let freeMarginOpened = totalBalance;
     openOrders.forEach((el) => {
       const orderPrice =
         el.type === "Buy"
@@ -481,6 +482,19 @@ export default function MainBoard() {
     return freeMarginOpened < 0 ? 0.0 : freeMarginOpened;
   };
   const freeMarginData = calculateFreeMargin();
+
+  const calculatePledge = () => {
+    let totalPledge = 0.0;
+    openOrders.forEach((el) => {
+      const spread = el.sum / 100; // 1% of sum
+      const swap = 0.0;
+      const pledge = el.sum - spread - swap;
+      totalPledge += pledge;
+    });
+    return +totalPledge;
+  };
+
+  const pledge = calculatePledge();
 
   return (
     <div id="mainboard">
@@ -559,16 +573,7 @@ export default function MainBoard() {
                   setIsBalOpen(true);
                 }}
               >
-                {newUserData?.totalBalance}
-              </h4>
-            </div>
-            <div>
-              <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                {/* Свободно */}
-                Free
-              </h5>
-              <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                500.00
+                {totalBalance.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -576,7 +581,7 @@ export default function MainBoard() {
                 {/* Профит */}Profit
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {userProfit}
+                {userProfit.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -585,7 +590,7 @@ export default function MainBoard() {
                 Bonus
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {userBonus}
+                {allBonus.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -605,7 +610,7 @@ export default function MainBoard() {
                 Pledge
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                00.00
+                {pledge.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -614,7 +619,7 @@ export default function MainBoard() {
                 Equity
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                828.00
+                {equity.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -623,16 +628,7 @@ export default function MainBoard() {
                 Free margin
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {freeMarginData}
-              </h4>
-            </div>
-            <div>
-              <h5 className="text-left" style={{ lineHeight: 1.1 }}>
-                {/* Кредит */}
-                Credit
-              </h5>
-              <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                00.00
+                {freeMarginData.toFixed(6)}
               </h4>
             </div>
             <div>
