@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faClose } from "@fortawesome/free-solid-svg-icons";
 import { getAskValue, getBidValue } from "../../utills/helpers";
+import { BsGear } from "react-icons/bs";
 
 const symbolsColumns = (
   { setSelectedSymbol, setDeleteDuplicate } = {
@@ -26,23 +27,20 @@ const symbolsColumns = (
     name: "Action",
     selector: (row) =>
       row && (
-        <div className="order-actions">
+        <div className="d-flex align-items-center gap-2">
           {!row.duplicate && (
-            <div
-              className="custom-edit-icon"
+            <FontAwesomeIcon
+              icon={faEdit}
               onClick={() => setSelectedSymbol(row)}
-            >
-              <FontAwesomeIcon icon={faEdit} />
-            </div>
+            />
           )}
           {row.duplicate && (
-            <div
-              className="custom-delete-icon"
+            <FontAwesomeIcon
+              icon={faClose}
               onClick={() => setDeleteDuplicate(row)}
-            >
-              <FontAwesomeIcon icon={faClose} />
-            </div>
+            />
           )}
+          <BsGear size={18} />
         </div>
       ),
     center: true,
