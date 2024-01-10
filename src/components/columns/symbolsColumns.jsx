@@ -1,12 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faClose } from "@fortawesome/free-solid-svg-icons";
+import { faClose, faCopy } from "@fortawesome/free-solid-svg-icons";
 import { getAskValue, getBidValue } from "../../utills/helpers";
 import { BsGear } from "react-icons/bs";
 
 const symbolsColumns = (
-  { setSelectedSymbol, setDeleteDuplicate } = {
+  { setSelectedSymbol, setDeleteDuplicate, setSymbolSettings } = {
     setSelectedSymbol: () => {},
     setDeleteDuplicate: () => {},
+    setSymbolSettings: () => {},
   }
 ) => [
   { name: "Symbol", selector: (row) => row.symbol },
@@ -30,7 +31,7 @@ const symbolsColumns = (
         <div className="d-flex align-items-center gap-2">
           {!row.duplicate && (
             <FontAwesomeIcon
-              icon={faEdit}
+              icon={faCopy}
               onClick={() => setSelectedSymbol(row)}
             />
           )}
@@ -40,7 +41,7 @@ const symbolsColumns = (
               onClick={() => setDeleteDuplicate(row)}
             />
           )}
-          <BsGear size={18} />
+          <BsGear size={18} onClick={() => setSymbolSettings(row)} />
         </div>
       ),
     center: true,

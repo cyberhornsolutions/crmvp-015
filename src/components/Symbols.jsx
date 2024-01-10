@@ -6,6 +6,7 @@ import {
 import DataTable from "react-data-table-component";
 import symbolsColumns from "./columns/symbolsColumns";
 import EditSymbol from "./EditSymbol";
+import SymbolSettings from "./SymbolSettings";
 import { Button, Modal, Navbar, Nav } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +22,7 @@ const Symbols = () => {
   const [searchBy, setSearchBy] = useState("");
   const [selectedSymbol, setSelectedSymbol] = useState(false);
   const [deleteDuplicate, setDeleteDuplicate] = useState(false);
+  const [symbolSettings, setSymbolSettings] = useState(false);
 
   const setSymbols = useCallback((symbolsData) => {
     dispatch(setSymbolsState(symbolsData));
@@ -120,6 +122,7 @@ const Symbols = () => {
             columns={symbolsColumns({
               setSelectedSymbol,
               setDeleteDuplicate,
+              setSymbolSettings,
             })}
             pagination
           />
@@ -159,6 +162,13 @@ const Symbols = () => {
           setSelectedSymbol={setSelectedSymbol}
         />
       )}
+      {symbolSettings && (
+        <SymbolSettings
+          selectedSymbol={symbolSettings}
+          setSelectedSymbol={setSymbolSettings}
+        />
+      )}
+
       {deleteDuplicate && (
         <DeleteSymbol
           selectedSymbol={deleteDuplicate}
