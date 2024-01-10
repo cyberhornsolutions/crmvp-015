@@ -31,46 +31,62 @@ function AddBalanceModal({ setShowModal }) {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!newBalance) {
+      toast.error("Please enter amount");
+    } else {
+      handleAddNewBalance(newBalance);
+    }
+  };
+
   return (
     <Modal show onHide={setShowModal} centered>
-      <Modal.Header closeButton>Add Balance</Modal.Header>
+      <Modal.Header closeButton>
+        <h5 className="m-0">Add Balance</h5>
+      </Modal.Header>
       <Modal.Body>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Balance</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="Enter balance"
-            value={newBalance}
-            onChange={(e) => {
-              const { value } = e.target;
-              if (value >= 0) setNewBalance(value);
-            }}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Type</Form.Label>
-          <Form.Select
-            aria-label="Default select example"
-            value={balanceType}
-            onChange={(e) => setBalanceType(e.target.value)}
-          >
-            <option value="Bonus">Bonus</option>
-            <option value="Deposit">Deposit</option>
-            <option value="Withdraw">Withdraw</option>
-          </Form.Select>
-        </Form.Group>
-        <button
-          className="btn btn-primary mt-3"
-          onClick={() => {
-            if (!newBalance) {
-              toast.error("Please enter amount");
-            } else {
-              handleAddNewBalance(newBalance);
-            }
-          }}
-        >
-          Add Balance
-        </button>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="row mb-3">
+            <div className="col-3">
+              <Form.Label htmlFor="balance">Balance</Form.Label>
+            </div>
+            <div className="col">
+              <Form.Control
+                id="balance"
+                type="number"
+                placeholder="Enter balance"
+                required
+                value={newBalance}
+                onChange={(e) => {
+                  const { value } = e.target;
+                  if (value >= 0) setNewBalance(value);
+                }}
+              />
+            </div>
+          </Form.Group>
+          <Form.Group className="row mb-3">
+            <div className="col-3">
+              <Form.Label htmlFor="balance-type">Type</Form.Label>
+            </div>
+            <div className="col">
+              <Form.Select
+                id="balance-type"
+                aria-label="Default select example"
+                required
+                value={balanceType}
+                onChange={(e) => setBalanceType(e.target.value)}
+              >
+                <option value="Bonus">Bonus</option>
+                <option value="Deposit">Deposit</option>
+                <option value="Withdraw">Withdraw</option>
+              </Form.Select>
+            </div>
+          </Form.Group>
+          <button className="btn btn-primary w-100 " type="submit">
+            Add Balance
+          </button>
+        </Form>
       </Modal.Body>
     </Modal>
   );

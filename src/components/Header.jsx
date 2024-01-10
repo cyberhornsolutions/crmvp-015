@@ -1,6 +1,15 @@
-import React from "react";
+import { useState } from "react";
+import enFlagIcon from "../assets/images/gb-fl.png";
+import ruFlagIcon from "../assets/images/ru-fl.png";
 
 export default function Header({ title }) {
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
+
+  const changeLanguage = (lng) => {
+    setSelectedLanguage(lng);
+    // i18n.changeLanguage(lng);
+  };
+
   return (
     <div id="header" style={{ paddingTop: 10, paddingBottom: 9 }}>
       <div>
@@ -15,7 +24,22 @@ export default function Header({ title }) {
           {title}
         </h5>
       </div>
-      <div>
+      <div className="d-flex align-items-center gap-4">
+        <button>
+          {selectedLanguage === "en" ? (
+            <img
+              width={50}
+              src={enFlagIcon}
+              onClick={() => changeLanguage("ru")}
+            />
+          ) : (
+            <img
+              width={50}
+              src={ruFlagIcon}
+              onClick={() => changeLanguage("en")}
+            />
+          )}
+        </button>
         <h1>
           <svg
             id="notifications-bell"

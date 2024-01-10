@@ -24,7 +24,8 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
   {
     name: "Sum",
     selector: (row) =>
-      row && isEdit ? (
+      row &&
+      (isEdit ? (
         <input
           type="number"
           className="form-control"
@@ -34,14 +35,15 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
           }}
         />
       ) : (
-        row.sum
-      ),
+        (+row.sum).toFixed(6)
+      )),
     sortable: true,
   },
   {
     name: "Open Price",
     selector: (row) =>
-      row && isEdit ? (
+      row &&
+      (isEdit ? (
         <input
           type="number"
           className="form-control"
@@ -51,8 +53,8 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
           }}
         />
       ) : (
-        row.symbolValue
-      ),
+        (+row.symbolValue).toFixed(6)
+      )),
     sortable: true,
     grow: 1.5,
     compact: true,
@@ -65,10 +67,9 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
   },
   {
     name: "Profit",
-    selector: (row) => row.profit,
-    sortable: true,
-    cell: (row) =>
-      row && isEdit ? (
+    selector: (row) =>
+      row &&
+      (isEdit ? (
         <input
           type="number"
           className="form-control"
@@ -78,8 +79,9 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
           }}
         />
       ) : (
-        row.profit
-      ),
+        row.profit.toFixed(6)
+      )),
+    sortable: true,
   },
   {
     name: "Date",
