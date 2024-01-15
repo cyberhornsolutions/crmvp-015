@@ -210,17 +210,16 @@ export const addUserNewBalance = async (userId, newDeposit) => {
 
   if (userDocSnapshot.exists()) {
     const userData = userDocSnapshot.data();
-    const currentBalanceString = userData.totalBalance || 0;
-    const currentBalance = parseFloat(currentBalanceString);
-    let updatedBalance;
+    const currentBonusString = userData.bonus || 0;
+    let bonus = parseFloat(currentBonusString);
     if (newDeposit.type === "Withdraw") {
-      updatedBalance = currentBalance - parseFloat(newDeposit.sum);
+      bonus -= parseFloat(newDeposit.sum);
     } else {
-      updatedBalance = currentBalance + parseFloat(newDeposit.sum);
+      bonus += parseFloat(newDeposit.sum);
     }
 
     // Update the balance in the database directly
-    await setDoc(userDocRef, { totalBalance: updatedBalance }, { merge: true });
+    await setDoc(userDocRef, { bonus }, { merge: true });
 
     const depositRef = collection(db, "deposits");
 
