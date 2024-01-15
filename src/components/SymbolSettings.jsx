@@ -52,8 +52,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                   <input
                     type="number"
                     step={0.1}
-                    min={1}
-                    max={100}
+                    min={0}
+                    max={50}
                     id="bid-spread"
                     placeholder="Bid Spread"
                     className="form-control"
@@ -74,8 +74,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                   <input
                     type="number"
                     step={0.1}
-                    min={1}
-                    max={100}
+                    min={0}
+                    max={50}
                     id="ask-spread"
                     placeholder="Ask Spread"
                     className="form-control"

@@ -13,15 +13,12 @@ const symbolsColumns = (
   { name: "Symbol", selector: (row) => row.symbol },
   {
     name: "Bid",
-    selector: (row) => row && getBidValue(row.price),
+    selector: (row) => row && getBidValue(row.price, row.bidSpread),
     right: true,
   },
   {
     name: "Ask",
-    selector: (row) => {
-      if (!row) return;
-      return getAskValue(row.price);
-    },
+    selector: (row) => row && getAskValue(row.price, row.askSpread),
     right: true,
   },
   {
