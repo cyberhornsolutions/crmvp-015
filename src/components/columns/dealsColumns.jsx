@@ -87,8 +87,8 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     selector: (row) =>
       row &&
       (row.type === "Buy"
-        ? getBidValue(row.currentPrice)
-        : getAskValue(row.currentPrice)),
+        ? getBidValue(row.currentPrice, row.bidSpread)
+        : getAskValue(row.currentPrice, row.askSpread)),
     sortable: true,
     grow: 1.5,
   },

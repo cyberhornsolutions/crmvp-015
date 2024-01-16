@@ -24,7 +24,7 @@ export const convertTimestamptToDate = (date) => {
 };
 
 export const fillArrayWithEmptyRows = (arr, size) =>
-  arr.concat(arr.length < size ? new Array(size - arr.length).fill("") : []);
+  arr?.concat(arr.length < size ? new Array(size - arr.length).fill("") : []);
 
 export const getBidValue = (val, percent = 1) =>
   parseFloat(val * (1 - percent / 100)).toFixed(6);

@@ -435,12 +435,17 @@ export default function MainBoard() {
   const openOrders = userOrderData
     ?.filter(({ status }) => status === "Pending")
     .map((order) => {
-      const currentPrice = symbols.find(
-        (symbol) => symbol.symbol === order.symbol
-      )?.price;
+      const symbol = symbols.find((s) => s.symbol === order.symbol);
+      let enableOpenPrice = false;
+      if (order.enableOpenPrice && order.openPriceValue !== symbol.price) {
+        enableOpenPrice = true;
+      }
       return {
         ...order,
-        currentPrice,
+        currentPrice: symbol.price,
+        bidSpread: symbol.bidSpread,
+        askSpread: symbol.askSpread,
+        enableOpenPrice,
       };
     });
 
@@ -462,20 +467,25 @@ export default function MainBoard() {
   };
   const userProfit = calculateProfit();
 
+  const allowBonus = newUserData?.settings?.allowBonus;
   const allBonus = deposits.reduce((p, v) => p + parseFloat(v.sum), 0);
 
-  const totalBalance =
-    parseFloat(newUserData.totalBalance) + parseFloat(userProfit);
+  const calculateTotalBalance = () => {
+    let balance = parseFloat(newUserData.totalBalance);
+    if (userProfit) balance += parseFloat(userProfit);
+    if (allowBonus) balance += allBonus;
+    return balance;
+  };
 
-  const equity = totalBalance - allBonus || 0.0;
+  const totalBalance = calculateTotalBalance();
 
   const calculateFreeMargin = () => {
     let freeMarginOpened = totalBalance;
     openOrders.forEach((el) => {
       const orderPrice =
         el.type === "Buy"
-          ? getBidValue(el.currentPrice)
-          : getAskValue(el.currentPrice);
+          ? getBidValue(el.currentPrice, el.bidSpread)
+          : getAskValue(el.currentPrice, el.askSpread);
       const dealSum = parseFloat(el.volume) * orderPrice;
       freeMarginOpened -= parseFloat(dealSum);
     });
@@ -495,6 +505,14 @@ export default function MainBoard() {
   };
 
   const pledge = calculatePledge();
+
+  const calculateEquity = () => {
+    let equity = freeMarginData + pledge;
+    if (allowBonus) equity -= allBonus;
+    return equity;
+  };
+
+  const equity = calculateEquity();
 
   return (
     <div id="mainboard">
