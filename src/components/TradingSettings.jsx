@@ -1,14 +1,21 @@
 import React, { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { updateSymbolSpread, updateUserById } from "../utills/firebaseHelpers";
+import { updateUserById } from "../utills/firebaseHelpers";
 import { useSelector } from "react-redux";
 
 const TradingSettings = ({ setShowModal }) => {
   const { selectedUser } = useSelector((state) => state.user);
   const [settings, setSettings] = useState({
+    group: selectedUser?.settings?.group || "general",
+    leverage: selectedUser?.settings?.leverage || "1",
+    maintenanceMargin: selectedUser?.settings?.maintenanceMargin || "5",
+    stopOut: selectedUser?.settings?.stopOut || "",
+    minDeposit: selectedUser?.settings?.minDeposit || "",
+    maxDeals: selectedUser?.settings?.maxDeals || "",
     allowBonus: selectedUser?.settings?.allowBonus || false,
   });
+  const [loading, setLoading] = useState(false);
 
   const closeModal = () => setShowModal(false);
 
@@ -19,23 +26,15 @@ const TradingSettings = ({ setShowModal }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      // const spread = {
-      //   bidSpread,
-      //   askSpread,
-      // };
-      // const id = selectedSymbol.duplicate
-      //   ? selectedSymbol.symbolId
-      //   : selectedSymbol.id;
-
-      // await updateSymbolSpread(id, spread);
-      const res = await updateUserById(selectedUser.id, { settings });
-      console.log("res = ", res);
+      await updateUserById(selectedUser.id, { settings });
       toast.success("Trading settings saved successfully");
       closeModal();
     } catch (error) {
       toast.error("Failed to save trading settings!");
       console.log(error.message);
+      setLoading(false);
     }
   };
 
@@ -45,84 +44,112 @@ const TradingSettings = ({ setShowModal }) => {
         <Modal.Header closeButton>
           <h5 className="m-0">Trading settings</h5>
         </Modal.Header>
-        <Modal.Body className="p-3">
+        <Modal.Body className="px-4">
           <Form onSubmit={handleSubmit}>
-            <Form.Group className="row mb-3">
-              <div className="col-3">
-                <Form.Label htmlFor="group" className="">
-                  Group
-                </Form.Label>
+            <Form.Group className="row align-items-center mb-3">
+              <div className="col-5 text-left">
+                <Form.Label htmlFor="group">Group</Form.Label>
               </div>
               <div className="col">
                 <Form.Select
                   id="group"
                   placeholder="Group"
                   required
-                  // onChange={(e) => setBidSpread(e.target.value)}
+                  value={settings.group}
+                  onChange={handleChange}
                 >
                   <option value="general">General</option>
                   <option value="special">Special</option>
                 </Form.Select>
               </div>
             </Form.Group>
-            <Form.Group className="row mb-3">
-              <div className="col-3">
+            <Form.Group className="row align-items-center mb-3">
+              <div className="col-5 text-left">
                 <Form.Label htmlFor="leverage">Leverage</Form.Label>
               </div>
               <div className="col">
                 <Form.Control
                   id="leverage"
+                  name="leverage"
                   type="number"
                   min={1}
                   max={100}
                   placeholder="Leverage"
                   required
-                  // onChange={(e) => setBidSpread(e.target.value)}
+                  value={settings.leverage}
+                  onChange={handleChange}
                 />
               </div>
             </Form.Group>
-            <Form.Group className="row mb-3">
-              <div className="col-3">
+            <Form.Group className="row align-items-center mb-3">
+              <div className="col-5 text-left">
+                <Form.Label htmlFor="maintenance-margin">
+                  Maintenance margin
+                </Form.Label>
+              </div>
+              <div className="col">
+                <Form.Control
+                  id="maintenance-margin"
+                  name="maintenanceMargin"
+                  type="number"
+                  min={0}
+                  max={100}
+                  defaultValue={5}
+                  placeholder="Maintenance margin"
+                  required
+                  value={settings.maintenanceMargin}
+                  onChange={handleChange}
+                />
+              </div>
+            </Form.Group>
+            <Form.Group className="row align-items-center mb-3">
+              <div className="col-5 text-left">
                 <Form.Label htmlFor="stop-out">Stop-out</Form.Label>
               </div>
               <div className="col">
                 <Form.Control
                   id="stop-out"
+                  name="stopOut"
                   type="number"
                   min={1}
                   placeholder="Stop-out"
                   required
-                  // onChange={(e) => setBidSpread(e.target.value)}
+                  value={settings.stopOut}
+                  onChange={handleChange}
                 />
               </div>
             </Form.Group>
-            <Form.Group className="row mb-3">
-              <div className="col-3">
+            <Form.Group className="row align-items-center mb-3">
+              <div className="col-5 text-left">
                 <Form.Label htmlFor="min-deposit">Min deposit</Form.Label>
               </div>
               <div className="col">
                 <Form.Control
                   id="min-deposit"
+                  name="minDeposit"
                   type="number"
                   min={1}
                   placeholder="Min deposit"
                   required
-                  // onChange={(e) => setBidSpread(e.target.value)}
+                  value={settings.minDeposit}
+                  onChange={handleChange}
                 />
               </div>
             </Form.Group>
-            <Form.Group className="row mb-3">
-              <div className="col-3">
+            <Form.Group className="row align-items-center mb-3">
+              <div className="col-5 text-left">
                 <Form.Label htmlFor="max-deals">Max deals</Form.Label>
               </div>
               <div className="col">
                 <Form.Control
                   id="max-deals"
+                  name="maxDeals"
                   type="number"
                   min={1}
                   placeholder="Max deals"
                   required
-                  // onChange={(e) => setBidSpread(e.target.value)}
+                  value={settings.maxDeals}
+                  onChange={handleChange}
                 />
               </div>
             </Form.Group>
@@ -138,7 +165,7 @@ const TradingSettings = ({ setShowModal }) => {
                 setSettings((p) => ({ ...p, allowBonus: e.target.checked }))
               }
             />
-            <Button type="submit" className="w-100">
+            <Button type="submit" className="w-100" disabled={loading}>
               Save
             </Button>
           </Form>
