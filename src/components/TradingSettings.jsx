@@ -1,38 +1,47 @@
 import React, { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { updateSymbolSpread } from "../utills/firebaseHelpers";
+import { updateSymbolSpread, updateUserById } from "../utills/firebaseHelpers";
 import { useSelector } from "react-redux";
 
 const TradingSettings = ({ setShowModal }) => {
-  // const [bidSpread, setBidSpread] = useState(selectedSymbol?.bidSpread || 1);
-  // const [askSpread, setAskSpread] = useState(selectedSymbol?.askSpread || 1);
+  const { selectedUser } = useSelector((state) => state.user);
+  const [settings, setSettings] = useState({
+    allowBonus: selectedUser?.settings?.allowBonus || false,
+  });
 
-  const { selectedUser, user } = useSelector((state) => state.user);
+  const closeModal = () => setShowModal(false);
+
+  console.log("settings = ", settings);
+
+  const handleChange = (e) =>
+    setSettings((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // try {
-    //   const spread = {
-    //     bidSpread,
-    //     askSpread,
-    //   };
-    //   const id = selectedSymbol.duplicate
-    //     ? selectedSymbol.symbolId
-    //     : selectedSymbol.id;
+    try {
+      // const spread = {
+      //   bidSpread,
+      //   askSpread,
+      // };
+      // const id = selectedSymbol.duplicate
+      //   ? selectedSymbol.symbolId
+      //   : selectedSymbol.id;
 
-    //   await updateSymbolSpread(id, spread);
-    //   toast.success("Symbol spread values updated successfully");
-    //   setSelectedSymbol(false);
-    // } catch (error) {
-    //   toast.error("Failed to update symbol spread values!");
-    //   console.log(error.message);
-    // }
+      // await updateSymbolSpread(id, spread);
+      const res = await updateUserById(selectedUser.id, { settings });
+      console.log("res = ", res);
+      toast.success("Trading settings saved successfully");
+      closeModal();
+    } catch (error) {
+      toast.error("Failed to save trading settings!");
+      console.log(error.message);
+    }
   };
 
   return (
     <>
-      <Modal size="md" show onHide={() => setShowModal(false)} centered>
+      <Modal size="md" show onHide={closeModal} centered>
         <Modal.Header closeButton>
           <h5 className="m-0">Trading settings</h5>
         </Modal.Header>
@@ -119,10 +128,15 @@ const TradingSettings = ({ setShowModal }) => {
             </Form.Group>
             <Form.Check
               id="allow-bonus"
+              name="allowBonus"
               className="mb-3"
               label="Allow using bonus"
               inline
               reverse
+              checked={settings.allowBonus}
+              onChange={(e) =>
+                setSettings((p) => ({ ...p, allowBonus: e.target.checked }))
+              }
             />
             <Button type="submit" className="w-100">
               Save

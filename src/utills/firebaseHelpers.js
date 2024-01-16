@@ -255,6 +255,11 @@ export const getUserById = async (userId) => {
   }
 };
 
+export const updateUserById = async (id, payload) => {
+  const userDocRef = doc(db, "users", id);
+  await updateDoc(userDocRef, payload);
+};
+
 export const getAllSymbols = (setState, setLoading) => {
   setLoading(true);
   const q = query(
