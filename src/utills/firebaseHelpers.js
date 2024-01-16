@@ -194,11 +194,11 @@ export const removeDuplicateSymbol = async (selectedSymbol, duplicate) => {
   }
 };
 
-export const updateSymbolSpread = async (id, spread) => {
+export const updateSymbol = async (id, payload) => {
   try {
     const symbolRef = doc(db, "symbols", id);
-    await updateDoc(symbolRef, spread);
-    console.log("Symbol spread values updated");
+    await updateDoc(symbolRef, payload);
+    console.log("Symbol is updated successfully");
   } catch (error) {
     console.log(error);
   }
