@@ -96,9 +96,13 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     name: "Profit",
     selector: (row) => {
       if (!row) return;
+      const currentPrice =
+        row.type === "Buy"
+          ? getBidValue(row.currentPrice, row.bidSpread)
+          : getAskValue(row.currentPrice, row.askSpread);
       const profit = calculateProfit(
         row.type,
-        row.currentPrice,
+        currentPrice,
         row.symbolValue,
         row.volume
       );

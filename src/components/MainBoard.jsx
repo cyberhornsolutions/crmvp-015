@@ -436,7 +436,7 @@ export default function MainBoard() {
     ?.filter(({ status }) => status === "Pending")
     .map((order) => {
       const symbol = symbols.find((s) => s.symbol === order.symbol);
-			if(!symbol) return order;
+      if (!symbol) return order;
       let enableOpenPrice = false;
       if (order.enableOpenPrice && order.openPriceValue !== symbol.price) {
         enableOpenPrice = true;
@@ -444,8 +444,8 @@ export default function MainBoard() {
       return {
         ...order,
         currentPrice: symbol.price,
-        bidSpread: symbol.bidSpread,
-        askSpread: symbol.askSpread,
+        bidSpread: symbol?.settings?.bidSpread,
+        askSpread: symbol?.settings?.askSpread,
         enableOpenPrice,
       };
     });
