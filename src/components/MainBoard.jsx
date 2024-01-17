@@ -436,6 +436,7 @@ export default function MainBoard() {
     ?.filter(({ status }) => status === "Pending")
     .map((order) => {
       const symbol = symbols.find((s) => s.symbol === order.symbol);
+			if(!symbol) return order;
       let enableOpenPrice = false;
       if (order.enableOpenPrice && order.openPriceValue !== symbol.price) {
         enableOpenPrice = true;
