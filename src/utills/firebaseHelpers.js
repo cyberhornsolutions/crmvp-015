@@ -260,8 +260,7 @@ export const updateUserById = async (id, payload) => {
   await updateDoc(userDocRef, payload);
 };
 
-export const getAllSymbols = (setState, setLoading) => {
-  setLoading(true);
+export const getAllSymbols = (setState) => {
   const q = query(
     collection(db, "symbols"),
     where("symbol", "in", ["BTCUSDT", "ETHUSDT", "DOGEUSDT"])
@@ -276,13 +275,10 @@ export const getAllSymbols = (setState, setLoading) => {
       snapshot.forEach((doc) => {
         symbolsData.push({ id: doc.id, ...doc.data() });
       });
-
       setState(symbolsData);
-      setLoading(false);
     },
     (error) => {
       console.error("Error fetching data:", error);
-      setLoading(false);
     }
   );
   return () => unsubscribe();
