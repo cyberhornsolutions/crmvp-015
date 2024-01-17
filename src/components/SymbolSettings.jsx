@@ -15,12 +15,14 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     askSpread: selectedSymbol?.settings?.askSpread || "1",
     fee: selectedSymbol?.settings?.fee || "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
     setSettings((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const id = selectedSymbol.duplicate
         ? selectedSymbol.symbolId
@@ -32,6 +34,7 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     } catch (error) {
       toast.error("Failed to update symbol spread values!");
       console.log(error.message);
+      setLoading(false);
     }
   };
 
@@ -244,7 +247,9 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                 </div>
               </Form.Group>
             </div>
-            <Button type="submit">Save</Button>
+            <Button type="submit" disabled={loading}>
+              Save
+            </Button>
           </Form>
         </Modal.Body>
       </Modal>
