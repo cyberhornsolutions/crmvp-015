@@ -35,7 +35,7 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
           }}
         />
       ) : (
-        (+row.sum).toFixed(6)
+        parseFloat(row.sum).toFixed(6)
       )),
     sortable: true,
   },
@@ -53,7 +53,7 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
           }}
         />
       ) : (
-        (+row.symbolValue).toFixed(6)
+        parseFloat(row.symbolValue).toFixed(6)
       )),
     sortable: true,
     grow: 1.5,
@@ -79,7 +79,7 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
           }}
         />
       ) : (
-        row.profit.toFixed(6)
+        parseFloat(row.profit).toFixed(6)
       )),
     sortable: true,
   },
