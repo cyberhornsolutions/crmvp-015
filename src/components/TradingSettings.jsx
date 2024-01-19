@@ -19,8 +19,6 @@ const TradingSettings = ({ setShowModal }) => {
 
   const closeModal = () => setShowModal(false);
 
-  console.log("settings = ", settings);
-
   const handleChange = (e) =>
     setSettings((p) => ({ ...p, [e.target.name]: e.target.value }));
 
