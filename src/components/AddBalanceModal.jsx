@@ -37,7 +37,7 @@ function AddBalanceModal({ setShowModal }) {
     if (!newBalance) {
       toast.error("Please enter amount");
     } else if (newBalance < minDeposit) {
-      toast.error(`Minimum Deposit amount is ${minDeposit}`);
+      toast.error(`Minimum Deposit amount for this player is ${minDeposit}`);
     } else {
       handleAddNewBalance(newBalance);
     }
