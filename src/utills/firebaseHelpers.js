@@ -271,10 +271,28 @@ export const getAllSymbols = (setState) => {
     // symbolsRef,
     q,
     (snapshot) => {
-      const symbolsData = [];
+      const symbols = [];
       snapshot.forEach((doc) => {
-        symbolsData.push({ id: doc.id, ...doc.data() });
+        symbols.push({ id: doc.id, ...doc.data() });
       });
+
+      const symbolsData = symbols
+        .map((s) => {
+          return s.duplicates?.length
+            ? [
+                s,
+                ...s.duplicates.map((m) => ({
+                  symbolId: s.id,
+                  symbol: m,
+                  price: s.price,
+                  duplicate: s.symbol,
+                  settings: s.settings,
+                })),
+              ]
+            : s;
+        })
+        .flat();
+
       setState(symbolsData);
     },
     (error) => {

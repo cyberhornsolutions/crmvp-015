@@ -38,28 +38,16 @@ const Symbols = () => {
     ? filterSearchObjects(searchText, symbols)
     : symbols;
 
-  const crypto = filteredSymbols
-    .filter(({ symbol }) => symbol.endsWith("USDT"))
-    .map((s) => {
-      return s.duplicates?.length
-        ? [
-            s,
-            ...s.duplicates.map((m) => ({
-              symbolId: s.id,
-              symbol: m,
-              price: s.price,
-              duplicate: s.symbol,
-              bidSpread: s.bidSpread,
-              askSpread: s.askSpread,
-            })),
-          ]
-        : s;
-    })
-    .flat();
-
-  const currencies = [];
-  const stocks = [];
-  const commodities = [];
+  const crypto = [],
+    currencies = [],
+    stocks = [],
+    commodities = [];
+  filteredSymbols.forEach((s) => {
+    if (s?.settings?.group === "crypto" || !s.settings) crypto.push(s);
+    else if (s?.settings?.group === "currencies") currencies.push(s);
+    else if (s?.settings?.group === "stocks") stocks.push(s);
+    else if (s?.settings?.group === "commodities") commodities.push(s);
+  });
 
   return (
     <div>
@@ -133,31 +121,37 @@ const Symbols = () => {
           />
         )}
         {tab === "currenciesTab" && (
-          <>
-            <DataTable
-              data={fillArrayWithEmptyRows(currencies, 5)}
-              columns={symbolsColumns()}
-              pagination
-            />
-          </>
+          <DataTable
+            data={fillArrayWithEmptyRows(currencies, 5)}
+            columns={symbolsColumns({
+              setSelectedSymbol,
+              setDeleteDuplicate,
+              setSymbolSettings,
+            })}
+            pagination
+          />
         )}
         {tab === "stocksTab" && (
-          <>
-            <DataTable
-              data={fillArrayWithEmptyRows(stocks, 5)}
-              columns={symbolsColumns()}
-              pagination
-            />
-          </>
+          <DataTable
+            data={fillArrayWithEmptyRows(stocks, 5)}
+            columns={symbolsColumns({
+              setSelectedSymbol,
+              setDeleteDuplicate,
+              setSymbolSettings,
+            })}
+            pagination
+          />
         )}
         {tab === "commoditiesTab" && (
-          <>
-            <DataTable
-              data={fillArrayWithEmptyRows(commodities, 5)}
-              columns={symbolsColumns()}
-              pagination
-            />
-          </>
+          <DataTable
+            data={fillArrayWithEmptyRows(commodities, 5)}
+            columns={symbolsColumns({
+              setSelectedSymbol,
+              setDeleteDuplicate,
+              setSymbolSettings,
+            })}
+            pagination
+          />
         )}
       </div>
 
