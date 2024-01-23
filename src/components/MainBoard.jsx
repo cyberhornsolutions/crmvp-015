@@ -466,7 +466,7 @@ export default function MainBoard() {
       if (!Number.isInteger(spread)) spread = parseFloat(spread);
       let feeValue = spread * fee;
       if (!Number.isInteger(feeValue)) feeValue = parseFloat(feeValue);
-      let pledge = order.sum - spread - swapValue;
+      let pledge = order.sum;
       if (!Number.isInteger(pledge)) pledge = parseFloat(pledge);
 
       return {
@@ -498,15 +498,15 @@ export default function MainBoard() {
   const allowBonus = newUserData?.settings?.allowBonus;
   const allBonus = deposits.reduce((p, v) => p + parseFloat(v.sum), 0);
 
+  const ordersFee = openOrders.reduce(
+    (p, v) => p + v.spread + v.swap + v.fee,
+    0
+  );
+
   const calculateTotalBalance = () => {
     let balance = parseFloat(newUserData.totalBalance);
     if (userProfit) balance += parseFloat(userProfit);
     if (allowBonus) balance += allBonus;
-    const ordersFee = openOrders.reduce(
-      (p, v) => p + v.spread + v.swap + v.fee,
-      0
-    );
-    balance -= ordersFee;
     return balance;
   };
 
@@ -523,7 +523,7 @@ export default function MainBoard() {
   const pledge = parseFloat(openOrders.reduce((p, v) => p + v.pledge, 0));
 
   const calculateEquity = () => {
-    let equity = freeMarginData + pledge;
+    let equity = freeMarginData + pledge - ordersFee;
     if (allowBonus) equity -= allBonus;
     return equity;
   };
@@ -607,7 +607,7 @@ export default function MainBoard() {
                   setIsBalOpen(true);
                 }}
               >
-                {totalBalance.toFixed(6)}
+                {(totalBalance - ordersFee).toFixed(6)}
               </h4>
             </div>
             <div>
