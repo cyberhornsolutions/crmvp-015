@@ -494,14 +494,8 @@ export default function MainBoard() {
 
   const calculateFreeMargin = () => {
     let freeMarginOpened = totalBalance;
-    openOrders.forEach((el) => {
-      const orderPrice =
-        el.type === "Buy"
-          ? getBidValue(el.currentPrice, el.bidSpread)
-          : getAskValue(el.currentPrice, el.askSpread);
-      const dealSum = parseFloat(el.volume) * orderPrice;
-      freeMarginOpened -= parseFloat(dealSum);
-    });
+    const dealSum = openOrders.reduce((p, v) => p + v.sum, 0);
+    freeMarginOpened -= parseFloat(dealSum);
     return freeMarginOpened < 0 ? 0.0 : freeMarginOpened;
   };
   const freeMarginData = calculateFreeMargin();
