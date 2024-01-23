@@ -463,12 +463,11 @@ export default function MainBoard() {
       let spread = order.sum / 100; // 1% of sum
       console.log("spread = ", spread);
       console.log("spread * fee = ", spread * fee);
-      if (!Number.isInteger(spread)) spread = parseFloat(spread).toFixed(4);
+      if (!Number.isInteger(spread)) spread = parseFloat(spread);
       let feeValue = spread * fee;
-      if (!Number.isInteger(feeValue))
-        feeValue = parseFloat(feeValue).toFixed(4);
+      if (!Number.isInteger(feeValue)) feeValue = parseFloat(feeValue);
       let pledge = order.sum - spread - swapValue;
-      if (!Number.isInteger(pledge)) pledge = parseFloat(pledge).toFixed(4);
+      if (!Number.isInteger(pledge)) pledge = parseFloat(pledge);
 
       return {
         ...order,
@@ -503,6 +502,11 @@ export default function MainBoard() {
     let balance = parseFloat(newUserData.totalBalance);
     if (userProfit) balance += parseFloat(userProfit);
     if (allowBonus) balance += allBonus;
+    const ordersFee = openOrders.reduce(
+      (p, v) => p + v.spread + v.swap + v.fee,
+      0
+    );
+    balance -= ordersFee;
     return balance;
   };
 
