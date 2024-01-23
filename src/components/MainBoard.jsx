@@ -26,6 +26,7 @@ import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
 import overviewColumns from "./columns/overviewColumns";
 import {
+	calculateProfit,
   convertTimestamptToDate,
   fillArrayWithEmptyRows,
   getAskValue,
@@ -469,6 +470,14 @@ export default function MainBoard() {
       let pledge = order.sum;
       if (!Number.isInteger(pledge)) pledge = parseFloat(pledge);
 
+      let profit = calculateProfit(
+        order.type,
+        currentPrice,
+        order.symbolValue,
+        order.volume
+      );
+      profit = profit - swapValue - feeValue;
+
       return {
         ...order,
         currentPrice,
@@ -477,6 +486,7 @@ export default function MainBoard() {
         spread,
         swap: swapValue,
         fee: feeValue,
+				profit
       };
     });
 
@@ -484,16 +494,7 @@ export default function MainBoard() {
     ({ status }) => status !== "Pending"
   );
 
-  const calculateProfit = () => {
-    let totalProfit = 0.0;
-    userOrders?.map((el) => {
-      if (el.status != "Pending") {
-        totalProfit = totalProfit + parseFloat(el.profit);
-      }
-    });
-    return totalProfit;
-  };
-  const userProfit = calculateProfit();
+  const userProfit = closedOrders.reduce((p, v) => p + v.profit, 0);
 
   const allowBonus = newUserData?.settings?.allowBonus;
   const allBonus = deposits.reduce((p, v) => p + parseFloat(v.sum), 0);

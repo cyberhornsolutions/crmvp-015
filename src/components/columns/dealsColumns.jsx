@@ -64,7 +64,10 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   {
     name: "Additional parameters",
     selector: (row) =>
-      row && `${row.pledge}/${row.spread}/${row.swap}/${row.fee}`,
+      row &&
+      `${row.pledge?.toFixed(4)}/${row.spread?.toFixed(4)}/${row.swap?.toFixed(
+        4
+      )}/${row.fee?.toFixed(4)}`,
     grow: 3,
     compact: true,
     sortable: true,
@@ -77,20 +80,12 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   },
   {
     name: "Profit",
-    selector: (row) => {
-      if (!row) return;
-      const profit = calculateProfit(
-        row.type,
-        row.currentPrice,
-        row.symbolValue,
-        row.volume
-      );
-      return (
-        <div style={{ color: `${profit < 0 ? "red" : "green"}` }}>
-          {profit.toFixed(6)}
+    selector: (row) =>
+      row && (
+        <div style={{ color: `${row.profit < 0 ? "red" : "green"}` }}>
+          {row.profit.toFixed(6)}
         </div>
-      );
-    },
+      ),
     sortable: true,
     compact: true,
   },

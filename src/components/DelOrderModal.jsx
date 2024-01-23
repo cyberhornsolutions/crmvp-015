@@ -18,25 +18,18 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
   const [volume, setVolume] = useState(selectedOrder?.volume);
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState("Full");
-  const symbols = useSelector((state) => state?.symbols);
-  const price = symbols?.find((el) => el.symbol == selectedOrder?.symbol);
+
+  const closedPrice = selectedOrder?.currentPrice;
 
   const updateOrderStatus = async (orderId, newStatus, newVolume) => {
     const orderRef = doc(db, "orders", orderId);
     const docSnapshot = await getDoc(orderRef);
 
-    const profit = calculateProfit(
-      selectedOrder.type,
-      price?.price,
-      selectedOrder?.symbolValue,
-      selectedOrder?.volume
-    );
-
     const newData = {
       status: newStatus,
       closedDate: serverTimestamp(),
-      closedPrice: price?.price,
-      profit: profit,
+      closedPrice,
+      profit: selectedOrder.profit,
     };
 
     if (newVolume) {
@@ -193,7 +186,7 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
           )}
           <div className="ps-3 fs-5">
             Current Price:
-            <span className="ms-2 text-success">{price?.price}</span>
+            <span className="ms-2 text-success">{closedPrice}</span>
           </div>
           <div className="w-100 text-center my-2">
             <button
