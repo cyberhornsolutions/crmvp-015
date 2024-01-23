@@ -457,10 +457,7 @@ export default function MainBoard() {
   const calculateProfit = () => {
     let totalProfit = 0.0;
     userOrders?.map((el) => {
-      if (
-        el.status.toLocaleLowerCase() == "success" ||
-        el.status.toLocaleLowerCase() == "closed"
-      ) {
+      if (el.status != "Pending") {
         totalProfit = totalProfit + parseFloat(el.profit);
       }
     });
