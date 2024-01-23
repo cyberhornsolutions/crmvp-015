@@ -31,6 +31,7 @@ import {
   getAskValue,
   getBidValue,
 } from "../utills/helpers";
+import moment from "moment";
 
 export default function MainBoard() {
   const dispatch = useDispatch();
@@ -441,12 +442,26 @@ export default function MainBoard() {
       if (order.enableOpenPrice && order.openPriceValue !== symbol.price) {
         enableOpenPrice = true;
       }
+      const { bidSpread, askSpread, fee, swapShort, swapLong } =
+        symbol.settings;
+      const swap = order.type === "Buy" ? swapShort : swapLong;
+      let swapValue = 0;
+      if (order.createdTime) {
+        const jsDate = new Date(order.createdTime.seconds * 1000).setHours(
+          0,
+          0,
+          0
+        );
+        swapValue = (order.sum / 100) * (swap * moment().diff(jsDate, "d"));
+      }
       return {
         ...order,
         currentPrice: symbol.price,
-        bidSpread: symbol?.settings?.bidSpread,
-        askSpread: symbol?.settings?.askSpread,
         enableOpenPrice,
+        bidSpread,
+        askSpread,
+        fee,
+        swap: swapValue,
       };
     });
 
@@ -495,7 +510,7 @@ export default function MainBoard() {
     let totalPledge = 0.0;
     openOrders.forEach((el) => {
       const spread = el.sum / 100; // 1% of sum
-      const swap = 0.0;
+      const swap = el.swap;
       const pledge = el.sum - spread - swap;
       totalPledge += pledge;
     });
