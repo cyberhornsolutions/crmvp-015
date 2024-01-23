@@ -5,12 +5,7 @@ import {
   faCaretUp,
   faCaretDown,
 } from "@fortawesome/free-solid-svg-icons";
-import {
-  convertTimestamptToDate,
-  getBidValue,
-  getAskValue,
-  calculateProfit,
-} from "../../utills/helpers";
+import { convertTimestamptToDate, calculateProfit } from "../../utills/helpers";
 
 const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   {
@@ -68,27 +63,15 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   },
   {
     name: "Additional parameters",
-    selector: (row) => {
-      if (!row) return;
-      let spread = row.sum / 100; // 1% of sum
-      if (!Number.isInteger(spread)) spread = spread.toFixed(4);
-      const swap = 0.0;
-      const fee = spread;
-      let pledge = row.sum - spread - swap;
-      if (!Number.isInteger(pledge)) pledge = pledge.toFixed(4);
-      return `${pledge}/${spread}/${swap}/${+fee}`;
-    },
+    selector: (row) =>
+      row && `${row.pledge}/${row.spread}/${row.swap}/${row.fee}`,
     grow: 3,
     compact: true,
     sortable: true,
   },
   {
     name: "Current Price",
-    selector: (row) =>
-      row &&
-      (row.type === "Buy"
-        ? getBidValue(row.currentPrice, row.bidSpread)
-        : getAskValue(row.currentPrice, row.askSpread)),
+    selector: (row) => row && row.currentPrice,
     sortable: true,
     grow: 1.5,
   },
@@ -96,13 +79,9 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     name: "Profit",
     selector: (row) => {
       if (!row) return;
-      const currentPrice =
-        row.type === "Buy"
-          ? getBidValue(row.currentPrice, row.bidSpread)
-          : getAskValue(row.currentPrice, row.askSpread);
       const profit = calculateProfit(
         row.type,
-        currentPrice,
+        row.currentPrice,
         row.symbolValue,
         row.volume
       );

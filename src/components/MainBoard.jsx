@@ -454,14 +454,30 @@ export default function MainBoard() {
         );
         swapValue = (order.sum / 100) * (swap * moment().diff(jsDate, "d"));
       }
+
+      const currentPrice =
+        order.type === "Buy"
+          ? getBidValue(symbol.price, bidSpread)
+          : getAskValue(symbol.price, askSpread);
+
+      let spread = order.sum / 100; // 1% of sum
+      console.log("spread = ", spread);
+      console.log("spread * fee = ", spread * fee);
+      if (!Number.isInteger(spread)) spread = parseFloat(spread).toFixed(4);
+      let feeValue = spread * fee;
+      if (!Number.isInteger(feeValue))
+        feeValue = parseFloat(feeValue).toFixed(4);
+      let pledge = order.sum - spread - swapValue;
+      if (!Number.isInteger(pledge)) pledge = parseFloat(pledge).toFixed(4);
+
       return {
         ...order,
-        currentPrice: symbol.price,
+        currentPrice,
         enableOpenPrice,
-        bidSpread,
-        askSpread,
-        fee,
+        pledge,
+        spread,
         swap: swapValue,
+        fee: feeValue,
       };
     });
 
@@ -500,18 +516,7 @@ export default function MainBoard() {
   };
   const freeMarginData = calculateFreeMargin();
 
-  const calculatePledge = () => {
-    let totalPledge = 0.0;
-    openOrders.forEach((el) => {
-      const spread = el.sum / 100; // 1% of sum
-      const swap = el.swap;
-      const pledge = el.sum - spread - swap;
-      totalPledge += pledge;
-    });
-    return +totalPledge;
-  };
-
-  const pledge = calculatePledge();
+  const pledge = parseFloat(openOrders.reduce((p, v) => p + v.pledge, 0));
 
   const calculateEquity = () => {
     let equity = freeMarginData + pledge;
