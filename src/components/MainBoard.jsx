@@ -24,6 +24,7 @@ import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
+import delayedColumns from "./columns/delayedColumns";
 import overviewColumns from "./columns/overviewColumns";
 import {
   calculateProfit,
@@ -498,6 +499,9 @@ export default function MainBoard() {
     (p, v) => p + v.spread + v.swap + v.fee,
     0
   );
+
+  const activeOrders = pendingOrders.filter((order) => !order.enableOpenPrice);
+  const delayedOrders = pendingOrders.filter((order) => order.enableOpenPrice);
 
   const calculateTotalBalance = () => {
     let balance = parseFloat(newUserData.totalBalance);
@@ -1268,7 +1272,7 @@ export default function MainBoard() {
                   handleEditOrder,
                   handleCloseOrder,
                 })}
-                data={fillArrayWithEmptyRows(pendingOrders, 5)}
+                data={fillArrayWithEmptyRows(activeOrders, 5)}
                 highlightOnHover
                 pointerOnHover
                 pagination
@@ -1282,11 +1286,11 @@ export default function MainBoard() {
           {tab === "delayed" && (
             <div id="menu3">
               <DataTable
-                columns={dealsColumns({
+                columns={delayedColumns({
                   handleEditOrder,
                   handleCloseOrder,
                 })}
-                data={fillArrayWithEmptyRows(pendingOrders, 5)}
+                data={fillArrayWithEmptyRows(delayedOrders, 5)}
                 highlightOnHover
                 pointerOnHover
                 pagination

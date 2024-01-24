@@ -7,7 +7,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { convertTimestamptToDate } from "../../utills/helpers";
 
-const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
+const delayedColumns = ({ handleEditOrder, handleCloseOrder }) => [
   {
     name: "ID",
     selector: (row, i) => row && i + 1,
@@ -91,17 +91,6 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     minWidth: "120px",
   },
   {
-    name: "Profit",
-    selector: (row) =>
-      row && (
-        <div style={{ color: `${row.profit < 0 ? "red" : "green"}` }}>
-          {+parseFloat(row.profit).toFixed(6)}
-        </div>
-      ),
-    sortable: true,
-    compact: true,
-  },
-  {
     name: "Action",
     selector: (row) => row.id,
     cell: (row) =>
@@ -120,4 +109,4 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   },
 ];
 
-export default dealsColumns;
+export default delayedColumns;
