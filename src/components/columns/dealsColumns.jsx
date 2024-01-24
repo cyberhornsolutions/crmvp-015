@@ -16,7 +16,8 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   },
   {
     name: "Date",
-    selector: (row) => row && convertTimestamptToDate(row.createdTime),
+    selector: (row) =>
+      row.createdTime && convertTimestamptToDate(row.createdTime),
     sortable: true,
     grow: 2.5,
     compact: true,
@@ -46,35 +47,41 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
   },
   {
     name: "Volume",
-    selector: (row) => row && (+row.volume).toFixed(6),
+    selector: (row) => row && +parseFloat(row.volume)?.toFixed(6),
     sortable: true,
     compact: true,
   },
   {
     name: "Open Price",
-    selector: (row) => row && (+row.symbolValue).toFixed(6),
+    selector: (row) => row && +parseFloat(row.symbolValue)?.toFixed(6),
     sortable: true,
     compact: true,
   },
   {
     name: "SL / TP",
-    selector: (row) => row && `${row.sl || ""}/${row.tp || ""}`,
+    selector: (row) =>
+      row &&
+      `${+parseFloat(row.sl)?.toFixed(4) || ""}/${
+        +parseFloat(row.tp)?.toFixed(4) || ""
+      }`,
     grow: 2,
   },
   {
     name: "Additional parameters",
     selector: (row) =>
       row &&
-      `${row.pledge?.toFixed(4)}/${row.spread?.toFixed(4)}/${row.swap?.toFixed(
-        4
-      )}/${row.fee?.toFixed(4)}`,
+      `${+parseFloat(row.pledge)?.toFixed(4)}/${+parseFloat(
+        row.spread
+      )?.toFixed(4)}/${+parseFloat(row.swap)?.toFixed(4)}/${+parseFloat(
+        row.fee
+      )?.toFixed(4)}`,
     grow: 3,
     compact: true,
     sortable: true,
   },
   {
     name: "Current Price",
-    selector: (row) => row && row.currentPrice,
+    selector: (row) => row && +parseFloat(row.currentPrice)?.toFixed(6),
     sortable: true,
     grow: 1.5,
   },
@@ -83,7 +90,7 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     selector: (row) =>
       row && (
         <div style={{ color: `${row.profit < 0 ? "red" : "green"}` }}>
-          {row.profit.toFixed(6)}
+          {+parseFloat(row.profit).toFixed(6)}
         </div>
       ),
     sortable: true,

@@ -31,6 +31,7 @@ import AddBalanceModal from "./AddBalanceModal";
 import TradingSettings from "./TradingSettings";
 import {
   convertTimestamptToDate,
+  fillArrayWithEmptyRows,
   filterSearchObjects,
 } from "../utills/helpers";
 
@@ -86,15 +87,6 @@ export default function Leads({ setTab }) {
           orders.push({ id: doc.id, ...doc.data() });
         });
         dispatch(setUserOrders(orders));
-        let profit = 0;
-        orders?.map((el) => {
-          if (
-            el.status.toLocaleLowerCase() == "success" ||
-            el.status.toLocaleLowerCase() == "closed"
-          ) {
-            profit = profit + parseFloat(el.profit);
-          }
-        });
         if (isOk === true) {
           setTab("MainBoard");
         }
@@ -143,12 +135,12 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Price",
-      selector: (row) => row.symbolValue,
+      selector: (row) => row && +parseFloat(row.symbolValue)?.toFixed(6),
       sortable: true,
     },
     {
       name: "Profit",
-      selector: (row) => row.profit,
+      selector: (row) => row && +parseFloat(row.profit)?.toFixed(6),
       sortable: true,
     },
     {
@@ -433,11 +425,7 @@ export default function Leads({ setTab }) {
           </div>
           <DataTable
             columns={userColumns}
-            data={filteredUsers.concat(
-              filteredUsers.length < 5
-                ? new Array(5 - filteredUsers.length).fill("")
-                : []
-            )}
+            data={fillArrayWithEmptyRows(filteredUsers, 5)}
             highlightOnHover
             pointerOnHover
             pagination
@@ -456,9 +444,7 @@ export default function Leads({ setTab }) {
           </div>
           <DataTable
             columns={columns}
-            data={deals.concat(
-              deals.length < 3 ? new Array(3 - deals.length).fill("") : []
-            )}
+            data={fillArrayWithEmptyRows(deals, 3)}
             pagination
             paginationPerPage={5}
             paginationRowsPerPageOptions={[5, 10, 20, 50]}

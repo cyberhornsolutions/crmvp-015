@@ -333,9 +333,10 @@ export default function MainBoard() {
   const depositColumns = [
     {
       name: "Date",
-      selector: (row) => row && convertTimestamptToDate(row.createdAt),
+      selector: (row) =>
+        row.createdAt && convertTimestamptToDate(row.createdAt),
     },
-    { name: "Sum", selector: (row) => row.sum },
+    { name: "Sum", selector: (row) => row && +parseFloat(row.sum)?.toFixed(6) },
     { name: "Type", selector: (row) => row.type },
   ];
   const handleClose = () => {
@@ -601,7 +602,7 @@ export default function MainBoard() {
                   setIsBalOpen(true);
                 }}
               >
-                {(totalBalance - ordersFee).toFixed(6)}
+                {+(totalBalance - ordersFee)?.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -609,7 +610,7 @@ export default function MainBoard() {
                 {/* Профит */}Profit
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {userProfit.toFixed(6)}
+                {+userProfit?.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -618,7 +619,7 @@ export default function MainBoard() {
                 Bonus
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {bonus.toFixed(6)}
+                {+bonus?.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -638,7 +639,7 @@ export default function MainBoard() {
                 Pledge
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {pledge.toFixed(6)}
+                {+pledge?.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -647,7 +648,7 @@ export default function MainBoard() {
                 Equity
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {equity.toFixed(6)}
+                {+equity?.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -656,7 +657,7 @@ export default function MainBoard() {
                 Free margin
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {freeMarginData.toFixed(6)}
+                {+freeMarginData?.toFixed(6)}
               </h4>
             </div>
             <div>
