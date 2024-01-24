@@ -491,7 +491,7 @@ export default function MainBoard() {
   const userProfit = closedOrders.reduce((p, v) => p + v.profit, 0);
 
   const allowBonus = newUserData?.settings?.allowBonus;
-  const allBonus = deposits.reduce((p, v) => p + parseFloat(v.sum), 0);
+  const bonus = newUserData?.bonus;
 
   const ordersFee = openOrders.reduce(
     (p, v) => p + v.spread + v.swap + v.fee,
@@ -501,7 +501,6 @@ export default function MainBoard() {
   const calculateTotalBalance = () => {
     let balance = parseFloat(newUserData.totalBalance);
     if (userProfit) balance += parseFloat(userProfit);
-    if (allowBonus) balance += allBonus;
     return balance;
   };
 
@@ -519,7 +518,7 @@ export default function MainBoard() {
 
   const calculateEquity = () => {
     let equity = freeMarginData + pledge - ordersFee;
-    if (allowBonus) equity -= allBonus;
+    if (allowBonus) equity -= bonus;
     return equity;
   };
 
@@ -619,7 +618,7 @@ export default function MainBoard() {
                 Bonus
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {allBonus.toFixed(6)}
+                {bonus.toFixed(6)}
               </h4>
             </div>
             <div>
