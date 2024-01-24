@@ -61,8 +61,8 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     name: "SL / TP",
     selector: (row) =>
       row &&
-      `${+parseFloat(row.sl)?.toFixed(4) || ""}/${
-        +parseFloat(row.tp)?.toFixed(4) || ""
+      `${+parseFloat(row.sl)?.toFixed(6) || ""}/${
+        +parseFloat(row.tp)?.toFixed(6) || ""
       }`,
     grow: 2,
   },
