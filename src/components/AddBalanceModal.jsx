@@ -1,5 +1,5 @@
 import { Modal, Form } from "react-bootstrap";
-import { addUserNewBalance } from "../utills/firebaseHelpers";
+import { addNewDepsit, updateUserById } from "../utills/firebaseHelpers";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -21,8 +21,16 @@ function AddBalanceModal({ setShowModal }) {
       desk: user.desk || "",
     };
 
+    let userKey = "bonus";
+    if (selectedUser?.settings?.allowBonus) userKey = "totalBalance";
+
+    const userPayload = {
+      [userKey]: selectedUser[userKey] + newBalance,
+    };
+
     try {
-      await addUserNewBalance(selectedUser.id, newDeposit);
+      await addNewDepsit(newDeposit);
+      await updateUserById(selectedUser.id, userPayload);
       toast.success("Balance added successfully");
       setShowModal(false);
     } catch (error) {

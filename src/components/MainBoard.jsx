@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import placeholder from "../acc-img-placeholder.png";
 import { Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
-import { addUserNewBalance, getAllSymbols } from "../utills/firebaseHelpers";
+import { getAllSymbols } from "../utills/firebaseHelpers";
 import {
   getDocs,
   collection,
@@ -26,7 +26,7 @@ import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
 import overviewColumns from "./columns/overviewColumns";
 import {
-	calculateProfit,
+  calculateProfit,
   convertTimestamptToDate,
   fillArrayWithEmptyRows,
   getAskValue,
@@ -153,12 +153,6 @@ export default function MainBoard() {
 
   const handleUploadClick = (inputRef) => {
     inputRef.current.click();
-  };
-
-  const addNewBalance = async (amount) => {
-    await addUserNewBalance(selectedUser.id, amount);
-    setNewBalance(0);
-    setIsBalOpen(false);
   };
 
   const handleFileChange = (e, fileStateSetter) => {
@@ -486,7 +480,7 @@ export default function MainBoard() {
         spread,
         swap: swapValue,
         fee: feeValue,
-				profit
+        profit,
       };
     });
 

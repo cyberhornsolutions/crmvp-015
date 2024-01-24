@@ -204,34 +204,12 @@ export const updateSymbol = async (id, payload) => {
   }
 };
 
-export const addUserNewBalance = async (userId, newDeposit) => {
-  const userDocRef = doc(db, "users", userId);
-  const userDocSnapshot = await getDoc(userDocRef);
-
-  if (userDocSnapshot.exists()) {
-    const userData = userDocSnapshot.data();
-    const currentBonusString = userData.bonus || 0;
-    let bonus = parseFloat(currentBonusString);
-    if (newDeposit.type === "Withdraw") {
-      bonus -= parseFloat(newDeposit.sum);
-    } else {
-      bonus += parseFloat(newDeposit.sum);
-    }
-
-    // Update the balance in the database directly
-    await setDoc(userDocRef, { bonus }, { merge: true });
-
-    const depositRef = collection(db, "deposits");
-
-    await addDoc(depositRef, {
-      ...newDeposit,
-      createdAt: serverTimestamp(),
-    });
-
-    console.log("Balance updated successfully!");
-  } else {
-    console.error("User ID does not exist in the database.");
-  }
+export const addNewDepsit = async (newDeposit) => {
+  const depositRef = collection(db, "deposits");
+  await addDoc(depositRef, {
+    ...newDeposit,
+    createdAt: serverTimestamp(),
+  });
 };
 
 export const getUserById = async (userId) => {
