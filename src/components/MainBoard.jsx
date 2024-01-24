@@ -41,7 +41,7 @@ export default function MainBoard() {
   const { selectedUser } = useSelector((state) => state?.user);
   const [deposits, setDeposits] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState("info");
   const [users, setUsers] = useState([]);
   const idInputRef = useRef(null);
   const locationInputRef = useRef(null);
@@ -429,7 +429,7 @@ export default function MainBoard() {
     },
   ];
 
-  const openOrders = userOrderData
+  const pendingOrders = userOrderData
     ?.filter(({ status }) => status === "Pending")
     .map((order) => {
       const symbol = symbols.find((s) => s.symbol === order.symbol);
@@ -494,7 +494,7 @@ export default function MainBoard() {
   const allowBonus = newUserData?.settings?.allowBonus;
   const bonus = newUserData?.bonus;
 
-  const ordersFee = openOrders.reduce(
+  const ordersFee = pendingOrders.reduce(
     (p, v) => p + v.spread + v.swap + v.fee,
     0
   );
@@ -509,13 +509,13 @@ export default function MainBoard() {
 
   const calculateFreeMargin = () => {
     let freeMarginOpened = totalBalance;
-    const dealSum = openOrders.reduce((p, v) => p + v.sum, 0);
+    const dealSum = pendingOrders.reduce((p, v) => p + v.sum, 0);
     freeMarginOpened -= parseFloat(dealSum);
     return freeMarginOpened < 0 ? 0.0 : freeMarginOpened;
   };
   const freeMarginData = calculateFreeMargin();
 
-  const pledge = parseFloat(openOrders.reduce((p, v) => p + v.pledge, 0));
+  const pledge = parseFloat(pendingOrders.reduce((p, v) => p + v.pledge, 0));
 
   const calculateEquity = () => {
     let equity = freeMarginData + pledge - ordersFee;
@@ -561,7 +561,7 @@ export default function MainBoard() {
                 className="f-s-inherit  f-w-inherit "
                 style={{ lineHeight: 1.1 }}
               >
-                {openOrders.length}
+                {pendingOrders.length}
               </h5>
               <h5
                 className="f-s-inherit  f-w-inherit "
@@ -717,51 +717,57 @@ export default function MainBoard() {
         <Navbar className="nav nav-tabs p-0">
           <Nav className="me-auto" style={{ gap: "2px" }}>
             <Nav.Link
-              className={tab === 0 && "active"}
-              onClick={() => setTab(0)}
+              className={tab === "info" && "active"}
+              onClick={() => setTab("info")}
             >
               Info
             </Nav.Link>
             <Nav.Link
-              className={tab === 1 && "active"}
-              onClick={() => setTab(1)}
+              className={tab === "verification" && "active"}
+              onClick={() => setTab("verification")}
             >
               Verification
             </Nav.Link>
             <Nav.Link
-              className={tab === 2 && "active"}
-              onClick={() => setTab(2)}
+              className={tab === "overview" && "active"}
+              onClick={() => setTab("overview")}
             >
               Overview
             </Nav.Link>
             <Nav.Link
-              className={tab === 3 && "active"}
-              onClick={() => setTab(3)}
+              className={tab === "deals" && "active"}
+              onClick={() => setTab("deals")}
             >
               Deals
             </Nav.Link>
             <Nav.Link
-              className={tab === 4 && "active"}
-              onClick={() => setTab(4)}
+              className={tab === "delayed" && "active"}
+              onClick={() => setTab("delayed")}
+            >
+              Delayed
+            </Nav.Link>
+            <Nav.Link
+              className={tab === "history" && "active"}
+              onClick={() => setTab("history")}
             >
               History
             </Nav.Link>
             <Nav.Link
-              className={tab === 5 && "active"}
-              onClick={() => setTab(5)}
+              className={tab === "news" && "active"}
+              onClick={() => setTab("news")}
             >
               News
             </Nav.Link>
             <Nav.Link
-              className={tab === 6 && "active"}
-              onClick={() => setTab(6)}
+              className={tab === "referral" && "active"}
+              onClick={() => setTab("referral")}
             >
               Referrals
             </Nav.Link>
           </Nav>
         </Navbar>
         <div className="tab-content">
-          {tab === 0 && (
+          {tab === "info" && (
             <div id="menu0">
               <div id="menu0-main">
                 <div
@@ -941,7 +947,7 @@ export default function MainBoard() {
             </div>
           )}
 
-          {tab === 1 && (
+          {tab === "verification" && (
             <div id="menu1">
               <div className="menu1-main">
                 <div className="menu1-title">
@@ -1214,7 +1220,7 @@ export default function MainBoard() {
             </div>
           )}
 
-          {tab === 2 && (
+          {tab === "overview" && (
             <div id="menu2">
               <div id="menu3-buttons">
                 <button
@@ -1255,14 +1261,14 @@ export default function MainBoard() {
               />
             </div>
           )}
-          {tab === 3 && (
+          {tab === "deals" && (
             <div id="menu3">
               <DataTable
                 columns={dealsColumns({
                   handleEditOrder,
                   handleCloseOrder,
                 })}
-                data={fillArrayWithEmptyRows(openOrders, 5)}
+                data={fillArrayWithEmptyRows(pendingOrders, 5)}
                 highlightOnHover
                 pointerOnHover
                 pagination
@@ -1273,7 +1279,25 @@ export default function MainBoard() {
             </div>
           )}
 
-          {tab === 4 && (
+          {tab === "delayed" && (
+            <div id="menu3">
+              <DataTable
+                columns={dealsColumns({
+                  handleEditOrder,
+                  handleCloseOrder,
+                })}
+                data={fillArrayWithEmptyRows(pendingOrders, 5)}
+                highlightOnHover
+                pointerOnHover
+                pagination
+                paginationPerPage={10}
+                paginationRowsPerPageOptions={[10, 20, 50]}
+                // responsive
+              />
+            </div>
+          )}
+
+          {tab === "history" && (
             <div id="menu">
               <DataTable
                 columns={depositColumns}
@@ -1288,9 +1312,7 @@ export default function MainBoard() {
             </div>
           )}
 
-          {tab === 5 && <div id="menu5" />}
-
-          {tab === 6 && (
+          {tab === "referral" && (
             <div id="menu6">
               <div className="ref-table w-100 pt-2 pb-4 mb-1">
                 <p className="my-3">Referral Information</p>
