@@ -41,12 +41,14 @@ function AddBalanceModal({ setShowModal }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const minDeposit = selectedUser?.settings?.minDeposit;
+    // const minDeposit = selectedUser?.settings?.minDeposit;
     if (!newBalance) {
       toast.error("Please enter amount");
-    } else if (newBalance < +minDeposit) {
-      toast.error(`Minimum Deposit amount for this player is ${minDeposit}`);
-    } else {
+    }
+    // else if (newBalance < +minDeposit) {
+    //   toast.error(`Minimum Deposit amount for this player is ${minDeposit}`);
+    // }
+    else {
       handleAddNewBalance(newBalance);
     }
   };

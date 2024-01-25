@@ -11,7 +11,7 @@ const TradingSettings = ({ setShowModal }) => {
     leverage: selectedUser?.settings?.leverage || "1",
     maintenanceMargin: selectedUser?.settings?.maintenanceMargin || "5",
     stopOut: selectedUser?.settings?.stopOut || "",
-    minDeposit: selectedUser?.settings?.minDeposit || "",
+    minDealSum: selectedUser?.settings?.minDealSum || "",
     maxDeals: selectedUser?.settings?.maxDeals || "",
     allowBonus: selectedUser?.settings?.allowBonus || false,
   });
@@ -124,17 +124,17 @@ const TradingSettings = ({ setShowModal }) => {
             </Form.Group>
             <Form.Group className="row align-items-center mb-3">
               <div className="col-5 text-left">
-                <Form.Label htmlFor="min-deposit">Min deposit</Form.Label>
+                <Form.Label htmlFor="min-deposit">Min. deal sum</Form.Label>
               </div>
               <div className="col">
                 <Form.Control
-                  id="min-deposit"
-                  name="minDeposit"
+                  id="min-deal-sum"
+                  name="minDealSum"
                   type="number"
                   min={1}
-                  placeholder="Min deposit"
+                  placeholder="Min. deal sum"
                   required
-                  value={settings.minDeposit}
+                  value={settings.minDealSum}
                   onChange={handleChange}
                 />
               </div>
