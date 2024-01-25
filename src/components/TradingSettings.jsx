@@ -9,7 +9,7 @@ const TradingSettings = ({ setShowModal }) => {
   const [settings, setSettings] = useState({
     group: selectedUser?.settings?.group || "general",
     leverage: selectedUser?.settings?.leverage || "1",
-    maintenanceMargin: selectedUser?.settings?.maintenanceMargin || "5",
+    maintenanceMargin: selectedUser?.settings?.maintenanceMargin || "0",
     stopOut: selectedUser?.settings?.stopOut || "",
     minDealSum: selectedUser?.settings?.minDealSum || "",
     maxDeals: selectedUser?.settings?.maxDeals || "",
