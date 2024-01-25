@@ -80,7 +80,14 @@ const TradingSettings = ({ setShowModal }) => {
                   placeholder="Leverage"
                   required
                   value={settings.leverage}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const { name, value } = e.target;
+                    setSettings((p) => ({
+                      ...p,
+                      [name]: value,
+                      maintenanceMargin: value <= 1 ? 0 : p.maintenanceMargin,
+                    }));
+                  }}
                 />
               </div>
             </Form.Group>
@@ -99,6 +106,7 @@ const TradingSettings = ({ setShowModal }) => {
                   max={100}
                   defaultValue={5}
                   placeholder="Maintenance margin"
+                  disabled={settings.leverage <= 1}
                   required
                   value={settings.maintenanceMargin}
                   onChange={handleChange}
