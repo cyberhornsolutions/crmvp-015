@@ -16,7 +16,6 @@ import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
 const Symbols = () => {
   const dispatch = useDispatch();
   const symbols = useSelector((state) => state.symbols);
-  const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState("cryptoTab");
   const [searchText, setSearchText] = useState("");
   const [searchBy, setSearchBy] = useState("");
@@ -30,7 +29,7 @@ const Symbols = () => {
 
   useEffect(() => {
     if (!symbols.length) {
-      getAllSymbols(setSymbols, setLoading);
+      getAllSymbols(setSymbols);
     }
   }, []);
 

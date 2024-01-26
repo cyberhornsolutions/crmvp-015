@@ -41,7 +41,6 @@ export default function MainBoard() {
   const symbols = useSelector((state) => state?.symbols);
   const { selectedUser } = useSelector((state) => state?.user);
   const [deposits, setDeposits] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState("info");
   const [users, setUsers] = useState([]);
   const idInputRef = useRef(null);
@@ -258,7 +257,7 @@ export default function MainBoard() {
 
   useEffect(() => {
     if (!symbols.length) {
-      return getAllSymbols(setSymbols, setLoading);
+      getAllSymbols(setSymbols);
     }
   }, []);
 
