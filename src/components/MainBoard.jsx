@@ -34,6 +34,7 @@ import {
   getBidValue,
 } from "../utills/helpers";
 import moment from "moment";
+import SelectColumnsModal from "./SelectColumnsModal";
 
 export default function MainBoard() {
   const dispatch = useDispatch();
@@ -61,6 +62,43 @@ export default function MainBoard() {
   const [isDealEdit, setIsDealEdit] = useState(false);
   const [userOrderData, setUserOrderData] = useState(userOrders);
   const [isUserEdit, setIsUserEdit] = useState(false);
+  const [showColumnsModal, setShowColumnsModal] = useState(true);
+  const [hideColumns, setHideColumns] = useState({});
+
+  useEffect(() => {
+    let cols;
+    switch (tab) {
+      case "overview":
+        cols = overviewColumns().reduce(
+          (p, { name }) => ({ ...p, [name]: false }),
+          {}
+        );
+        break;
+      case "deals":
+        cols = dealsColumns().reduce(
+          (p, { name }) => ({ ...p, [name]: false }),
+          {}
+        );
+        break;
+      case "delayed":
+        cols = delayedColumns().reduce(
+          (p, { name }) => ({ ...p, [name]: false }),
+          {}
+        );
+        break;
+      default:
+        return;
+    }
+    const header = document.querySelector(".rdt_TableHead");
+    if (!header) return;
+    setHideColumns(cols);
+    const handleRightClick = (e) => {
+      e.preventDefault();
+      setShowColumnsModal(true);
+    };
+    header.addEventListener("contextmenu", handleRightClick);
+    return () => header.removeEventListener("contextmenu", handleRightClick);
+  }, [tab]);
 
   const handleKeyPress = (event) => {
     const keyCode = event.keyCode || event.which;
@@ -71,79 +109,6 @@ export default function MainBoard() {
       event.preventDefault();
     }
   };
-  // const fetchOrders = async (row, isOk = false) => {
-  //   console.log("UserId", row?.id);
-  //   const orders = [];
-
-  //   try {
-  //     const q = query(
-  //       collection(db, "orders"),
-  //       orderBy("createdTime", "desc"),
-  //       where("userId", "==", row?.id)
-  //     );
-
-  //     const unsubscribe = await onSnapshot(q, async (querySnapshot) => {
-  //       await querySnapshot.forEach(async (doc) => {
-  //         await orders.push({ id: doc.id, ...doc.data() });
-  //       });
-  //       let profit = 0;
-  //       orders?.map((el) => {
-  //         if (
-  //           el.status.toLocaleLowerCase() == "success" ||
-  //           el.status.toLocaleLowerCase() == "closed"
-  //         ) {
-  //           profit = profit + parseFloat(el.profit);
-  //         }
-
-  //         setUserProfit(profit);
-  //       });
-  //       const newO = orders?.map((order, i) => ({
-  //         index: i + 1,
-  //         id: order?.id,
-  //         type: order?.type,
-  //         symbol: order?.symbol,
-  //         sl: order?.sl,
-  //         sum: order?.volume,
-  //         price: order?.symbolValue,
-  //         tp: order?.tp,
-  //         status: order?.status,
-  //         profit: order?.profit,
-  //         userId: order?.userId,
-  //         createdAt: order?.createdAt,
-  //         docId: order?.id,
-  //         createdTime: order?.createdTime,
-  //       }));
-  //       dispatch(setUserOrders(newO));
-  //       setUserOrderData(
-  //         orders?.map((order, i) => ({
-  //           index: i + 1,
-  //           id: order?.id,
-  //           type: order?.type,
-  //           symbol: order?.symbol,
-  //           sl: order?.sl,
-  //           sum: order?.volume,
-  //           price: order?.symbolValue,
-  //           tp: order?.tp,
-  //           status: order?.status,
-  //           profit: order?.profit,
-  //           userId: order?.userId,
-  //           createdAt: order?.createdAt,
-  //           docId: order?.id,
-  //           createdTime: order?.createdTime,
-  //         }))
-  //       );
-  //     });
-
-  //     console.log(orders, row, 222);
-
-  //     // Return a cleanup function to unsubscribe when the component unmounts
-  //     return () => {
-  //       unsubscribe();
-  //     };
-  //   } catch (error) {
-  //     console.error("Error fetching orders:", error);
-  //   }
-  // };
 
   const handleImageClick = (image) => {
     console.log("Image", image);
@@ -1254,6 +1219,7 @@ export default function MainBoard() {
                 columns={overviewColumns({
                   isEdit,
                   handleEditOrder: handleEditOverviewOrders,
+                  hideColumns,
                 })}
                 data={fillArrayWithEmptyRows(closedOrders, 5)}
                 highlightOnHover
@@ -1271,6 +1237,7 @@ export default function MainBoard() {
                 columns={dealsColumns({
                   handleEditOrder,
                   handleCloseOrder,
+                  hideColumns,
                 })}
                 data={fillArrayWithEmptyRows(activeOrders, 5)}
                 highlightOnHover
@@ -1289,6 +1256,7 @@ export default function MainBoard() {
                 columns={delayedColumns({
                   handleEditOrder,
                   handleCloseOrder,
+                  hideColumns,
                 })}
                 data={fillArrayWithEmptyRows(delayedOrders, 5)}
                 highlightOnHover
@@ -1367,6 +1335,13 @@ export default function MainBoard() {
       )}
 
       {isUserEdit && <EditUserModal onClose={handleClose} show={isUserEdit} />}
+      {showColumnsModal && (
+        <SelectColumnsModal
+          setModal={setShowColumnsModal}
+          columns={hideColumns}
+          setColumns={setHideColumns}
+        />
+      )}
     </div>
   );
 }

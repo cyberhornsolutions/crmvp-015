@@ -7,12 +7,17 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { convertTimestamptToDate } from "../../utills/helpers";
 
-const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
+const dealsColumns = ({
+  handleEditOrder,
+  handleCloseOrder,
+  hideColumns = {},
+} = {}) => [
   {
     name: "ID",
     selector: (row, i) => row && i + 1,
     sortable: true,
     width: "70px",
+    omit: hideColumns.ID,
   },
   {
     name: "Date",
@@ -21,12 +26,14 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     sortable: true,
     compact: true,
     minWidth: "180px",
+    omit: hideColumns.Date,
   },
   {
     name: "Symbol",
     selector: (row) => row.symbol,
     sortable: true,
     minWidth: "fit-content",
+    omit: hideColumns.Symbol,
   },
   {
     name: "Type",
@@ -44,18 +51,21 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
         </div>
       )),
     sortable: true,
+    omit: hideColumns.Type,
   },
   {
     name: "Volume",
     selector: (row) => row && +parseFloat(row.volume)?.toFixed(6),
     sortable: true,
     compact: true,
+    omit: hideColumns.Volume,
   },
   {
     name: "Open Price",
     selector: (row) => row && +parseFloat(row.symbolValue)?.toFixed(6),
     sortable: true,
     compact: true,
+    omit: hideColumns["Open Price"],
   },
   {
     name: "SL / TP",
@@ -65,6 +75,7 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
         +parseFloat(row.tp)?.toFixed(6) || ""
       }`,
     minWidth: "180px",
+    omit: hideColumns["SL / TP"],
   },
   {
     name: "Additional parameters",
@@ -76,12 +87,14 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     minWidth: "320px",
     compact: true,
     sortable: true,
+    omit: hideColumns["Additional parameters"],
   },
   {
     name: "Pledge",
     selector: (row) => row && +parseFloat(row.pledge)?.toFixed(6),
     sortable: true,
     minWidth: "120px",
+    omit: hideColumns.Pledge,
   },
   {
     name: "Current Price",
@@ -89,6 +102,7 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
     sortable: true,
     compact: true,
     minWidth: "120px",
+    omit: hideColumns["Current Price"],
   },
   {
     name: "Profit",
@@ -100,6 +114,7 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
       ),
     sortable: true,
     compact: true,
+    omit: hideColumns.Profit,
   },
   {
     name: "Action",
@@ -117,6 +132,7 @@ const dealsColumns = ({ handleEditOrder, handleCloseOrder }) => [
       ),
     sortable: false,
     compact: true,
+    omit: hideColumns.Action,
   },
 ];
 

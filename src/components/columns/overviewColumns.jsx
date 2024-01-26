@@ -2,24 +2,31 @@ import moment from "moment/moment";
 import { convertTimestamptToDate } from "../../utills/helpers";
 import { Timestamp } from "firebase/firestore";
 
-const overviewColumns = ({ isEdit, handleEditOrder }) => [
+const overviewColumns = ({
+  isEdit,
+  handleEditOrder,
+  hideColumns = {},
+} = {}) => [
   {
     name: "ID",
     selector: (row, i) => row && i + 1,
     sortable: true,
     grow: 0.5,
+    omit: hideColumns.ID,
   },
   {
     name: "Transaction Type",
     selector: (row) => row.type,
     sortable: true,
     compact: true,
+    omit: hideColumns["Transaction Type"],
   },
   {
     name: "Symbol",
     selector: (row) => row.symbol,
     sortable: true,
     cell: (row) => row.symbol,
+    omit: hideColumns.Symbol,
   },
   {
     name: "Sum",
@@ -38,6 +45,7 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
         +parseFloat(row.sum)?.toFixed(6)
       )),
     sortable: true,
+    omit: hideColumns.Sum,
   },
   {
     name: "Open Price",
@@ -58,12 +66,14 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
     sortable: true,
     grow: 1.5,
     compact: true,
+    omit: hideColumns["Open Price"],
   },
   {
     name: "Status",
     selector: (row) => row.status,
     sortable: true,
     cell: (row) => row.status,
+    omit: hideColumns.Status,
   },
   {
     name: "Profit",
@@ -82,6 +92,7 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
         +parseFloat(row.profit)?.toFixed(6)
       )),
     sortable: true,
+    omit: hideColumns.Profit,
   },
   {
     name: "Date",
@@ -107,6 +118,7 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
     sortable: true,
     grow: 2,
     compact: true,
+    omit: hideColumns.Date,
   },
 ];
 

@@ -169,3 +169,8 @@ body {
 .form-select:focus {
   box-shadow: none !important;
 }
+
+.columns-modal {
+  right: 2%;
+  top: 16%;
+}
