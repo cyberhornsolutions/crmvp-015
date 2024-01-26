@@ -7,9 +7,11 @@ import { toast } from "react-toastify";
 function AddBalanceModal({ setShowModal }) {
   const [newBalance, setNewBalance] = useState(0);
   const [balanceType, setBalanceType] = useState("Bonus");
+  const [loading, setLoading] = useState(false);
   const { selectedUser, user } = useSelector((state) => state.user);
 
   const handleAddNewBalance = async (amount) => {
+    setLoading(true);
     const newDeposit = {
       player: selectedUser.name,
       userId: selectedUser.id,
@@ -36,6 +38,7 @@ function AddBalanceModal({ setShowModal }) {
     } catch (error) {
       toast.error("Failed");
       console.log(error);
+      setLoading(false);
     }
   };
 
@@ -96,7 +99,11 @@ function AddBalanceModal({ setShowModal }) {
               </Form.Select>
             </div>
           </Form.Group>
-          <button className="btn btn-primary w-100 " type="submit">
+          <button
+            className="btn btn-primary w-100 "
+            type="submit"
+            disabled={loading}
+          >
             Add Balance
           </button>
         </Form>
