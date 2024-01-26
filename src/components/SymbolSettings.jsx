@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Modal, Form } from "react-bootstrap";
+import { Button, Modal, Form, InputGroup } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { updateSymbol } from "../utills/firebaseHelpers";
 
@@ -89,11 +89,12 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                 <Form.Label htmlFor="swap-short" className="col-4">
                   Swap Short
                 </Form.Label>
-                <div className="col position-relative">
+                <InputGroup className="col">
                   <Form.Control
                     id="swap-short"
                     name="swapShort"
                     type="number"
+                    className="w-50"
                     min={0}
                     max={100}
                     placeholder="0-100%"
@@ -101,23 +102,22 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     value={settings.swapShort}
                     onChange={handleChange}
                   />
-                  <span
-                    className="position-absolute"
-                    style={{ top: 8, right: 15 }}
-                  >
-                    %
-                  </span>
-                </div>
+                  <Form.Select size="sm">
+                    <option>%</option>
+                    <option>$</option>
+                  </Form.Select>
+                </InputGroup>
               </Form.Group>
               <Form.Group className="row align-items-center mb-2">
                 <Form.Label htmlFor="swap-long" className="col-4">
                   Swap Long
                 </Form.Label>
-                <div className="col position-relative">
+                <InputGroup className="col">
                   <Form.Control
                     id="swap-long"
                     name="swapLong"
                     type="number"
+                    className="w-50"
                     min={0}
                     max={100}
                     placeholder="0-100%"
@@ -125,13 +125,11 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     value={settings.swapLong}
                     onChange={handleChange}
                   />
-                  <span
-                    className="position-absolute"
-                    style={{ top: 8, right: 15 }}
-                  >
-                    %
-                  </span>
-                </div>
+                  <Form.Select size="sm">
+                    <option>%</option>
+                    <option>$</option>
+                  </Form.Select>
+                </InputGroup>
               </Form.Group>
               <Form.Group className="row align-items-center mb-2">
                 <Form.Label htmlFor="contract-size" className="col-4">
@@ -176,11 +174,12 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                 <Form.Label htmlFor="bid-spread" className="col-4">
                   Bid Spread
                 </Form.Label>
-                <div className="col position-relative">
+                <InputGroup className="col">
                   <Form.Control
                     id="bid-spread"
                     name="bidSpread"
                     type="number"
+                    className="w-50"
                     step={0.1}
                     min={0}
                     max={50}
@@ -189,23 +188,22 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     value={settings.bidSpread}
                     onChange={handleChange}
                   />
-                  <span
-                    className="position-absolute"
-                    style={{ top: 8, right: 15 }}
-                  >
-                    %
-                  </span>
-                </div>
+                  <Form.Select size="sm">
+                    <option>%</option>
+                    <option>$</option>
+                  </Form.Select>
+                </InputGroup>
               </Form.Group>
               <Form.Group className="row align-items-center mb-2">
                 <Form.Label htmlFor="ask-spread" className="col-4">
                   Ask Spread
                 </Form.Label>
-                <div className="col position-relative">
+                <InputGroup className="col">
                   <Form.Control
                     id="ask-spread"
                     name="askSpread"
                     type="number"
+                    className="w-50"
                     step={0.1}
                     min={0}
                     max={50}
@@ -214,23 +212,22 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     value={settings.askSpread}
                     onChange={handleChange}
                   />
-                  <span
-                    className="position-absolute"
-                    style={{ top: 8, right: 15 }}
-                  >
-                    %
-                  </span>
-                </div>
+                  <Form.Select size="sm">
+                    <option>%</option>
+                    <option>$</option>
+                  </Form.Select>
+                </InputGroup>
               </Form.Group>
               <Form.Group className="row align-items-center mb-2">
                 <Form.Label htmlFor="fee" className="col-4">
                   Fee
                 </Form.Label>
-                <div className="col position-relative">
+                <InputGroup className="col">
                   <Form.Control
                     id="fee"
                     name="fee"
                     type="number"
+                    className="w-50"
                     min={0}
                     max={100}
                     placeholder="0-100%"
@@ -238,13 +235,11 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     value={settings.fee}
                     onChange={handleChange}
                   />
-                  <span
-                    className="position-absolute"
-                    style={{ top: 8, right: 15 }}
-                  >
-                    %
-                  </span>
-                </div>
+                  <Form.Select size="sm">
+                    <option>%</option>
+                    <option>$</option>
+                  </Form.Select>
+                </InputGroup>
               </Form.Group>
             </div>
             <Button type="submit" disabled={loading}>
