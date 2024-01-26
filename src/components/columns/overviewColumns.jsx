@@ -79,7 +79,7 @@ const overviewColumns = ({ isEdit, handleEditOrder }) => [
           }}
         />
       ) : (
-        +row.profit?.toFixed(6)
+        +parseFloat(row.profit)?.toFixed(6)
       )),
     sortable: true,
   },

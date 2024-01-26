@@ -490,7 +490,7 @@ export default function MainBoard() {
     ({ status }) => status !== "Pending"
   );
 
-  const userProfit = closedOrders.reduce((p, v) => p + v.profit, 0);
+  const userProfit = closedOrders.reduce((p, v) => p + +v.profit, 0);
 
   const allowBonus = newUserData?.settings?.allowBonus;
   const bonus = newUserData?.bonus;
@@ -614,7 +614,7 @@ export default function MainBoard() {
                 {/* Профит */}Profit
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+userProfit?.toFixed(6)}
+                {+parseFloat(userProfit)?.toFixed(6)}
               </h4>
             </div>
             <div>
