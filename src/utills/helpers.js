@@ -27,7 +27,7 @@ export const fillArrayWithEmptyRows = (arr, size) =>
   arr?.concat(arr.length < size ? new Array(size - arr.length).fill("") : []);
 
 export const getBidValue = (val, percent = 1) =>
-  parseFloat(val * (1 - percent / 100)).toFixed(6);
+  +parseFloat(val * (1 - percent / 100))?.toFixed(6);
 
 export const getAskValue = (val, percent = 1) =>
-  parseFloat(val * (1 + percent / 100)).toFixed(6);
+  +parseFloat(val * (1 + percent / 100))?.toFixed(6);
