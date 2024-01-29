@@ -13,12 +13,22 @@ const symbolsColumns = (
   { name: "Symbol", selector: (row) => row.symbol },
   {
     name: "Bid",
-    selector: (row) => row && getBidValue(row.price, row?.settings?.bidSpread),
+    selector: (row) => {
+      if (!row) return;
+      const { settings } = row;
+      const isDirectPrice = settings.bidSpreadUnit === "$";
+      return getBidValue(row.price, settings.bidSpread, isDirectPrice);
+    },
     right: true,
   },
   {
     name: "Ask",
-    selector: (row) => row && getAskValue(row.price, row?.settings?.askSpread),
+    selector: (row) => {
+      if (!row) return;
+      const { settings } = row;
+      const isDirectPrice = settings.askSpreadUnit === "$";
+      return getAskValue(row.price, settings.askSpread, isDirectPrice);
+    },
     right: true,
   },
   {
