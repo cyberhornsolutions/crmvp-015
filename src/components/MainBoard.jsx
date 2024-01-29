@@ -63,7 +63,7 @@ export default function MainBoard() {
   const [isDealEdit, setIsDealEdit] = useState(false);
   const [userOrderData, setUserOrderData] = useState(userOrders);
   const [isUserEdit, setIsUserEdit] = useState(false);
-  const [showColumnsModal, setShowColumnsModal] = useState(true);
+  const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [hideColumns, setHideColumns] = useState({});
 
   useEffect(() => {
