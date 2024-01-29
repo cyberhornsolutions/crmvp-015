@@ -408,30 +408,40 @@ export default function MainBoard() {
       if (order.enableOpenPrice && order.openPriceValue !== symbol.price) {
         enableOpenPrice = true;
       }
-      const { bidSpread, askSpread, fee, swapShort, swapLong } =
-        symbol.settings;
-      const swap = order.type === "Buy" ? swapShort : swapLong;
+      const {
+        bidSpread,
+        bidSpreadUnit,
+        askSpread,
+        askSpreadUnit,
+        fee,
+        feeUnit,
+        swapShort,
+        swapShortUnit,
+        swapLong,
+        swapLongUnit,
+      } = symbol.settings;
+
       let swapValue = 0;
       if (order.createdTime) {
+        const swap = order.type === "Buy" ? swapShort : swapLong;
+        const swapUnit = order.type === "Buy" ? swapShortUnit : swapLongUnit;
         const jsDate = new Date(order.createdTime.seconds * 1000).setHours(
           0,
           0,
           0
         );
-        swapValue = (order.sum / 100) * (swap * moment().diff(jsDate, "d"));
+        const days = swap * moment().diff(jsDate, "d");
+        swapValue = swapUnit === "$" ? swap * days : (order.sum / 100) * days;
       }
 
       const currentPrice =
         order.type === "Buy"
-          ? getBidValue(symbol.price, bidSpread)
-          : getAskValue(symbol.price, askSpread);
+          ? getBidValue(symbol.price, bidSpread, bidSpreadUnit === "$")
+          : getAskValue(symbol.price, askSpread, askSpreadUnit === "$");
 
-      let spread = order.sum / 100; // 1% of sum
-      if (!Number.isInteger(spread)) spread = parseFloat(spread);
-      let feeValue = spread * fee;
-      if (!Number.isInteger(feeValue)) feeValue = parseFloat(feeValue);
-      let pledge = order.sum;
-      if (!Number.isInteger(pledge)) pledge = parseFloat(pledge);
+      const spread = order.sum / 100; // 1% of sum
+      const feeValue = feeUnit === "$" ? fee : spread * fee;
+      const pledge = order.sum;
 
       let profit = calculateProfit(
         order.type,
@@ -445,10 +455,10 @@ export default function MainBoard() {
         ...order,
         currentPrice,
         enableOpenPrice,
-        pledge,
-        spread,
-        swap: swapValue,
-        fee: feeValue,
+        pledge: parseFloat(pledge),
+        spread: parseFloat(spread),
+        swap: parseFloat(swapValue),
+        fee: parseFloat(feeValue),
         profit,
       };
     });
