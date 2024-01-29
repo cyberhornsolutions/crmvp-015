@@ -1,17 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import transactionsColumns from "./columns/transactionsColumns";
 import DataTable from "react-data-table-component";
-import { filterSearchObjects } from "../utills/helpers";
+import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
 import { getAllDeposits } from "../utills/firebaseHelpers";
+import { setDepositsState } from "../redux/slicer/transactionSlicer";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Transactions() {
+  const dispatch = useDispatch();
   const [searchText, setSearchText] = useState("");
   const [searchBy, setSearchBy] = useState("");
-  const [deposits, setDeposits] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const deposits = useSelector((state) => state.deposits);
+
+  const setDeposits = useCallback((data) => {
+    dispatch(setDepositsState(data));
+  }, []);
 
   useEffect(() => {
-    return getAllDeposits(setDeposits, setLoading);
+    if (!deposits.length) getAllDeposits(setDeposits);
   }, []);
 
   const filteredTransactions = searchText
@@ -49,11 +55,7 @@ export default function Transactions() {
           />
         </div>
         <DataTable
-          data={filteredTransactions.concat(
-            filteredTransactions.length < 5
-              ? new Array(5 - filteredTransactions.length).fill("")
-              : []
-          )}
+          data={fillArrayWithEmptyRows(filteredTransactions, 5)}
           columns={transactionsColumns}
           pagination
         />

@@ -295,8 +295,7 @@ export const getSymbolByName = async (symbol) => {
   }
 };
 
-export const getAllDeposits = (setState, setLoading) => {
-  setLoading(true);
+export const getAllDeposits = (setState) => {
   try {
     const depositsRef = collection(db, "deposits");
     const userDepositsQuery = query(depositsRef, orderBy("createdAt", "desc"));
@@ -314,16 +313,14 @@ export const getAllDeposits = (setState, setLoading) => {
           });
         });
         setState(depositsData);
-        setLoading(false);
       },
       (error) => {
         console.error("Error fetching data:", error);
       }
     );
 
-    return () => unsubscribe();
+    return unsubscribe;
   } catch (error) {
     console.error("Error:", error);
   }
-  setLoading(false);
 };

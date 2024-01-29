@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import placeholder from "../acc-img-placeholder.png";
 import { Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
-import { getAllSymbols } from "../utills/firebaseHelpers";
+import { getAllSymbols, getAllDeposits } from "../utills/firebaseHelpers";
 import {
   getDocs,
   collection,
@@ -21,6 +21,9 @@ import EditOrder from "./EditOrder";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
+import { setSelectedUser } from "../redux/slicer/userSlice";
+import { setDepositsState } from "../redux/slicer/transactionSlicer";
+
 import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
@@ -35,14 +38,15 @@ import {
 } from "../utills/helpers";
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
-import { setSelectedUser } from "../redux/slicer/userSlice";
 
 export default function MainBoard() {
   const dispatch = useDispatch();
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const symbols = useSelector((state) => state?.symbols);
   const { selectedUser } = useSelector((state) => state?.user);
-  const [deposits, setDeposits] = useState([]);
+  const deposits = useSelector((state) =>
+    state.deposits.filter(({ userId }) => userId === selectedUser.id)
+  );
   const [tab, setTab] = useState("info");
   const [users, setUsers] = useState([]);
   const idInputRef = useRef(null);
@@ -66,7 +70,17 @@ export default function MainBoard() {
   const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [hideColumns, setHideColumns] = useState({});
 
+  const setDeposits = useCallback((data) => {
+    dispatch(setDepositsState(data));
+  }, []);
+  const setSymbols = useCallback((symbolsData) => {
+    dispatch(setSymbolsState(symbolsData));
+  }, []);
+
   useEffect(() => {
+    if (!symbols.length) getAllSymbols(setSymbols);
+    if (!deposits.length) getAllDeposits(setDeposits);
+
     let cols;
     switch (tab) {
       case "overview":
@@ -133,36 +147,6 @@ export default function MainBoard() {
     Confirmed: { variant: "warning", now: 75 },
     Closed: { variant: "danger", now: 100 },
   };
-  const getDeposits = async (userId) => {
-    try {
-      const depositsRef = collection(db, "deposits");
-      const userDepositsQuery = query(
-        depositsRef,
-        orderBy("createdAt", "desc"),
-        where("userId", "==", userId)
-      );
-
-      const unsubscribe = onSnapshot(
-        userDepositsQuery,
-        (snapshot) => {
-          const depositsData = [];
-          snapshot.forEach((doc) => {
-            depositsData.push({ id: doc.id, ...doc.data() });
-          });
-
-          setDeposits(depositsData);
-        },
-        (error) => {
-          console.error("Error fetching data:", error);
-        }
-      );
-
-      // Optionally returning unsubscribe function for cleanup if needed
-      return unsubscribe;
-    } catch (error) {
-      console.log("Error:", error);
-    }
-  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -185,10 +169,7 @@ export default function MainBoard() {
       }
     };
     fetchUsers();
-    getDeposits(userOrders[0]?.userId);
-
-    // setIsEdit(false);
-  }, [userOrders.length]);
+  }, []);
 
   const getSelectedUserData = () => {
     const userDocRef = doc(db, "users", selectedUser.id);
@@ -220,16 +201,6 @@ export default function MainBoard() {
   useEffect(() => {
     setUserOrderData(userOrders);
   }, [userOrders]);
-
-  const setSymbols = useCallback((symbolsData) => {
-    dispatch(setSymbolsState(symbolsData));
-  }, []);
-
-  useEffect(() => {
-    if (!symbols.length) {
-      getAllSymbols(setSymbols);
-    }
-  }, []);
 
   const saveOrders = async () => {
     for (let i = 0; i < userOrderData.length; i++) {
@@ -303,8 +274,7 @@ export default function MainBoard() {
   const depositColumns = [
     {
       name: "Date",
-      selector: (row) =>
-        row.createdAt && convertTimestamptToDate(row.createdAt),
+      selector: (row) => row && row.createdAt,
     },
     { name: "Sum", selector: (row) => row && +parseFloat(row.sum)?.toFixed(6) },
     { name: "Type", selector: (row) => row.type },
