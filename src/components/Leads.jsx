@@ -45,13 +45,14 @@ import dealsColumns from "./columns/dealsColumns";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
+import { setPlayersState } from "../redux/slicer/playersSlicer";
 
 export default function Leads({ setTab }) {
+  const players = useSelector((state) => state.players);
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const selectedUser = useSelector((state) => state.user.selectedUser);
   const symbols = useSelector((state) => state?.symbols);
   const [selected, setSelected] = useState();
-  const [users, setUsers] = useState([]);
   const [searchBy, setSearchBy] = useState("");
   const [searchText, setSearchText] = useState("");
   const [statusUpdate, setStatusUpdate] = useState(false);
@@ -83,22 +84,24 @@ export default function Leads({ setTab }) {
     setIsDelModalOpen(true);
   };
 
+  const setPlayers = useCallback((data) => {
+    dispatch(setPlayersState(data));
+  }, []);
+
   const setSymbols = useCallback((symbolsData) => {
     dispatch(setSymbolsState(symbolsData));
   }, []);
 
   let filteredUsers = isOnline
-    ? users.filter((el) => el.onlineStatus == true)
-    : users;
+    ? players.filter((el) => el.onlineStatus == true)
+    : players;
   if (searchText)
     filteredUsers = filterSearchObjects(searchText, filteredUsers);
 
   useEffect(() => {
-    const unsubFetchUsers = fetchPlayers(setUsers);
+    if (!players.length) fetchPlayers(setPlayers);
 
-    if (!symbols.length) {
-      getAllSymbols(setSymbols);
-    }
+    if (!symbols.length) getAllSymbols(setSymbols);
 
     const headers = document.querySelectorAll(".rdt_TableHead");
     if (!headers.length) return;
@@ -123,7 +126,6 @@ export default function Leads({ setTab }) {
     headers.item(0)?.addEventListener("contextmenu", handlePlayersRightClick);
     headers.item(1)?.addEventListener("contextmenu", handleDealsRightClick);
     return () => {
-      unsubFetchUsers();
       headers
         .item(0)
         ?.removeEventListener("contextmenu", handlePlayersRightClick);
