@@ -174,3 +174,13 @@ body {
   right: 2%;
   top: 16%;
 }
+
+.players-columns {
+  right: 2%;
+  top: 12%;
+}
+
+.deals-columns {
+  right: 2%;
+  bottom: 12%;
+}

@@ -4,6 +4,7 @@ const SelectColumnsModal = ({
   setModal,
   columns,
   setColumns = () => {},
+  position = "",
 } = {}) => {
   const closeModal = () => setModal(false);
 
@@ -11,7 +12,9 @@ const SelectColumnsModal = ({
     <Modal
       show
       onHide={closeModal}
-      dialogClassName="position-absolute columns-modal"
+      dialogClassName={`position-absolute ${
+        position ? position : "columns-modal"
+      }`}
       backdropClassName="opacity-0"
       animation
       keyboard

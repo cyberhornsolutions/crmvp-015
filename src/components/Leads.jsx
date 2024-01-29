@@ -44,6 +44,7 @@ import {
 import dealsColumns from "./columns/dealsColumns";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import moment from "moment";
+import SelectColumnsModal from "./SelectColumnsModal";
 
 export default function Leads({ setTab }) {
   const userOrders = useSelector((state) => state?.userOrders?.orders);
@@ -61,6 +62,9 @@ export default function Leads({ setTab }) {
   const [isOnline, setIsOnline] = useState(false);
   const [isBalanceModal, setIsBalanceModal] = useState(false);
   const [tradingSettingsModal, setTradingSettingsModal] = useState(false);
+  const [showColumnsModal, setShowColumnsModal] = useState(false);
+  const [hidePlayersColumns, setHidePlayersColumns] = useState({});
+  const [hideDealsColumns, setHideDealsColumns] = useState({});
   const dispatch = useDispatch();
   const progressBarConfig = {
     New: { variant: "success", now: 25 },
@@ -90,10 +94,43 @@ export default function Leads({ setTab }) {
     filteredUsers = filterSearchObjects(searchText, filteredUsers);
 
   useEffect(() => {
+    const unsubFetchUsers = fetchPlayers(setUsers);
+
     if (!symbols.length) {
       getAllSymbols(setSymbols);
     }
-    return fetchPlayers(setUsers);
+
+    const headers = document.querySelectorAll(".rdt_TableHead");
+    if (!headers.length) return;
+    const dealsCols = dealsColumns().reduce(
+      (p, { name }) => ({ ...p, [name]: false }),
+      {}
+    );
+    const playersCols = userColumns.reduce(
+      (p, { name }) => ({ ...p, [name]: false }),
+      {}
+    );
+    setHidePlayersColumns(playersCols);
+    setHideDealsColumns(dealsCols);
+    const handlePlayersRightClick = (e) => {
+      e.preventDefault();
+      setShowColumnsModal("players");
+    };
+    const handleDealsRightClick = (e) => {
+      e.preventDefault();
+      setShowColumnsModal("deals");
+    };
+    headers.item(0)?.addEventListener("contextmenu", handlePlayersRightClick);
+    headers.item(1)?.addEventListener("contextmenu", handleDealsRightClick);
+    return () => {
+      unsubFetchUsers();
+      headers
+        .item(0)
+        ?.removeEventListener("contextmenu", handlePlayersRightClick);
+      headers
+        .item(1)
+        ?.removeEventListener("contextmenu", handleDealsRightClick);
+    };
   }, []);
 
   const fetchOrders = async (row, isOk) => {
@@ -206,23 +243,6 @@ export default function Leads({ setTab }) {
   };
   const userColumns = [
     {
-      name: "",
-      selector: "",
-      cell: (row) =>
-        row ? (
-          <input
-            type="checkbox"
-            checked={row.checked}
-            // onChange={() => handleCheckboxChange(row.id)}
-          />
-        ) : (
-          ""
-        ),
-      grow: 0.25,
-      compact: true,
-      center: true,
-    },
-    {
       name: "ID",
       selector: (row, i) =>
         row ? (
@@ -240,6 +260,7 @@ export default function Leads({ setTab }) {
       sortable: false,
       compact: true,
       width: "50px",
+      omit: hidePlayersColumns.ID,
     },
     {
       name: "Registered",
@@ -247,6 +268,7 @@ export default function Leads({ setTab }) {
         row.createdAt && convertTimestamptToDate(row.createdAt),
       sortable: false,
       grow: 2,
+      omit: hidePlayersColumns.Registered,
     },
     {
       name: "Name",
@@ -266,6 +288,7 @@ export default function Leads({ setTab }) {
 
         return 0;
       },
+      omit: hidePlayersColumns.Name,
     },
     {
       name: "Status",
@@ -300,20 +323,12 @@ export default function Leads({ setTab }) {
           ""
         ),
       sortable: false,
-    },
-    {
-      name: "Sale",
-      selector: (row) => (row ? (row.sale ? row.sale : "New") : ""),
-      sortable: false,
-    },
-    {
-      name: "Reten",
-      selector: (row) => (row ? (row.reten ? row.reten : "New") : ""),
-      sortable: false,
+      omit: hidePlayersColumns.Status,
     },
     {
       name: "Phone",
       selector: (row) => (row ? (row.phone ? row.phone : "12312321") : ""),
+      omit: hidePlayersColumns.Phone,
     },
     {
       name: "Email",
@@ -333,23 +348,22 @@ export default function Leads({ setTab }) {
 
         return 0;
       },
+      omit: hidePlayersColumns.Email,
     },
     {
       name: "Balance",
       selector: (row) => row.totalBalance,
+      omit: hidePlayersColumns.Balance,
     },
     {
       name: "Deposit",
       selector: (row) => (row ? (row.deposit ? row.deposit : "50") : ""),
+      omit: hidePlayersColumns.Deposit,
     },
     {
       name: "Manager",
       selector: (row) => (row ? (row.manager ? row.manager : "Jhon") : ""),
-    },
-    {
-      name: "Affiliates",
-      selector: (row) =>
-        row ? (row.affiliates ? row.affiliates : "Candy Land") : "",
+      omit: hidePlayersColumns.Manager,
     },
     {
       name: "Actions",
@@ -373,6 +387,7 @@ export default function Leads({ setTab }) {
             />
           </div>
         ),
+      omit: hidePlayersColumns.Actions,
     },
   ];
   const conditionalRowStyles = [
@@ -461,6 +476,7 @@ export default function Leads({ setTab }) {
             columns={dealsColumns({
               handleEditOrder,
               handleCloseOrder,
+              hideColumns: hideDealsColumns,
             })}
             data={fillArrayWithEmptyRows(deals, 3)}
             pagination
@@ -485,6 +501,22 @@ export default function Leads({ setTab }) {
         <EditOrder
           onClose={() => setShowEditOrderModal(false)}
           selectedOrder={selectedOrder}
+        />
+      )}
+      {showColumnsModal && (
+        <SelectColumnsModal
+          setModal={setShowColumnsModal}
+          columns={
+            showColumnsModal === "deals" ? hideDealsColumns : hidePlayersColumns
+          }
+          setColumns={
+            showColumnsModal === "deals"
+              ? setHideDealsColumns
+              : setHidePlayersColumns
+          }
+          position={
+            showColumnsModal === "deals" ? "deals-columns" : "players-columns"
+          }
         />
       )}
     </>
