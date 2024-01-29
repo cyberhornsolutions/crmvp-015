@@ -8,12 +8,17 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     title: selectedSymbol?.settings?.title || "",
     description: selectedSymbol?.settings?.description || "",
     swapShort: selectedSymbol?.settings?.swapShort || "",
+    swapShortUnit: selectedSymbol?.settings?.swapShortUnit || "%",
     swapLong: selectedSymbol?.settings?.swapLong || "",
+    swapLongUnit: selectedSymbol?.settings?.swapLongUnit || "%",
     contractSize: selectedSymbol?.settings?.contractSize || "",
     group: selectedSymbol?.settings?.group || "crypto",
     bidSpread: selectedSymbol?.settings?.bidSpread || "1",
+    bidSpreadUnit: selectedSymbol?.settings?.bidSpreadUnit || "%",
     askSpread: selectedSymbol?.settings?.askSpread || "1",
+    askSpreadUnit: selectedSymbol?.settings?.askSpreadUnit || "%",
     fee: selectedSymbol?.settings?.fee || "",
+    feeUnit: selectedSymbol?.settings?.feeUnit || "%",
   });
   const [loading, setLoading] = useState(false);
 
@@ -102,7 +107,13 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     value={settings.swapShort}
                     onChange={handleChange}
                   />
-                  <Form.Select size="sm">
+                  <Form.Select
+                    size="sm"
+                    name="swapShortUnit"
+                    required
+                    value={settings.swapShortUnit}
+                    onChange={handleChange}
+                  >
                     <option>%</option>
                     <option>$</option>
                   </Form.Select>
@@ -125,7 +136,13 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     value={settings.swapLong}
                     onChange={handleChange}
                   />
-                  <Form.Select size="sm">
+                  <Form.Select
+                    size="sm"
+                    name="swapLongUnit"
+                    required
+                    value={settings.swapLongUnit}
+                    onChange={handleChange}
+                  >
                     <option>%</option>
                     <option>$</option>
                   </Form.Select>
@@ -188,7 +205,13 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     value={settings.bidSpread}
                     onChange={handleChange}
                   />
-                  <Form.Select size="sm">
+                  <Form.Select
+                    size="sm"
+                    name="bidSpreadUnit"
+                    required
+                    value={settings.bidSpreadUnit}
+                    onChange={handleChange}
+                  >
                     <option>%</option>
                     <option>$</option>
                   </Form.Select>
@@ -212,7 +235,13 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     value={settings.askSpread}
                     onChange={handleChange}
                   />
-                  <Form.Select size="sm">
+                  <Form.Select
+                    size="sm"
+                    name="askSpreadUnit"
+                    required
+                    value={settings.askSpreadUnit}
+                    onChange={handleChange}
+                  >
                     <option>%</option>
                     <option>$</option>
                   </Form.Select>
@@ -235,7 +264,13 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     value={settings.fee}
                     onChange={handleChange}
                   />
-                  <Form.Select size="sm">
+                  <Form.Select
+                    size="sm"
+                    name="feeUnit"
+                    required
+                    value={settings.feeUnit}
+                    onChange={handleChange}
+                  >
                     <option>%</option>
                     <option>$</option>
                   </Form.Select>
