@@ -463,14 +463,13 @@ export default function MainBoard() {
   const activeOrders = pendingOrders.filter((order) => !order.enableOpenPrice);
   const delayedOrders = pendingOrders.filter((order) => order.enableOpenPrice);
 
-  const userProfit = [...activeOrders, ...closedOrders].reduce(
-    (p, v) => p + +v.profit,
-    0
-  );
+  const activeOrdersProfit = activeOrders.reduce((p, v) => p + +v.profit, 0);
+  const closedOrdersProfit = closedOrders.reduce((p, v) => p + +v.profit, 0);
 
   const calculateTotalBalance = () => {
     let balance = parseFloat(newUserData.totalBalance);
-    if (userProfit) balance += parseFloat(userProfit);
+    if (closedOrdersProfit) balance += closedOrdersProfit;
+    if (activeOrdersProfit) balance += activeOrdersProfit;
     return balance;
   };
 
@@ -579,7 +578,7 @@ export default function MainBoard() {
                 {/* Профит */}Profit
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+parseFloat(userProfit)?.toFixed(6)}
+                {+parseFloat(activeOrdersProfit)?.toFixed(6)}
               </h4>
             </div>
             <div>
