@@ -457,16 +457,16 @@ export default function MainBoard() {
     0
   );
 
-  const userProfit = [...pendingOrders, ...closedOrders].reduce(
-    (p, v) => p + +v.profit,
-    0
-  );
-
   const allowBonus = newUserData?.settings?.allowBonus;
   const bonus = newUserData?.bonus;
 
   const activeOrders = pendingOrders.filter((order) => !order.enableOpenPrice);
   const delayedOrders = pendingOrders.filter((order) => order.enableOpenPrice);
+
+  const userProfit = [...activeOrders, ...closedOrders].reduce(
+    (p, v) => p + +v.profit,
+    0
+  );
 
   const calculateTotalBalance = () => {
     let balance = parseFloat(newUserData.totalBalance);
