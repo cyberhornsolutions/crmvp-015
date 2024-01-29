@@ -35,6 +35,7 @@ import {
 } from "../utills/helpers";
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
+import { setSelectedUser } from "../redux/slicer/userSlice";
 
 export default function MainBoard() {
   const dispatch = useDispatch();
@@ -195,7 +196,11 @@ export default function MainBoard() {
       userDocRef,
       (userDocSnapshot) => {
         if (userDocSnapshot.exists()) {
-          const userData = userDocSnapshot.data();
+          const userData = {
+            id: userDocSnapshot.id,
+            ...userDocSnapshot.data(),
+          };
+          dispatch(setSelectedUser(userData));
           setNewUserData(userData);
         } else {
           console.error("User ID does not exist in the database.");

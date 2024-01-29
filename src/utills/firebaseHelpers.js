@@ -30,7 +30,7 @@ export const getData = async (collectionName) => {
   }
 };
 
-export const fetchPlayers = (setState, setLoading) => {
+export const fetchPlayers = (setState) => {
   const usersRef = collection(db, "users");
   const unsubscribe = onSnapshot(
     usersRef,
@@ -40,7 +40,6 @@ export const fetchPlayers = (setState, setLoading) => {
         userData.push({ id: doc.id, ...doc.data() });
       });
       setState(userData);
-      setLoading(false);
     },
     (error) => {
       console.error("Error fetching users:", error);

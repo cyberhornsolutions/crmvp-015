@@ -23,12 +23,18 @@ function AddBalanceModal({ setShowModal }) {
       desk: user.desk || "",
     };
 
-    let userKey = "bonus";
-    if (selectedUser?.settings?.allowBonus) userKey = "totalBalance";
-
-    const userPayload = {
-      [userKey]: selectedUser[userKey] + newBalance,
-    };
+    const userPayload = {};
+    if (balanceType === "Bonus") {
+      if (selectedUser?.settings?.allowBonus) {
+        userPayload.totalBalance = selectedUser.totalBalance + newBalance;
+      } else {
+        userPayload.bonus = selectedUser.bonus + newBalance;
+      }
+    } else if (balanceType === "Withdraw") {
+      userPayload.totalBalance = selectedUser.totalBalance - newBalance;
+    } else {
+      userPayload.totalBalance = selectedUser.totalBalance + newBalance;
+    }
 
     try {
       await addNewDepsit(newDeposit);

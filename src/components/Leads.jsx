@@ -69,7 +69,7 @@ export default function Leads({ setTab }) {
     filteredUsers = filterSearchObjects(searchText, filteredUsers);
 
   useEffect(() => {
-    return fetchPlayers(setUsers, setLoading);
+    return fetchPlayers(setUsers);
   }, []);
 
   const fetchOrders = async (row, isOk) => {
