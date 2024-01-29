@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { db } from "../firebase";
 import {
   collection,
@@ -23,21 +23,32 @@ import { BsGear } from "react-icons/bs";
 import DelOrderModal from "./DelOrderModal";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditOrder from "./EditOrder";
-import { getUserById, fetchPlayers } from "../utills/firebaseHelpers";
+import {
+  getUserById,
+  fetchPlayers,
+  getAllSymbols,
+} from "../utills/firebaseHelpers";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import AddBalanceModal from "./AddBalanceModal";
 import TradingSettings from "./TradingSettings";
 import {
+  calculateProfit,
   convertTimestamptToDate,
   fillArrayWithEmptyRows,
   filterSearchObjects,
+  getAskValue,
+  getBidValue,
 } from "../utills/helpers";
+import dealsColumns from "./columns/dealsColumns";
+import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
+import moment from "moment";
 
 export default function Leads({ setTab }) {
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const selectedUser = useSelector((state) => state.user.selectedUser);
+  const symbols = useSelector((state) => state?.symbols);
   const [selected, setSelected] = useState();
   const [users, setUsers] = useState([]);
   const [searchBy, setSearchBy] = useState("");
@@ -46,7 +57,7 @@ export default function Leads({ setTab }) {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
+  const [showEditOrderModal, setShowEditOrderModal] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
   const [isBalanceModal, setIsBalanceModal] = useState(false);
   const [tradingSettingsModal, setTradingSettingsModal] = useState(false);
@@ -57,10 +68,20 @@ export default function Leads({ setTab }) {
     Confirmed: { variant: "warning", now: 75 },
     Closed: { variant: "danger", now: 100 },
   };
-  const handleCloseModal = () => {
-    setIsDelModalOpen(false);
-    setIsEdit(false);
+
+  const handleEditOrder = (row) => {
+    setSelectedOrder(row);
+    setShowEditOrderModal(true);
   };
+
+  const handleCloseOrder = (row) => {
+    setSelectedOrder(row);
+    setIsDelModalOpen(true);
+  };
+
+  const setSymbols = useCallback((symbolsData) => {
+    dispatch(setSymbolsState(symbolsData));
+  }, []);
 
   let filteredUsers = isOnline
     ? users.filter((el) => el.onlineStatus == true)
@@ -69,6 +90,9 @@ export default function Leads({ setTab }) {
     filteredUsers = filterSearchObjects(searchText, filteredUsers);
 
   useEffect(() => {
+    if (!symbols.length) {
+      getAllSymbols(setSymbols);
+    }
     return fetchPlayers(setUsers);
   }, []);
 
@@ -111,78 +135,69 @@ export default function Leads({ setTab }) {
     setStatusUpdate(true);
   };
 
-  const columns = [
-    {
-      name: "ID",
-      selector: (row, i) => (row ? i + 1 : ""),
-      sortable: true,
-    },
-    {
-      name: "Type",
-      selector: (row) => row.type,
-      sortable: true,
-      compact: true,
-    },
-    {
-      name: "Symbol",
-      selector: (row) => row.symbol,
-      sortable: true,
-    },
-    {
-      name: "Sum",
-      selector: (row) => row.sum,
-      sortable: true,
-    },
-    {
-      name: "Price",
-      selector: (row) => row && +parseFloat(row.symbolValue)?.toFixed(6),
-      sortable: true,
-    },
-    {
-      name: "Profit",
-      selector: (row) => row && +parseFloat(row.profit)?.toFixed(6),
-      sortable: true,
-    },
-    {
-      name: "Date",
-      selector: (row) => row && convertTimestamptToDate(row.createdTime),
-      sortable: true,
-      grow: 1.5,
-      compact: true,
-    },
-    {
-      name: "Actions",
-      selector: (row) =>
-        row ? (
-          <div className="order-actions">
-            <div
-              className="custom-edit-icon"
-              onClick={() => {
-                setSelectedOrder(row);
-                setIsEdit(true);
-              }}
-            >
-              <FontAwesomeIcon icon={faEdit} />
-            </div>
-            <div
-              style={{ marginLeft: "10px" }}
-              className="custom-delete-icon"
-              onClick={() => {
-                setSelectedOrder(row);
-                setIsDelModalOpen(true);
-              }}
-            >
-              <FontAwesomeIcon icon={faClose} />
-            </div>
-          </div>
-        ) : (
-          ""
-        ),
-      sortable: true,
-    },
-  ];
+  const deals = userOrders
+    .filter((order) => order.status === "Pending" && !order.enableOpenPrice)
+    .map((order) => {
+      const symbol = symbols.find((s) => s.symbol === order.symbol);
+      if (!symbol) return order;
+      let enableOpenPrice = false;
+      if (order.enableOpenPrice && order.openPriceValue !== symbol.price) {
+        enableOpenPrice = true;
+      }
+      const {
+        bidSpread,
+        bidSpreadUnit,
+        askSpread,
+        askSpreadUnit,
+        fee,
+        feeUnit,
+        swapShort,
+        swapShortUnit,
+        swapLong,
+        swapLongUnit,
+      } = symbol.settings;
 
-  const deals = userOrders.filter(({ status }) => status === "Pending");
+      let swapValue = 0;
+      if (order.createdTime) {
+        const swap = order.type === "Buy" ? swapShort : swapLong;
+        const swapUnit = order.type === "Buy" ? swapShortUnit : swapLongUnit;
+        const jsDate = new Date(order.createdTime.seconds * 1000).setHours(
+          0,
+          0,
+          0
+        );
+        const days = swap * moment().diff(jsDate, "d");
+        swapValue = swapUnit === "$" ? swap * days : (order.sum / 100) * days;
+      }
+
+      const currentPrice =
+        order.type === "Buy"
+          ? getBidValue(symbol.price, bidSpread, bidSpreadUnit === "$")
+          : getAskValue(symbol.price, askSpread, askSpreadUnit === "$");
+
+      const spread = order.sum / 100; // 1% of sum
+      const feeValue = feeUnit === "$" ? fee : spread * fee;
+      const pledge = order.sum;
+
+      let profit = calculateProfit(
+        order.type,
+        currentPrice,
+        order.symbolValue,
+        order.volume
+      );
+      profit = profit - swapValue - feeValue;
+
+      return {
+        ...order,
+        currentPrice,
+        enableOpenPrice,
+        pledge: parseFloat(pledge),
+        spread: parseFloat(spread),
+        swap: parseFloat(swapValue),
+        fee: parseFloat(feeValue),
+        profit,
+      };
+    });
 
   const onUserDoubleClick = async (row) => {
     const u = await getUserById(row.id);
@@ -443,7 +458,10 @@ export default function Leads({ setTab }) {
             <h6>{selected}</h6>
           </div>
           <DataTable
-            columns={columns}
+            columns={dealsColumns({
+              handleEditOrder,
+              handleCloseOrder,
+            })}
             data={fillArrayWithEmptyRows(deals, 3)}
             pagination
             paginationPerPage={5}
@@ -459,17 +477,14 @@ export default function Leads({ setTab }) {
       )}
       {isDelModalOpen && (
         <DelOrderModal
-          onClose={handleCloseModal}
+          onClose={() => setIsDelModalOpen(false)}
           selectedOrder={selectedOrder}
         />
       )}
-      {isEdit && (
+      {showEditOrderModal && (
         <EditOrder
-          show={isEdit}
-          onClose={handleCloseModal}
+          onClose={() => setShowEditOrderModal(false)}
           selectedOrder={selectedOrder}
-          fetchOrders={fetchOrders}
-          isMain={false}
         />
       )}
     </>

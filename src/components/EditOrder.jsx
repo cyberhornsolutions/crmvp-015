@@ -5,7 +5,7 @@ import { db } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { getSymbolByName } from "../utills/firebaseHelpers";
 
-const EditOrder = ({ onClose, show, selectedOrder }) => {
+const EditOrder = ({ onClose, selectedOrder }) => {
   const [record, setRecord] = useState({
     sl: selectedOrder.sl,
     tp: selectedOrder.tp,
@@ -49,7 +49,7 @@ const EditOrder = ({ onClose, show, selectedOrder }) => {
 
   return (
     <>
-      <Modal size="md" show={show} onHide={onClose} className="" centered>
+      <Modal size="md" show onHide={onClose} className="" centered>
         <Modal.Header
           //   className="bg-transparent border-0 rounded-0 text-center p-1 pb-0 align-items-center"
           title={`Order Editing-${selectedOrder?.symbol}`}
