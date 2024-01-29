@@ -424,6 +424,7 @@ export default function MainBoard() {
       return {
         ...order,
         currentPrice,
+				currentMarketPrice: parseFloat(symbol.price),
         enableOpenPrice,
         pledge: parseFloat(pledge),
         spread: parseFloat(spread),
