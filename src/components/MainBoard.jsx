@@ -374,10 +374,6 @@ export default function MainBoard() {
     .map((order) => {
       const symbol = symbols.find((s) => s.symbol === order.symbol);
       if (!symbol) return order;
-      let enableOpenPrice = false;
-      if (order.enableOpenPrice && order.openPriceValue !== symbol.price) {
-        enableOpenPrice = true;
-      }
       const {
         bidSpread,
         bidSpreadUnit,
@@ -424,8 +420,8 @@ export default function MainBoard() {
       return {
         ...order,
         currentPrice,
-				currentMarketPrice: parseFloat(symbol.price),
-        enableOpenPrice,
+        currentMarketPrice: parseFloat(symbol.price),
+        enableOpenPrice: order.enableOpenPrice,
         pledge: parseFloat(pledge),
         spread: parseFloat(spread),
         swap: parseFloat(swapValue),
@@ -439,7 +435,7 @@ export default function MainBoard() {
   );
 
   const ordersFee = [...pendingOrders, ...closedOrders].reduce(
-    (p, v) => p + v.spread + v.swap + v.fee,
+    (p, v) => p + parseFloat(v.spread) + parseFloat(v.swap) + parseFloat(v.fee),
     0
   );
 
@@ -469,7 +465,7 @@ export default function MainBoard() {
   };
   const freeMarginData = calculateFreeMargin();
 
-  const pledge = parseFloat(pendingOrders.reduce((p, v) => p + v.pledge, 0));
+  const pledge = pendingOrders.reduce((p, v) => p + v.pledge, 0);
 
   const calculateEquity = () => {
     let equity = freeMarginData + pledge - ordersFee;
