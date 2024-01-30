@@ -455,7 +455,7 @@ export default function MainBoard() {
   const closedOrdersProfit = closedOrders.reduce((p, v) => p + +v.profit, 0);
 
   const calculateTotalBalance = () => {
-    let balance = parseFloat(newUserData.totalBalance);
+    let balance = parseFloat(newUserData.totalBalance) - ordersFee;
     if (closedOrdersProfit) balance += closedOrdersProfit;
     if (activeOrdersProfit) balance += activeOrdersProfit;
     return balance;
@@ -558,7 +558,7 @@ export default function MainBoard() {
                   setIsBalOpen(true);
                 }}
               >
-                {+(totalBalance - ordersFee)?.toFixed(6)}
+                {+totalBalance?.toFixed(6)}
               </h4>
             </div>
             <div>
