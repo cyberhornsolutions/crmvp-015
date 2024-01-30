@@ -17,6 +17,7 @@ import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
 import { ToastContainer, toast } from "react-toastify";
 import DelOrderModal from "./DelOrderModal";
+import CancelOrderModal from "./CancelOrderModal";
 import EditOrder from "./EditOrder";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
@@ -63,6 +64,7 @@ export default function MainBoard() {
   const [isEdit, setIsEdit] = useState(false);
   const [newUserData, setNewUserData] = useState(selectedUser);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
+  const [showCancelOrderModal, setShowCancelOrderModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
   const [userOrderData, setUserOrderData] = useState(userOrders);
@@ -269,6 +271,10 @@ export default function MainBoard() {
   const handleCloseOrder = (row) => {
     setSelectedOrder(row);
     setIsDelModalOpen(true);
+  };
+  const handleCancelOrder = (row) => {
+    setSelectedOrder(row);
+    setShowCancelOrderModal(true);
   };
 
   const depositColumns = [
@@ -1236,7 +1242,7 @@ export default function MainBoard() {
               <DataTable
                 columns={delayedColumns({
                   handleEditOrder,
-                  handleCloseOrder,
+                  handleCancelOrder,
                   hideColumns,
                 })}
                 data={fillArrayWithEmptyRows(delayedOrders, 5)}
@@ -1306,6 +1312,12 @@ export default function MainBoard() {
       {isBalOpen && <AddBalanceModal setShowModal={setIsBalOpen} />}
       {isDelModalOpen && (
         <DelOrderModal selectedOrder={selectedOrder} onClose={handleClose} />
+      )}
+      {showCancelOrderModal && (
+        <CancelOrderModal
+          selectedOrder={selectedOrder}
+          setShow={setShowCancelOrderModal}
+        />
       )}
       {isDealEdit && (
         <EditOrder

@@ -6,6 +6,7 @@ import {
   where,
   query,
   doc,
+  deleteDoc,
   limit,
   setDoc,
   onSnapshot,
@@ -323,4 +324,12 @@ export const getAllDeposits = (setState) => {
   } catch (error) {
     console.error("Error:", error);
   }
+};
+
+export const deleteDocument = async (collectionPath, documentId) => {
+  const documentRef = doc(db, collectionPath, documentId);
+  await deleteDoc(documentRef);
+  console.log(
+    `Document with ID ${documentId} deleted successfully from ${collectionPath}`
+  );
 };

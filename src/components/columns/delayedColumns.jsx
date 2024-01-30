@@ -9,7 +9,7 @@ import { convertTimestamptToDate } from "../../utills/helpers";
 
 const delayedColumns = ({
   handleEditOrder,
-  handleCloseOrder,
+  handleCancelOrder,
   hideColumns = {},
 } = {}) => [
   {
@@ -114,7 +114,7 @@ const delayedColumns = ({
           <FontAwesomeIcon
             icon={faClose}
             className="ms-2"
-            onClick={() => handleCloseOrder(row)}
+            onClick={() => handleCancelOrder(row)}
           />
         </div>
       ),
