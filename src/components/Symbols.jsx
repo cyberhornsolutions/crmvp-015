@@ -180,26 +180,24 @@ const Symbols = () => {
 export default Symbols;
 
 const DeleteSymbol = ({ selectedSymbol, setSelectedSymbol }) => {
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await removeDuplicateSymbol(selectedSymbol);
       toast.success("Duplicate symbol deleted successfully!");
       setSelectedSymbol(false);
     } catch (error) {
       toast.error(error.message);
+      setLoading(false);
     }
   };
 
   return (
     <>
-      <Modal
-        size="md"
-        show
-        onHide={() => setSelectedSymbol(false)}
-        className=""
-        centered
-      >
+      <Modal size="md" show onHide={() => setSelectedSymbol(false)} centered>
         <Modal.Header closeButton>
           <div className="d-flex justify-content-between align-items-center">
             <h5>Delete Duplicate Symbol {selectedSymbol.symbol}</h5>
@@ -215,7 +213,7 @@ const DeleteSymbol = ({ selectedSymbol, setSelectedSymbol }) => {
             >
               Cancel
             </Button>
-            <Button type="submit" className="" onClick={handleSubmit}>
+            <Button type="submit" disabled={loading} onClick={handleSubmit}>
               Delete
             </Button>
           </div>
