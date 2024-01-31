@@ -239,15 +239,15 @@ export const updateUserById = async (id, payload) => {
 };
 
 export const getAllSymbols = (setState) => {
-  const q = query(
-    collection(db, "symbols"),
-    where("symbol", "in", ["BTCUSDT", "ETHUSDT", "DOGEUSDT"])
-  );
-  // const symbolsRef = collection(db, "symbols");
+  // const q = query(
+  //   collection(db, "symbols"),
+  //   where("symbol", "in", ["BTCUSDT", "ETHUSDT", "DOGEUSDT"])
+  // );
+  const symbolsRef = collection(db, "symbols");
 
   const unsubscribe = onSnapshot(
-    // symbolsRef,
-    q,
+    symbolsRef,
+    // q,
     (snapshot) => {
       const symbols = [];
       snapshot.forEach((doc) => {

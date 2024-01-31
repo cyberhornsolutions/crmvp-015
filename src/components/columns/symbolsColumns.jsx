@@ -15,7 +15,7 @@ const symbolsColumns = (
     name: "Bid",
     selector: (row) => {
       if (!row) return;
-      const { settings } = row;
+      const { settings = {} } = row;
       const isDirectPrice = settings.bidSpreadUnit === "$";
       return getBidValue(row.price, settings.bidSpread, isDirectPrice);
     },
@@ -25,7 +25,7 @@ const symbolsColumns = (
     name: "Ask",
     selector: (row) => {
       if (!row) return;
-      const { settings } = row;
+      const { settings = {} } = row;
       const isDirectPrice = settings.askSpreadUnit === "$";
       return getAskValue(row.price, settings.askSpread, isDirectPrice);
     },
