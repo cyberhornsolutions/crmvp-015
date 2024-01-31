@@ -30,11 +30,14 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
       closedDate: serverTimestamp(),
       closedPrice,
       profit: selectedOrder.profit,
+      spread: selectedOrder.spread,
+      swap: selectedOrder.swap,
+      fee: selectedOrder.fee,
     };
 
     if (newVolume) {
       newData.volume = newVolume;
-      newData.sum = newVolume * selectedOrder.symbolValue;
+      newData.sum = newVolume * closedPrice;
     }
     if (docSnapshot.exists()) {
       await updateDoc(orderRef, newData);
