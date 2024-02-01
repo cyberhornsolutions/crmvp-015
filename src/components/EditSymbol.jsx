@@ -1,23 +1,22 @@
-import moment from "moment";
 import React, { useState } from "react";
-import { Button, Modal, Toast } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { db } from "../firebase";
-import { doc, updateDoc } from "firebase/firestore";
-import { useSelector } from "react-redux";
 import { addDuplicateSymbol } from "../utills/firebaseHelpers";
 
 const EditSymbol = ({ selectedSymbol, setSelectedSymbol }) => {
   const [newSymbol, setNewSymbol] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await addDuplicateSymbol(selectedSymbol, newSymbol);
       toast.success("Duplicate symbol added successfully!");
       setSelectedSymbol(false);
     } catch (error) {
       toast.error(error.message);
+      setLoading(false);
     }
   };
 
@@ -52,7 +51,7 @@ const EditSymbol = ({ selectedSymbol, setSelectedSymbol }) => {
                 />
               </div>
             </div>
-            <Button type="submit" className="px-5 w-100">
+            <Button type="submit" className="px-5 w-100" disabled={loading}>
               Duplicate
             </Button>
           </form>
