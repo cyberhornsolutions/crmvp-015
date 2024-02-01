@@ -4,21 +4,22 @@ import { toast } from "react-toastify";
 import { updateSymbol } from "../utills/firebaseHelpers";
 
 const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
+  const symbolSettings = selectedSymbol.settings || {};
   const [settings, setSettings] = useState({
-    title: selectedSymbol?.settings?.title || "",
-    description: selectedSymbol?.settings?.description || "",
-    swapShort: selectedSymbol?.settings?.swapShort || "",
-    swapShortUnit: selectedSymbol?.settings?.swapShortUnit || "%",
-    swapLong: selectedSymbol?.settings?.swapLong || "",
-    swapLongUnit: selectedSymbol?.settings?.swapLongUnit || "%",
-    contractSize: selectedSymbol?.settings?.contractSize || "",
-    group: selectedSymbol?.settings?.group || "crypto",
-    bidSpread: selectedSymbol?.settings?.bidSpread || "1",
-    bidSpreadUnit: selectedSymbol?.settings?.bidSpreadUnit || "%",
-    askSpread: selectedSymbol?.settings?.askSpread || "1",
-    askSpreadUnit: selectedSymbol?.settings?.askSpreadUnit || "%",
-    fee: selectedSymbol?.settings?.fee || "",
-    feeUnit: selectedSymbol?.settings?.feeUnit || "%",
+    title: selectedSymbol?.symbol || "",
+    description: symbolSettings?.description || "",
+    swapShort: symbolSettings?.swapShort || "",
+    swapShortUnit: symbolSettings?.swapShortUnit || "%",
+    swapLong: symbolSettings?.swapLong || "",
+    swapLongUnit: symbolSettings?.swapLongUnit || "%",
+    contractSize: symbolSettings?.contractSize || "",
+    group: symbolSettings?.group || "crypto",
+    bidSpread: symbolSettings?.bidSpread || "1",
+    bidSpreadUnit: symbolSettings?.bidSpreadUnit || "%",
+    askSpread: symbolSettings?.askSpread || "1",
+    askSpreadUnit: symbolSettings?.askSpreadUnit || "%",
+    fee: symbolSettings?.fee || "",
+    feeUnit: symbolSettings?.feeUnit || "%",
   });
   const [loading, setLoading] = useState(false);
 
@@ -275,6 +276,19 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     <option>$</option>
                   </Form.Select>
                 </InputGroup>
+              </Form.Group>
+              <Form.Group className="row align-items-center">
+                <Form.Label htmlFor="fee" className="col-4">
+                  Current Price
+                </Form.Label>
+                <div className="col">
+                  <Form.Control
+                    type="number"
+                    placeholder="Current Price"
+                    value={+selectedSymbol.price}
+                    readOnly
+                  />
+                </div>
               </Form.Group>
             </div>
             <Button type="submit" disabled={loading}>
