@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { addDuplicateSymbol } from "../utills/firebaseHelpers";
 
@@ -23,44 +23,29 @@ const DuplicateSymbolModal = ({ selectedSymbol, setSelectedSymbol }) => {
 
   return (
     <>
-      <Modal
-        size="md"
-        show
-        onHide={() => setSelectedSymbol(false)}
-        className=""
-        centered
-      >
+      <Modal show onHide={() => setSelectedSymbol(false)} centered>
         <Modal.Header closeButton>
-          <div className="d-flex justify-content-between align-items-center">
-            <h5>Duplicate Symbol {selectedSymbol.symbol}</h5>
-          </div>
+          <h5 className="mb-0">Duplicate Symbol {selectedSymbol.symbol}</h5>
         </Modal.Header>
-        <Modal.Body className=" d-flex flex-column gap-3 p-3 pt-0 mt-3">
-          <form className="d-flex gap-2 flex-column" onSubmit={handleSubmit}>
-            <div className="form-group row">
-              <label className="col-md-3 col-form-label d-flex justify-content-between align-items-center">
-                New Symbol
-              </label>
-              <div className="col-md-7">
-                <input
+        <Modal.Body>
+          <Form className="d-flex gap-3 flex-column" onSubmit={handleSubmit}>
+            <Form.Group className="row align-items-center">
+              <Form.Label className="col-4">New Symbol</Form.Label>
+              <div className="col">
+                <Form.Control
                   type="text"
                   placeholder="Title"
-                  className="form-control"
                   value={newSymbol}
                   name="symbol"
                   required
                   onChange={(e) => setNewSymbol(e.target.value)}
                 />
               </div>
-            </div>
-            <Button
-              type="submit"
-              className="px-5 w-100"
-              disabled={loading || !newSymbol}
-            >
+            </Form.Group>
+            <Button type="submit" disabled={loading || !newSymbol}>
               Duplicate
             </Button>
-          </form>
+          </Form>
         </Modal.Body>
       </Modal>
     </>
