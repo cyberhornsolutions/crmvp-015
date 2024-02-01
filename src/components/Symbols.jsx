@@ -5,7 +5,7 @@ import {
 } from "../utills/firebaseHelpers";
 import DataTable from "react-data-table-component";
 import symbolsColumns from "./columns/symbolsColumns";
-import EditSymbol from "./EditSymbol";
+import DuplicateSymbolModal from "./DuplicateSymbolModal";
 import SymbolSettings from "./SymbolSettings";
 import { Button, Modal, Navbar, Nav } from "react-bootstrap";
 import { toast } from "react-toastify";
@@ -155,7 +155,7 @@ const Symbols = () => {
       </div>
 
       {selectedSymbol && (
-        <EditSymbol
+        <DuplicateSymbolModal
           selectedSymbol={selectedSymbol}
           setSelectedSymbol={setSelectedSymbol}
         />

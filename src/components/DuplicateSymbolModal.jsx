@@ -3,7 +3,7 @@ import { Button, Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { addDuplicateSymbol } from "../utills/firebaseHelpers";
 
-const EditSymbol = ({ selectedSymbol, setSelectedSymbol }) => {
+const DuplicateSymbolModal = ({ selectedSymbol, setSelectedSymbol }) => {
   const [newSymbol, setNewSymbol] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -61,4 +61,4 @@ const EditSymbol = ({ selectedSymbol, setSelectedSymbol }) => {
   );
 };
 
-export default EditSymbol;
+export default DuplicateSymbolModal;
