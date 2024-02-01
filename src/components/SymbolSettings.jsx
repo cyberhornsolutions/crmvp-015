@@ -5,8 +5,8 @@ import { updateSymbol } from "../utills/firebaseHelpers";
 
 const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
   const symbolSettings = selectedSymbol.settings || {};
+  const [title, setTitle] = useState(selectedSymbol?.symbol);
   const [settings, setSettings] = useState({
-    title: selectedSymbol?.symbol || "",
     description: symbolSettings?.description || "",
     swapShort: symbolSettings?.swapShort || "",
     swapShortUnit: symbolSettings?.swapShortUnit || "%",
@@ -29,12 +29,12 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    const payload = {
+      settings,
+    };
+    if (selectedSymbol.duplicate) payload.symbol = title;
     try {
-      const id = selectedSymbol.duplicate
-        ? selectedSymbol.symbolId
-        : selectedSymbol.id;
-
-      await updateSymbol(id, { settings });
+      await updateSymbol(selectedSymbol.id, payload);
       toast.success("Symbol settings updated successfully");
       setSelectedSymbol(false);
     } catch (error) {
@@ -70,8 +70,9 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     type="text"
                     placeholder="Title"
                     required
-                    value={settings.title}
-                    onChange={handleChange}
+                    disabled={!selectedSymbol.duplicate}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                   />
                 </div>
               </Form.Group>

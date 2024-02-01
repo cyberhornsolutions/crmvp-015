@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { addDuplicateSymbol } from "../utills/firebaseHelpers";
+import {
+  addDocument,
+  getSymbolByName,
+  updateSymbol,
+} from "../utills/firebaseHelpers";
 
 const DuplicateSymbolModal = ({ selectedSymbol, setSelectedSymbol }) => {
   const [newSymbol, setNewSymbol] = useState("");
@@ -10,10 +14,24 @@ const DuplicateSymbolModal = ({ selectedSymbol, setSelectedSymbol }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!newSymbol) return toast.error("Enter Symbol Title");
+    const { price, symbol, settings, duplicates = [] } = selectedSymbol;
+    const dSymbol = {
+      symbol: newSymbol,
+      settings,
+      price,
+      duplicate: symbol,
+    };
+
     setLoading(true);
     try {
-      await addDuplicateSymbol(selectedSymbol, newSymbol);
-      toast.success("Duplicate symbol added successfully!");
+      const isAlreadyExist = await getSymbolByName(newSymbol);
+      if (isAlreadyExist) throw new Error("Symbol name already exist");
+      const { id } = await addDocument("symbols", dSymbol);
+      if (!id) throw new Error("Failed to create duplicate symbol");
+      await updateSymbol(selectedSymbol.id, {
+        duplicates: [...duplicates, id],
+      });
+      toast.success("Duplicate symbol created successfully!");
       setSelectedSymbol(false);
     } catch (error) {
       toast.error(error.message);

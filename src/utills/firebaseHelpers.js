@@ -165,33 +165,14 @@ export const addDuplicateSymbol = async (selectedSymbol, duplicate) => {
   }
 };
 
-export const removeDuplicateSymbol = async (selectedSymbol, duplicate) => {
-  try {
-    const symbolDocRef = query(
-      collection(db, "symbols"),
-      where("symbol", "==", selectedSymbol.duplicate)
-    );
-    const symbolDocSnapshot = await getDocs(symbolDocRef);
-
-    if (!symbolDocSnapshot.empty) {
-      const symbolDocRef = symbolDocSnapshot.docs[0].ref;
-      const symbolData = symbolDocSnapshot.docs[0].data();
-      console.log("symbol data = ", symbolData);
-      let duplicates = symbolData.duplicates || [];
-      duplicates = duplicates.filter(
-        (symbol) => symbol !== selectedSymbol.symbol
-      );
-
-      // Update the balance in the database directly
-      await setDoc(symbolDocRef, { duplicates }, { merge: true });
-      console.log("Symbol updated successfully!");
-    } else {
-      console.error("Symbol does not exist in the database.");
-    }
-  } catch (error) {
-    console.error("Error updating Symbol:", error);
-    throw new Error(error.message);
-  }
+export const removeDuplicateSymbol = async (selectedSymbol) => {
+  const realSymbol = await getSymbolByName(selectedSymbol.duplicate);
+  if (!realSymbol) throw new Error("Symbol not found");
+  const duplicates = realSymbol.duplicates.filter(
+    (id) => id !== selectedSymbol.id
+  );
+  await updateSymbol(realSymbol.id, { duplicates });
+  await deleteDocument("symbols", selectedSymbol.id);
 };
 
 export const updateSymbol = async (id, payload) => {
@@ -249,23 +230,23 @@ export const getAllSymbols = (setState) => {
     symbolsRef,
     // q,
     (snapshot) => {
-      const symbols = [];
+      const realSymbols = [],
+        duplicateSymbols = [];
       snapshot.forEach((doc) => {
-        symbols.push({ id: doc.id, ...doc.data() });
+        const symbol = { id: doc.id, ...doc.data() };
+        symbol.duplicate
+          ? duplicateSymbols.push(symbol)
+          : realSymbols.push(symbol);
       });
 
-      const symbolsData = symbols
+      const symbolsData = realSymbols
         .map((s) => {
           return s.duplicates?.length
             ? [
                 s,
-                ...s.duplicates.map((m) => ({
-                  symbolId: s.id,
-                  symbol: m,
-                  price: s.price,
-                  duplicate: s.symbol,
-                  settings: s.settings,
-                })),
+                ...s.duplicates.map((d) =>
+                  duplicateSymbols.find(({ id }) => id === d)
+                ),
               ]
             : s;
         })
@@ -289,7 +270,8 @@ export const getSymbolByName = async (symbol) => {
     );
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
-      return querySnapshot.docs[0].data();
+      const symbolDoc = querySnapshot.docs[0];
+      return { id: symbolDoc.id, ...symbolDoc.data() };
     }
   } catch (error) {
     console.log(error);
@@ -325,6 +307,9 @@ export const getAllDeposits = (setState) => {
     console.error("Error:", error);
   }
 };
+
+export const addDocument = async (collectionPath, newDoc) =>
+  await addDoc(collection(db, collectionPath), newDoc);
 
 export const deleteDocument = async (collectionPath, documentId) => {
   const documentRef = doc(db, collectionPath, documentId);
