@@ -9,6 +9,7 @@ const DuplicateSymbolModal = ({ selectedSymbol, setSelectedSymbol }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!newSymbol) return toast.error("Enter Symbol Title");
     setLoading(true);
     try {
       await addDuplicateSymbol(selectedSymbol, newSymbol);
@@ -43,15 +44,20 @@ const DuplicateSymbolModal = ({ selectedSymbol, setSelectedSymbol }) => {
               <div className="col-md-7">
                 <input
                   type="text"
-                  placeholder="Enter Symbol"
+                  placeholder="Title"
                   className="form-control"
                   value={newSymbol}
                   name="symbol"
+                  required
                   onChange={(e) => setNewSymbol(e.target.value)}
                 />
               </div>
             </div>
-            <Button type="submit" className="px-5 w-100" disabled={loading}>
+            <Button
+              type="submit"
+              className="px-5 w-100"
+              disabled={loading || !newSymbol}
+            >
               Duplicate
             </Button>
           </form>
