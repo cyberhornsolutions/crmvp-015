@@ -178,6 +178,7 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     id="group"
                     name="group"
                     placeholder="Group"
+                    disabled={!selectedSymbol.duplicate}
                     required
                     value={settings.group}
                     onChange={handleChange}
