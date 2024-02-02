@@ -50,6 +50,7 @@ import { setPlayersState } from "../redux/slicer/playersSlicer";
 import { setManagersState } from "../redux/slicer/managersSlice";
 
 export default function Leads({ setTab }) {
+  const user = useSelector((state) => state.user.user);
   const players = useSelector((state) => state.players);
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const selectedUser = useSelector((state) => state.user.selectedUser);
@@ -74,7 +75,6 @@ export default function Leads({ setTab }) {
     Reten: { variant: "warning", now: 75 },
     VIP: { variant: "danger", now: 100 },
   };
-
   const handleEditOrder = (row) => {
     setSelectedOrder(row);
     setShowEditOrderModal(true);
@@ -85,8 +85,10 @@ export default function Leads({ setTab }) {
     setIsDelModalOpen(true);
   };
 
-  const setPlayers = useCallback((data) => {
-    dispatch(setPlayersState(data));
+  const setPlayers = useCallback((players) => {
+    if (user.role !== "Admin")
+      players = players.filter(({ manager }) => manager === user.username);
+    dispatch(setPlayersState(players));
   }, []);
 
   const setSymbols = useCallback((symbolsData) => {
