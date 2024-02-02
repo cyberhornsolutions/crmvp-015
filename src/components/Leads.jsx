@@ -87,7 +87,7 @@ export default function Leads({ setTab }) {
 
   const setPlayers = useCallback((players) => {
     if (user.role !== "Admin")
-      players = players.filter(({ manager }) => manager === user.username);
+      players = players.filter(({ manager }) => manager === user.id);
     dispatch(setPlayersState(players));
   }, []);
 
@@ -185,12 +185,10 @@ export default function Leads({ setTab }) {
     }
   };
 
-  const handleChangeManager = async (id, val) => {
+  const handleChangeManager = async (id, manager) => {
     try {
       const userRef = doc(db, "users", id);
-      await updateDoc(userRef, {
-        manager: val,
-      });
+      await updateDoc(userRef, { manager });
     } catch (error) {
       console.log(error);
     }
@@ -388,9 +386,7 @@ export default function Leads({ setTab }) {
         row && (
           <Dropdown data-bs-theme="light">
             <Dropdown.Toggle variant="none" className="border-0 lh-sm">
-              <div>
-                {managers.find((m) => m.username === row.manager)?.name}
-              </div>
+              <div>{managers.find((m) => m.id === row.manager)?.name}</div>
             </Dropdown.Toggle>
             <Dropdown.Menu className="ps-3" data-bs-theme="dark">
               {managers
@@ -402,7 +398,7 @@ export default function Leads({ setTab }) {
                 .map((m, i) => (
                   <Dropdown.Item
                     key={i}
-                    onClick={() => handleChangeManager(row.id, m.username)}
+                    onClick={() => handleChangeManager(row.id, m.id)}
                   >
                     {row.manager === m.username ? <span>&#10004;</span> : " "}{" "}
                     {m.name}
