@@ -27,6 +27,7 @@ import {
   getUserById,
   fetchPlayers,
   getAllSymbols,
+  fetchManagers,
 } from "../utills/firebaseHelpers";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
@@ -46,16 +47,17 @@ import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
 import { setPlayersState } from "../redux/slicer/playersSlicer";
+import { setManagersState } from "../redux/slicer/managersSlice";
 
 export default function Leads({ setTab }) {
   const players = useSelector((state) => state.players);
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const selectedUser = useSelector((state) => state.user.selectedUser);
   const symbols = useSelector((state) => state?.symbols);
+  const managers = useSelector((state) => state.managers);
   const [selected, setSelected] = useState();
   const [searchBy, setSearchBy] = useState("");
   const [searchText, setSearchText] = useState("");
-  const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [showEditOrderModal, setShowEditOrderModal] = useState(false);
@@ -91,6 +93,10 @@ export default function Leads({ setTab }) {
     dispatch(setSymbolsState(symbolsData));
   }, []);
 
+  const setManagers = useCallback((data) => {
+    dispatch(setManagersState(data));
+  }, []);
+
   let filteredUsers = isOnline
     ? players.filter((el) => el.onlineStatus == true)
     : players;
@@ -99,8 +105,8 @@ export default function Leads({ setTab }) {
 
   useEffect(() => {
     if (!players.length) fetchPlayers(setPlayers);
-
     if (!symbols.length) getAllSymbols(setSymbols);
+    if (!managers.length) fetchManagers(setManagers);
 
     const headers = document.querySelectorAll(".rdt_TableHead");
     if (!headers.length) return;
@@ -133,6 +139,8 @@ export default function Leads({ setTab }) {
         ?.removeEventListener("contextmenu", handleDealsRightClick);
     };
   }, []);
+
+  console.log("mangers = ", managers);
 
   const fetchOrders = async (row, isOk) => {
     try {
@@ -169,6 +177,17 @@ export default function Leads({ setTab }) {
       const userRef = doc(db, "users", userId);
       await updateDoc(userRef, {
         status: val,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleChangeManager = async (id, val) => {
+    try {
+      const userRef = doc(db, "users", id);
+      await updateDoc(userRef, {
+        manager: val,
       });
     } catch (error) {
       console.log(error);
@@ -296,7 +315,7 @@ export default function Leads({ setTab }) {
     {
       name: "Status",
       cell: (row) =>
-        row ? (
+        row && (
           <Dropdown data-bs-theme="light" className="custom-dropdown">
             <Dropdown.Toggle variant="none" id="dropdown-basic">
               {row.status && progressBarConfig[row.status] && (
@@ -322,8 +341,6 @@ export default function Leads({ setTab }) {
               ))}
             </Dropdown.Menu>
           </Dropdown>
-        ) : (
-          ""
         ),
       sortable: false,
       omit: hidePlayersColumns.Status,
@@ -365,7 +382,25 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Manager",
-      selector: (row) => (row ? (row.manager ? row.manager : "Jhon") : ""),
+      cell: (row) =>
+        row && (
+          <Dropdown data-bs-theme="light">
+            <Dropdown.Toggle variant="none" className="border-0">
+              {managers.find((m) => m.username === row.manager)?.name}
+            </Dropdown.Toggle>
+            <Dropdown.Menu className="ps-3" data-bs-theme="dark">
+              {managers.map((m, i) => (
+                <Dropdown.Item
+                  key={i}
+                  onClick={() => handleChangeManager(row.id, m.username)}
+                >
+                  {row.manager === m.username ? <span>&#10004;</span> : " "}{" "}
+                  {m.name}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        ),
       omit: hidePlayersColumns.Manager,
     },
     {
