@@ -65,7 +65,7 @@ export default function Sidebar({ setTab, tab }) {
               setTab("Symbols");
             }}
           >
-            Symbols
+            Assets
           </li>
           <li
             id="menu-calendar"
@@ -85,20 +85,7 @@ export default function Sidebar({ setTab, tab }) {
           >
             Administrator
           </li>
-          <li
-            id="menu-affiliates"
-            style={{
-              marginTop: 30,
-              borderTop: "1px solid whitesmoke",
-              paddingTop: 25,
-            }}
-            onClick={() => {
-              setTab("Affiliates");
-            }}
-          >
-            Affiliates
-          </li>
-          <li id="menu-news">News</li>
+          <hr />
           <li id="menu-platform">
             <a href="https://crm-015.vercel.app/">Game platform</a>
           </li>
