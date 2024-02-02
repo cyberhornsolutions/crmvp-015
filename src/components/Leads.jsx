@@ -55,7 +55,6 @@ export default function Leads({ setTab }) {
   const [selected, setSelected] = useState();
   const [searchBy, setSearchBy] = useState("");
   const [searchText, setSearchText] = useState("");
-  const [statusUpdate, setStatusUpdate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
@@ -69,9 +68,9 @@ export default function Leads({ setTab }) {
   const dispatch = useDispatch();
   const progressBarConfig = {
     New: { variant: "success", now: 25 },
-    InProgress: { variant: "info", now: 50 },
-    Confirmed: { variant: "warning", now: 75 },
-    Closed: { variant: "danger", now: 100 },
+    Sale: { variant: "info", now: 50 },
+    Reten: { variant: "warning", now: 75 },
+    VIP: { variant: "danger", now: 100 },
   };
 
   const handleEditOrder = (row) => {
@@ -166,12 +165,14 @@ export default function Leads({ setTab }) {
   };
 
   const handleDropdownItemClick = async (val, userId) => {
-    console.log("Dropdown", val, userId);
-    const userRef = doc(db, "users", userId);
-    await updateDoc(userRef, {
-      status: val,
-    });
-    setStatusUpdate(true);
+    try {
+      const userRef = doc(db, "users", userId);
+      await updateDoc(userRef, {
+        status: val,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const deals = userOrders
