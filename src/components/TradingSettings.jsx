@@ -6,14 +6,16 @@ import { useSelector } from "react-redux";
 
 const TradingSettings = ({ setShowModal }) => {
   const { selectedUser } = useSelector((state) => state.user);
+  const tradingSettings = selectedUser.settings || {};
   const [settings, setSettings] = useState({
-    group: selectedUser?.settings?.group || "general",
-    leverage: selectedUser?.settings?.leverage || "1",
-    maintenanceMargin: selectedUser?.settings?.maintenanceMargin || "0",
-    stopOut: selectedUser?.settings?.stopOut || "",
-    minDealSum: selectedUser?.settings?.minDealSum || "",
-    maxDeals: selectedUser?.settings?.maxDeals || "",
-    allowBonus: selectedUser?.settings?.allowBonus || false,
+    group: tradingSettings?.group || "general",
+    leverage: tradingSettings?.leverage || "1",
+    maintenanceMargin: tradingSettings?.maintenanceMargin || "0",
+    level: tradingSettings?.level || "100",
+    stopOut: tradingSettings?.stopOut || "",
+    minDealSum: tradingSettings?.minDealSum || "",
+    maxDeals: tradingSettings?.maxDeals || "",
+    allowBonus: tradingSettings?.allowBonus || false,
   });
   const [loading, setLoading] = useState(false);
 
@@ -104,11 +106,28 @@ const TradingSettings = ({ setShowModal }) => {
                   type="number"
                   min={0}
                   max={100}
-                  defaultValue={5}
                   placeholder="Maintenance margin"
                   disabled={settings.leverage <= 1}
                   required
                   value={settings.maintenanceMargin}
+                  onChange={handleChange}
+                />
+              </div>
+            </Form.Group>
+            <Form.Group className="row align-items-center mb-3">
+              <div className="col-5 text-left">
+                <Form.Label htmlFor="maintenance-margin">Level</Form.Label>
+              </div>
+              <div className="col">
+                <Form.Control
+                  id="level"
+                  name="level"
+                  type="number"
+                  min={1}
+                  max={100}
+                  placeholder="Level"
+                  required
+                  value={settings.level}
                   onChange={handleChange}
                 />
               </div>
