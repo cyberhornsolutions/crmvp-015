@@ -108,7 +108,7 @@ export default function Leads({ setTab }) {
   useEffect(() => {
     if (!players.length) fetchPlayers(setPlayers);
     if (!symbols.length) getAllSymbols(setSymbols);
-    if (!managers.length) fetchManagers(setManagers);
+    if (!managers.length && user.role === "Admin") fetchManagers(setManagers);
 
     const headers = document.querySelectorAll(".rdt_TableHead");
     if (!headers.length) return;
@@ -263,7 +263,8 @@ export default function Leads({ setTab }) {
     dispatch(setSelectedUser(u));
     await fetchOrders(row, true);
   };
-  const userColumns = [
+
+  let userColumns = [
     {
       name: "ID",
       selector: (row, i) =>
@@ -400,7 +401,7 @@ export default function Leads({ setTab }) {
                     key={i}
                     onClick={() => handleChangeManager(row.id, m.id)}
                   >
-                    {row.manager === m.username ? <span>&#10004;</span> : " "}{" "}
+                    {row.manager === m.id ? <span>&#10004;</span> : " "}{" "}
                     {m.name}
                   </Dropdown.Item>
                 ))}
@@ -434,6 +435,12 @@ export default function Leads({ setTab }) {
       omit: hidePlayersColumns.Actions,
     },
   ];
+
+  if (user.role !== "Admin")
+    userColumns = userColumns.filter(
+      ({ name }) => name !== "Status" && name !== "Manager"
+    );
+
   const conditionalRowStyles = [
     {
       when: (row) => row && row.id === selectedUser?.id,
@@ -470,7 +477,7 @@ export default function Leads({ setTab }) {
                 <option className="dropdown-item" value="All">
                   All
                 </option>
-                {userColumns.slice(1).map(({ name }) => (
+                {userColumns.map(({ name }) => (
                   <option className="dropdown-item">{name}</option>
                 ))}
               </select>
