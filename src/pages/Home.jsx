@@ -24,7 +24,7 @@ export default function Home() {
           {tab === "Dashboard" && <Dashboard />}
           {tab === "Players" && <Leads setTab={setTab} />}
           {tab === "Transactions" && <Transactions />}
-          {tab === "Symbols" && <Symbols />}
+          {tab === "Assets" && <Symbols />}
           {tab === "Calendar" && <Calendar />}
           {tab === "Administrator" && <Users />}
           {tab === "MainBoard" && <MainBoard />}

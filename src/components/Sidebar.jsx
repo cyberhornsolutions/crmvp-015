@@ -49,24 +49,28 @@ export default function Sidebar({ setTab, tab }) {
           >
             Players
           </li>
-          <li
-            id="menu-transactions"
-            className={tab === "Transactions" && "active"}
-            onClick={() => {
-              setTab("Transactions");
-            }}
-          >
-            Transactions
-          </li>
-          <li
-            id="menu-users"
-            className={tab === "Symbols" && "active"}
-            onClick={() => {
-              setTab("Symbols");
-            }}
-          >
-            Assets
-          </li>
+          {user.role === "Admin" && (
+            <li
+              id="menu-transactions"
+              className={tab === "Transactions" && "active"}
+              onClick={() => {
+                setTab("Transactions");
+              }}
+            >
+              Transactions
+            </li>
+          )}
+          {user.role !== "Sale" && (
+            <li
+              id="menu-users"
+              className={tab === "Assets" && "active"}
+              onClick={() => {
+                setTab("Assets");
+              }}
+            >
+              Assets
+            </li>
+          )}
           <li
             id="menu-calendar"
             className={tab === "Calendar" && "active"}
@@ -76,15 +80,17 @@ export default function Sidebar({ setTab, tab }) {
           >
             Calendar
           </li>
-          <li
-            id="menu-users"
-            className={tab === "Administrator" && "active"}
-            onClick={() => {
-              setTab("Administrator");
-            }}
-          >
-            Administrator
-          </li>
+          {user.role === "Admin" && (
+            <li
+              id="menu-users"
+              className={tab === "Administrator" && "active"}
+              onClick={() => {
+                setTab("Administrator");
+              }}
+            >
+              Administrator
+            </li>
+          )}
           <hr />
           <li id="menu-platform">
             <a href="https://crm-015.vercel.app/">Game platform</a>
