@@ -164,20 +164,11 @@ td:hover {
 }
 
 #header {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  padding: 3px;
-  padding-left: 20px;
-  padding-right: 20px;
-  margin: 5px;
-  font-weight: bold;
-  background-color: var(--main-elc2);
   border-radius: 5px;
+  background-color: var(--main-elc2);
   color: var(--main-elc);
   border: 2px solid white;
   box-shadow: 0px 0px 3px var(--main-elc);
-  height: 50px;
 }
 
 .nav-tabs .nav-link {
@@ -291,9 +282,6 @@ td:hover {
 }
 
 #header div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   font-weight: bold;
   color: whitesmoke;
 }

@@ -11,19 +11,11 @@ export default function Header({ title }) {
   };
 
   return (
-    <div id="header" style={{ paddingTop: 10, paddingBottom: 9 }}>
-      <div>
-        <h5
-          id="tab-title"
-          style={{
-            fontSize: "inherit",
-            fontWeight: "inherit",
-            lineHeight: 1.1,
-          }}
-        >
-          {title}
-        </h5>
-      </div>
+    <div
+      id="header"
+      className="d-flex align-items-center justify-content-between p-4 m-1"
+    >
+      <div>{title}</div>
       <div className="d-flex align-items-center gap-4">
         <button>
           {selectedLanguage === "en" ? (
