@@ -66,7 +66,7 @@ export default function Users() {
         }
       }
       delete manager.isEdit;
-      await updateManager(manager);
+      await updateManager(manager.id, manager);
       toast.success("Manager updated successfully");
     } catch (error) {
       console.error(error);
@@ -74,11 +74,12 @@ export default function Users() {
     }
   };
 
-  const toggleActiveManager = async (manager) => {
+  const toggleActiveManager = async (id, isActive) => {
     try {
-      delete manager.isEdit;
-      await updateManager(manager);
-      toast.success("Manager updated successfully");
+      await updateManager(id, {
+        isActive,
+      });
+      toast.success(isActive ? "Manager is active" : "Manager is disabled");
     } catch (error) {
       console.error(error);
       toast.error("Error updating manager");

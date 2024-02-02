@@ -133,9 +133,9 @@ export const getManagerByUsernameAndRole = async (username, role) => {
   }
 };
 
-export const updateManager = async (manager) => {
-  const docRef = doc(db, "managers", manager.id);
-  return await setDoc(docRef, manager);
+export const updateManager = async (id, payload) => {
+  const docRef = doc(db, "managers", id);
+  return await updateDoc(docRef, payload);
 };
 
 export const addDuplicateSymbol = async (selectedSymbol, duplicate) => {

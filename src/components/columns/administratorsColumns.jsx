@@ -125,9 +125,7 @@ const administratorsColumns = (
           <Form.Check
             type="switch"
             checked={row.isActive}
-            onChange={(e) =>
-              toggleActiveManager({ ...row, isActive: e.target.checked })
-            }
+            onChange={(e) => toggleActiveManager(row.id, e.target.checked)}
           />
         </div>
       ),
