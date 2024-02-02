@@ -142,8 +142,6 @@ export default function Leads({ setTab }) {
     };
   }, []);
 
-  console.log("mangers = ", managers);
-
   const fetchOrders = async (row, isOk) => {
     try {
       const q = query(
@@ -387,7 +385,7 @@ export default function Leads({ setTab }) {
         row && (
           <Dropdown data-bs-theme="light">
             <Dropdown.Toggle variant="none" className="border-0 lh-sm">
-              <div>{managers.find((m) => m.id === row.manager)?.name}</div>
+              <div>{managers.find((m) => m.id === row.manager)?.username}</div>
             </Dropdown.Toggle>
             <Dropdown.Menu className="ps-3" data-bs-theme="dark">
               {managers
@@ -402,7 +400,7 @@ export default function Leads({ setTab }) {
                     onClick={() => handleChangeManager(row.id, m.id)}
                   >
                     {row.manager === m.id ? <span>&#10004;</span> : " "}{" "}
-                    {m.name}
+                    {m.username}
                   </Dropdown.Item>
                 ))}
             </Dropdown.Menu>
