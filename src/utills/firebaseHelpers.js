@@ -121,7 +121,8 @@ export const getManagerByUsernameAndRole = async (username, role) => {
     );
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
-      return querySnapshot.docs[0].data();
+      const docSnap = querySnapshot.docs[0];
+      return { id: docSnap.id, ...docSnap.data() };
     }
   } catch (error) {
     console.log(error);
