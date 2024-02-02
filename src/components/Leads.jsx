@@ -389,10 +389,12 @@ export default function Leads({ setTab }) {
             </Dropdown.Toggle>
             <Dropdown.Menu className="ps-3" data-bs-theme="dark">
               {managers
-                .filter((m) =>
-                  row.status === "New" || row.status === "Sale"
-                    ? m.role === "Sale"
-                    : m.role === "Reten"
+                .filter(
+                  (m) =>
+                    m.isActive &&
+                    (row.status === "New" || row.status === "Sale"
+                      ? m.role === "Sale"
+                      : m.role === "Reten")
                 )
                 .map((m, i) => (
                   <Dropdown.Item
