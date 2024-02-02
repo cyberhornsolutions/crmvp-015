@@ -385,19 +385,27 @@ export default function Leads({ setTab }) {
       cell: (row) =>
         row && (
           <Dropdown data-bs-theme="light">
-            <Dropdown.Toggle variant="none" className="border-0">
-              {managers.find((m) => m.username === row.manager)?.name}
+            <Dropdown.Toggle variant="none" className="border-0 lh-sm">
+              <div>
+                {managers.find((m) => m.username === row.manager)?.name}
+              </div>
             </Dropdown.Toggle>
             <Dropdown.Menu className="ps-3" data-bs-theme="dark">
-              {managers.map((m, i) => (
-                <Dropdown.Item
-                  key={i}
-                  onClick={() => handleChangeManager(row.id, m.username)}
-                >
-                  {row.manager === m.username ? <span>&#10004;</span> : " "}{" "}
-                  {m.name}
-                </Dropdown.Item>
-              ))}
+              {managers
+                .filter((m) =>
+                  row.status === "New" || row.status === "Sale"
+                    ? m.role === "Sale"
+                    : m.role === "Reten"
+                )
+                .map((m, i) => (
+                  <Dropdown.Item
+                    key={i}
+                    onClick={() => handleChangeManager(row.id, m.username)}
+                  >
+                    {row.manager === m.username ? <span>&#10004;</span> : " "}{" "}
+                    {m.name}
+                  </Dropdown.Item>
+                ))}
             </Dropdown.Menu>
           </Dropdown>
         ),
