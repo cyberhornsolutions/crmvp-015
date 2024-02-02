@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Nav, Navbar, Form } from "react-bootstrap";
 import { auth, db } from "../firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
@@ -14,14 +14,17 @@ import {
   updateManager,
 } from "../utills/firebaseHelpers";
 import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
+import { useDispatch, useSelector } from "react-redux";
+import { setManagersState } from "../redux/slicer/managersSlice";
+import { setTeamsState } from "../redux/slicer/teamsSlice";
 
 export default function Users() {
+  const dispatch = useDispatch();
   const [tab, setTab] = useState("All");
-  const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [searchBy, setSearchBy] = useState("");
-  const [managers, setManagers] = useState([]);
-  const [teams, setTeams] = useState([]);
+  const managers = useSelector((state) => state.managers);
+  const teams = useSelector((state) => state.teams);
   const [processedManagers, setProcessedManagers] = useState([]);
 
   const [user, setUser] = useState({
@@ -35,6 +38,19 @@ export default function Users() {
     name: "",
     desk: "",
   });
+
+  const setManagers = useCallback((data) => {
+    dispatch(setManagersState(data));
+  }, []);
+
+  const setTeams = useCallback((data) => {
+    dispatch(setTeamsState(data));
+  }, []);
+
+  useEffect(() => {
+    if (!managers.length) fetchManagers(setManagers);
+    if (!teams.length) fetchTeams(setTeams);
+  }, []);
 
   const handleChangeUser = (e) =>
     setUser((p) => ({ ...p, [e.target.name]: e.target.value }));
@@ -135,16 +151,6 @@ export default function Users() {
     setProcessedManagers(managers);
   }, [managers]);
 
-  useEffect(() => {
-    const unsubManagers = fetchManagers(setManagers, setLoading);
-    const unsubTeams = fetchTeams(setTeams, setLoading);
-
-    return () => {
-      unsubManagers();
-      unsubTeams();
-    };
-  }, []);
-
   const filteredManagers = searchText
     ? filterSearchObjects(searchText, processedManagers)
     : processedManagers;
@@ -224,7 +230,6 @@ export default function Users() {
               columns={teamsColumns}
               data={filteredTeams}
               pagination
-              progressPending={loading}
               paginationPerPage={5}
               paginationRowsPerPageOptions={[5, 10, 20, 50]}
               highlightOnHover

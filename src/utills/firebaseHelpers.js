@@ -49,8 +49,7 @@ export const fetchPlayers = (setState) => {
   return () => unsubscribe();
 };
 
-export const fetchManagers = (setState, setLoading) => {
-  setLoading(true);
+export const fetchManagers = (setState) => {
   try {
     const q = query(
       collection(db, "managers"),
@@ -63,17 +62,15 @@ export const fetchManagers = (setState, setLoading) => {
         const data = doc.data();
         managerData.push({ ...data, id: doc.id });
       });
-      setLoading(false);
       setState(managerData);
     });
     return unsubscribe;
   } catch (error) {
     console.error("Error fetching managers:", error);
-    setLoading(false);
   }
 };
 
-export const fetchTeams = (setState, setLoading) => {
+export const fetchTeams = (setState) => {
   try {
     const q = query(collection(db, "teams"));
 
@@ -83,13 +80,11 @@ export const fetchTeams = (setState, setLoading) => {
         const data = doc.data();
         teamsData.push({ ...data, id: doc.id });
       });
-      setLoading(false);
       setState(teamsData);
     });
     return unsubscribe;
   } catch (error) {
     console.error("Error fetching teams:", error);
-    setLoading(false);
   }
 };
 

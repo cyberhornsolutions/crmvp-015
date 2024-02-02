@@ -15,6 +15,8 @@ import orderSlicer from "./slicer/orderSlicer";
 import userSlicer from "./slicer/userSlice";
 import transactionSlicer from "./slicer/transactionSlicer";
 import playersSlicer from "./slicer/playersSlicer";
+import managersSlice from "./slicer/managersSlice";
+import teamsSlice from "./slicer/teamsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +26,8 @@ export const store = configureStore({
     user: userSlicer,
     deposits: transactionSlicer,
     players: playersSlicer,
+    managers: managersSlice,
+    teams: teamsSlice,
   },
   middleware: getDefaultMiddleware({
     serializableCheck: {
