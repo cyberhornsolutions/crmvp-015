@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import moment from "moment";
+import { fillArrayWithEmptyRows } from "../utills/helpers";
+import depositsColumns from "./columns/depositsColumns";
+import DataTable from "react-data-table-component";
 
 export default function Dashboard() {
-  const deposits = useSelector((state) =>
-    state.deposits.filter(
-      ({ manager, type }) =>
-        manager === state.user.user.username && type === "Deposit"
-    )
+  const allTransaction = useSelector((state) =>
+    state.deposits.filter(({ manager }) => manager === state.user.user.username)
   );
+
+  const deposits = allTransaction.filter(({ type }) => type === "Deposit");
+
   const todayDeposits = [],
     thisMonthDeposits = [];
   deposits.forEach((deposit) => {
@@ -228,38 +231,18 @@ export default function Dashboard() {
         </div>
         <div className="details-item">
           <h5>Latest actions</h5>
-          <table className="table table-hover table-striped">
-            <thead>
-              <tr>
-                <th className="text-center" scope="col">
-                  Лид
-                </th>
-                <th className="text-center" scope="col">
-                  Дата
-                </th>
-                <th className="text-center" scope="col">
-                  Сумма
-                </th>
-                <th className="text-center" scope="col">
-                  ID Транзакции
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Тест</td>
-                <td>05-05-2023</td>
-                <td>$100</td>
-                <td>ID001</td>
-              </tr>
-              <tr>
-                <td>Тест</td>
-                <td>01-12-2023</td>
-                <td>$50</td>
-                <td>ID002</td>
-              </tr>
-            </tbody>
-          </table>
+          <DataTable
+            columns={depositsColumns}
+            data={fillArrayWithEmptyRows(allTransaction, 5)}
+            highlightOnHover
+            pointerOnHover
+            pagination
+            paginationPerPage={5}
+            paginationRowsPerPageOptions={[5, 10, 20, 50]}
+            striped
+            // dense
+            // responsive
+          />
         </div>
       </div>
     </div>
