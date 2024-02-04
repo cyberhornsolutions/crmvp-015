@@ -1,6 +1,23 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import moment from "moment";
 
 export default function Dashboard() {
+  const deposits = useSelector((state) =>
+    state.deposits.filter(
+      ({ manager, type }) =>
+        manager === state.user.user.username && type === "Deposit"
+    )
+  );
+  const todayDeposits = [],
+    thisMonthDeposits = [];
+  deposits.forEach((deposit) => {
+    if (moment(deposit.createdAt).diff(moment(), "day") === 0)
+      todayDeposits.push(deposit);
+    if (moment(deposit.createdAt).diff(moment(), "month") === 0)
+      thisMonthDeposits.push(deposit);
+  });
+
   const [details, setDetails] = useState({
     player: "",
     header: "",
@@ -79,27 +96,27 @@ export default function Dashboard() {
       <div id="cards">
         <div className="card-item">
           <h5>Today</h5>
-          <h6>1 FTD</h6>
+          <h6>{todayDeposits.length}</h6>
         </div>
         <div className="card-item">
           <h5>Month</h5>
-          <h6>1 FTD</h6>
+          <h6>{thisMonthDeposits.length}</h6>
         </div>
         <div className="card-item">
           <h5>Total</h5>
-          <h6>1 FTD</h6>
+          <h6>{deposits.length}</h6>
         </div>
         <div className="card-item">
           <h5>Today</h5>
-          <h6>$0</h6>
+          <h6>${todayDeposits.reduce((p, { sum }) => p + sum, 0)} </h6>
         </div>
         <div className="card-item">
           <h5>Month</h5>
-          <h6>$4000</h6>
+          <h6>${thisMonthDeposits.reduce((p, { sum }) => p + sum, 0)}</h6>
         </div>
         <div className="card-item">
           <h5>Total</h5>
-          <h6>$15000</h6>
+          <h6>${deposits.reduce((p, { sum }) => p + sum, 0)}</h6>
         </div>
       </div>
       <div id="details">

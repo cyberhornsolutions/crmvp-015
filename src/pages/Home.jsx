@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
 import Dashboard from "../components/Dashboard";
 import Header from "../components/Header";
@@ -9,9 +9,21 @@ import Calendar from "../components/Calendar";
 import MainBoard from "../components/MainBoard";
 import Symbols from "../components/Symbols";
 import { ToastContainer } from "react-toastify";
+import { getAllDeposits } from "../utills/firebaseHelpers";
+import { setDepositsState } from "../redux/slicer/transactionSlicer";
+import { useDispatch } from "react-redux";
 
 export default function Home() {
+  const dispatch = useDispatch();
   const [tab, setTab] = useState("Dashboard");
+
+  const setDeposits = useCallback((data) => {
+    dispatch(setDepositsState(data));
+  }, []);
+
+  useEffect(() => {
+    getAllDeposits(setDeposits);
+  }, []);
 
   return (
     <div id="content">
