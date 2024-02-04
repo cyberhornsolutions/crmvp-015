@@ -30,6 +30,7 @@ import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
 import delayedColumns from "./columns/delayedColumns";
 import overviewColumns from "./columns/overviewColumns";
+import depositsColumns from "./columns/depositsColumns";
 import {
   calculateProfit,
   convertTimestamptToDate,
@@ -277,14 +278,6 @@ export default function MainBoard() {
     setShowCancelOrderModal(true);
   };
 
-  const depositColumns = [
-    {
-      name: "Date",
-      selector: (row) => row && row.createdAt,
-    },
-    { name: "Sum", selector: (row) => row && +parseFloat(row.sum)?.toFixed(6) },
-    { name: "Type", selector: (row) => row.type },
-  ];
   const handleClose = () => {
     setIsBalOpen(false);
     setIsDelModalOpen(false);
@@ -707,12 +700,6 @@ export default function MainBoard() {
               onClick={() => setTab("history")}
             >
               History
-            </Nav.Link>
-            <Nav.Link
-              className={tab === "news" && "active"}
-              onClick={() => setTab("news")}
-            >
-              News
             </Nav.Link>
             <Nav.Link
               className={tab === "referral" && "active"}
@@ -1259,7 +1246,7 @@ export default function MainBoard() {
           {tab === "history" && (
             <div id="menu">
               <DataTable
-                columns={depositColumns}
+                columns={depositsColumns}
                 data={fillArrayWithEmptyRows(deposits, 5)}
                 highlightOnHover
                 pointerOnHover
