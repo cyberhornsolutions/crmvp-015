@@ -158,7 +158,7 @@ export default function Leads({ setTab }) {
         });
         dispatch(setUserOrders(orders));
         if (isOk === true) {
-          setTab("MainBoard");
+          setTab("Player Card");
         }
       });
       dispatch(setSelectedUser(row));

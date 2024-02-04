@@ -39,7 +39,7 @@ export default function Home() {
           {tab === "Assets" && <Symbols />}
           {tab === "Calendar" && <Calendar />}
           {tab === "Administrator" && <Users />}
-          {tab === "MainBoard" && <MainBoard />}
+          {tab === "Player Card" && <MainBoard />}
         </div>
       </div>
     </div>
