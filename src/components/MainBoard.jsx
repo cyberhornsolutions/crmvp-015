@@ -466,6 +466,9 @@ export default function MainBoard() {
 
   const pledge = pendingOrders.reduce((p, v) => p + v.pledge, 0);
 
+  const userLevel = newUserData?.settings?.level || 100;
+  const level = pledge && (totalBalance / pledge) * (userLevel / 100);
+
   const calculateEquity = () => {
     let equity = freeMarginData + pledge - ordersFee;
     if (allowBonus) equity -= bonus;
@@ -551,7 +554,7 @@ export default function MainBoard() {
                   setIsBalOpen(true);
                 }}
               >
-                {+totalBalance?.toFixed(6)}
+                {+parseFloat(newUserData.totalBalance)?.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -574,10 +577,21 @@ export default function MainBoard() {
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
                 {/* Заведено */}
-                Started
+                Free
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                100.00
+                {+parseFloat(freeMarginData - bonus)?.toFixed(6)}
+              </h4>
+            </div>
+            <div>
+              <h5 className="text-left" style={{ lineHeight: 1.1 }}>
+                {/* Заведено */}
+                Deposited
+              </h5>
+              <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
+                {deposits
+                  .filter(({ type }) => type === "Deposit")
+                  .reduce((p, { sum }) => p + +sum, 0)}
               </h4>
             </div>
           </div>
@@ -585,7 +599,7 @@ export default function MainBoard() {
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
                 {/* Залог */}
-                Pledge
+                Margin
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
                 {+pledge?.toFixed(6)}
@@ -597,7 +611,7 @@ export default function MainBoard() {
                 Equity
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+equity?.toFixed(6)}
+                {+totalBalance?.toFixed(6)}
               </h4>
             </div>
             <div>
@@ -612,10 +626,21 @@ export default function MainBoard() {
             <div>
               <h5 className="text-left" style={{ lineHeight: 1.1 }}>
                 {/* Выведено */}
+                Level
+              </h5>
+              <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
+                {+parseFloat(level)?.toFixed(6)}
+              </h4>
+            </div>
+            <div>
+              <h5 className="text-left" style={{ lineHeight: 1.1 }}>
+                {/* Выведено */}
                 Withdrawn
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                00.00
+                {deposits
+                  .filter(({ type }) => type === "Withdraw")
+                  .reduce((p, { sum }) => p + +sum, 0)}
               </h4>
             </div>
           </div>
