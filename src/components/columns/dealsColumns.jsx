@@ -17,7 +17,7 @@ const dealsColumns = ({
     selector: (row, i) => row && i + 1,
     sortable: true,
     width: "70px",
-    omit: hideColumns.ID,
+    omit: !hideColumns.ID,
   },
   {
     name: "Date",
@@ -26,14 +26,14 @@ const dealsColumns = ({
     sortable: true,
     compact: true,
     minWidth: "180px",
-    omit: hideColumns.Date,
+    omit: !hideColumns.Date,
   },
   {
     name: "Symbol",
     selector: (row) => row.symbol,
     sortable: true,
     minWidth: "fit-content",
-    omit: hideColumns.Symbol,
+    omit: !hideColumns.Symbol,
   },
   {
     name: "Type",
@@ -51,21 +51,21 @@ const dealsColumns = ({
         </div>
       )),
     sortable: true,
-    omit: hideColumns.Type,
+    omit: !hideColumns.Type,
   },
   {
     name: "Volume",
     selector: (row) => row && +parseFloat(row.volume)?.toFixed(6),
     sortable: true,
     compact: true,
-    omit: hideColumns.Volume,
+    omit: !hideColumns.Volume,
   },
   {
     name: "Open Price",
     selector: (row) => row && +parseFloat(row.symbolValue)?.toFixed(6),
     sortable: true,
     compact: true,
-    omit: hideColumns["Open Price"],
+    omit: !hideColumns["Open Price"],
   },
   {
     name: "SL / TP",
@@ -75,7 +75,7 @@ const dealsColumns = ({
         +parseFloat(row.tp)?.toFixed(6) || ""
       }`,
     minWidth: "180px",
-    omit: hideColumns["SL / TP"],
+    omit: !hideColumns["SL / TP"],
   },
   {
     name: "Additional parameters",
@@ -87,14 +87,14 @@ const dealsColumns = ({
     minWidth: "320px",
     compact: true,
     sortable: true,
-    omit: hideColumns["Additional parameters"],
+    omit: !hideColumns["Additional parameters"],
   },
   {
     name: "Pledge",
     selector: (row) => row && +parseFloat(row.pledge)?.toFixed(6),
     sortable: true,
     minWidth: "120px",
-    omit: hideColumns.Pledge,
+    omit: !hideColumns.Pledge,
   },
   {
     name: "Current Price",
@@ -102,7 +102,7 @@ const dealsColumns = ({
     sortable: true,
     compact: true,
     minWidth: "120px",
-    omit: hideColumns["Current Price"],
+    omit: !hideColumns["Current Price"],
   },
   {
     name: "Profit",
@@ -114,7 +114,7 @@ const dealsColumns = ({
       ),
     sortable: true,
     compact: true,
-    omit: hideColumns.Profit,
+    omit: !hideColumns.Profit,
   },
   {
     name: "Action",
@@ -132,7 +132,7 @@ const dealsColumns = ({
       ),
     sortable: false,
     compact: true,
-    omit: hideColumns.Action,
+    omit: !hideColumns.Action,
   },
 ];
 

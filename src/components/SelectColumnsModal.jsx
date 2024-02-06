@@ -27,9 +27,9 @@ const SelectColumnsModal = ({
             <Form.Check
               label={column}
               className="text-left"
-              checked={!columns[column]}
+              checked={columns[column]}
               onChange={(e) =>
-                setColumns((p) => ({ ...p, [column]: !e.target.checked }))
+                setColumns((p) => ({ ...p, [column]: e.target.checked }))
               }
             />
           );

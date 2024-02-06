@@ -66,8 +66,8 @@ export default function Leads({ setTab }) {
   const [isBalanceModal, setIsBalanceModal] = useState(false);
   const [tradingSettingsModal, setTradingSettingsModal] = useState(false);
   const [showColumnsModal, setShowColumnsModal] = useState(false);
-  const [hidePlayersColumns, setHidePlayersColumns] = useState({});
-  const [hideDealsColumns, setHideDealsColumns] = useState({});
+  const [showPlayersColumns, setShowPlayersColumns] = useState({});
+  const [showDealsColumns, setShowDealsColumns] = useState({});
   const dispatch = useDispatch();
   const progressBarConfig = {
     New: { variant: "success", now: 25 },
@@ -113,15 +113,15 @@ export default function Leads({ setTab }) {
     const headers = document.querySelectorAll(".rdt_TableHead");
     if (!headers.length) return;
     const dealsCols = dealsColumns().reduce(
-      (p, { name }) => ({ ...p, [name]: false }),
+      (p, { name }) => ({ ...p, [name]: true }),
       {}
     );
     const playersCols = userColumns.reduce(
-      (p, { name }) => ({ ...p, [name]: false }),
+      (p, { name }) => ({ ...p, [name]: true }),
       {}
     );
-    setHidePlayersColumns(playersCols);
-    setHideDealsColumns(dealsCols);
+    setShowPlayersColumns(playersCols);
+    setShowDealsColumns(dealsCols);
     const handlePlayersRightClick = (e) => {
       e.preventDefault();
       setShowColumnsModal("players");
@@ -281,7 +281,7 @@ export default function Leads({ setTab }) {
       sortable: false,
       compact: true,
       width: "50px",
-      omit: hidePlayersColumns.ID,
+      omit: !showPlayersColumns.ID,
     },
     {
       name: "Registered",
@@ -289,7 +289,7 @@ export default function Leads({ setTab }) {
         row.createdAt && convertTimestamptToDate(row.createdAt),
       sortable: false,
       grow: 2,
-      omit: hidePlayersColumns.Registered,
+      omit: !showPlayersColumns.Registered,
     },
     {
       name: "Name",
@@ -309,7 +309,7 @@ export default function Leads({ setTab }) {
 
         return 0;
       },
-      omit: hidePlayersColumns.Name,
+      omit: !showPlayersColumns.Name,
     },
     {
       name: "Status",
@@ -342,12 +342,12 @@ export default function Leads({ setTab }) {
           </Dropdown>
         ),
       sortable: false,
-      omit: hidePlayersColumns.Status,
+      omit: !showPlayersColumns.Status,
     },
     {
       name: "Phone",
       selector: (row) => (row ? (row.phone ? row.phone : "12312321") : ""),
-      omit: hidePlayersColumns.Phone,
+      omit: !showPlayersColumns.Phone,
     },
     {
       name: "Email",
@@ -367,17 +367,17 @@ export default function Leads({ setTab }) {
 
         return 0;
       },
-      omit: hidePlayersColumns.Email,
+      omit: !showPlayersColumns.Email,
     },
     {
       name: "Balance",
       selector: (row) => row.totalBalance,
-      omit: hidePlayersColumns.Balance,
+      omit: !showPlayersColumns.Balance,
     },
     {
       name: "Deposit",
       selector: (row) => (row ? (row.deposit ? row.deposit : "50") : ""),
-      omit: hidePlayersColumns.Deposit,
+      omit: !showPlayersColumns.Deposit,
     },
     {
       name: "Manager",
@@ -408,7 +408,7 @@ export default function Leads({ setTab }) {
             </Dropdown.Menu>
           </Dropdown>
         ),
-      omit: hidePlayersColumns.Manager,
+      omit: !showPlayersColumns.Manager,
     },
     {
       name: "Actions",
@@ -432,7 +432,7 @@ export default function Leads({ setTab }) {
             />
           </div>
         ),
-      omit: hidePlayersColumns.Actions,
+      omit: !showPlayersColumns.Actions,
     },
   ];
 
@@ -527,7 +527,7 @@ export default function Leads({ setTab }) {
             columns={dealsColumns({
               handleEditOrder,
               handleCloseOrder,
-              hideColumns: hideDealsColumns,
+              hideColumns: showDealsColumns,
             })}
             data={fillArrayWithEmptyRows(deals, 3)}
             pagination
@@ -558,12 +558,12 @@ export default function Leads({ setTab }) {
         <SelectColumnsModal
           setModal={setShowColumnsModal}
           columns={
-            showColumnsModal === "deals" ? hideDealsColumns : hidePlayersColumns
+            showColumnsModal === "deals" ? showDealsColumns : showPlayersColumns
           }
           setColumns={
             showColumnsModal === "deals"
-              ? setHideDealsColumns
-              : setHidePlayersColumns
+              ? setShowDealsColumns
+              : setShowPlayersColumns
           }
           position={
             showColumnsModal === "deals" ? "deals-columns" : "players-columns"
