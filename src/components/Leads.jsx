@@ -13,12 +13,7 @@ import {
 import { Dropdown, ProgressBar } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEdit,
-  faClose,
-  faL,
-  faEllipsis,
-} from "@fortawesome/free-solid-svg-icons";
+import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { BsGear } from "react-icons/bs";
 import DelOrderModal from "./DelOrderModal";
 import CircleIcon from "@mui/icons-material/Circle";
@@ -28,6 +23,7 @@ import {
   fetchPlayers,
   getAllSymbols,
   fetchManagers,
+  getColumnsById,
 } from "../utills/firebaseHelpers";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
@@ -120,8 +116,15 @@ export default function Leads({ setTab }) {
       (p, { name }) => ({ ...p, [name]: true }),
       {}
     );
-    setShowPlayersColumns(playersCols);
-    setShowDealsColumns(dealsCols);
+    getColumnsById(user.id).then((res) => {
+      if (res) {
+        setShowPlayersColumns(res.playersColumns || playersCols);
+        setShowDealsColumns(res.dealsColumns || dealsCols);
+      } else {
+        setShowPlayersColumns(playersCols);
+        setShowDealsColumns(dealsCols);
+      }
+    });
     const handlePlayersRightClick = (e) => {
       e.preventDefault();
       setShowColumnsModal("players");
@@ -556,6 +559,9 @@ export default function Leads({ setTab }) {
       )}
       {showColumnsModal && (
         <SelectColumnsModal
+          columnKey={
+            showColumnsModal === "deals" ? "dealsColumns" : "playersColumns"
+          }
           setModal={setShowColumnsModal}
           columns={
             showColumnsModal === "deals" ? showDealsColumns : showPlayersColumns

@@ -210,6 +210,26 @@ export const getUserById = async (userId) => {
   }
 };
 
+export const getColumnsById = async (id, setState) => {
+  try {
+    const userDocRef = doc(db, "columns", id);
+    const columnDocSnapshot = await getDoc(userDocRef);
+
+    if (columnDocSnapshot.exists()) {
+      return columnDocSnapshot.data();
+    } else {
+      throw new Error("Column ID does not exist in the database.");
+    }
+  } catch (error) {
+    console.error("Error fetching column:", error);
+  }
+};
+
+export const updateShowColumnsById = async (id, payload) => {
+  const columnDocRef = doc(db, "columns", id);
+  await setDoc(columnDocRef, payload, { merge: true });
+};
+
 export const updateUserById = async (id, payload) => {
   const userDocRef = doc(db, "users", id);
   await updateDoc(userDocRef, payload);
