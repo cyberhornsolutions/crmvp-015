@@ -5,28 +5,28 @@ import { Timestamp } from "firebase/firestore";
 const overviewColumns = ({
   isEdit,
   handleEditOrder,
-  hideColumns = {},
+  showColumns = {},
 } = {}) => [
   {
     name: "ID",
     selector: (row, i) => row && i + 1,
     sortable: true,
     grow: 0.5,
-    omit: hideColumns.ID,
+    omit: !showColumns.ID,
   },
   {
     name: "Transaction Type",
     selector: (row) => row.type,
     sortable: true,
     compact: true,
-    omit: hideColumns["Transaction Type"],
+    omit: !showColumns["Transaction Type"],
   },
   {
     name: "Symbol",
     selector: (row) => row.symbol,
     sortable: true,
     cell: (row) => row.symbol,
-    omit: hideColumns.Symbol,
+    omit: !showColumns.Symbol,
   },
   {
     name: "Sum",
@@ -45,7 +45,7 @@ const overviewColumns = ({
         +parseFloat(row.sum)?.toFixed(6)
       )),
     sortable: true,
-    omit: hideColumns.Sum,
+    omit: !showColumns.Sum,
   },
   {
     name: "Open Price",
@@ -66,14 +66,14 @@ const overviewColumns = ({
     sortable: true,
     grow: 1.5,
     compact: true,
-    omit: hideColumns["Open Price"],
+    omit: !showColumns["Open Price"],
   },
   {
     name: "Status",
     selector: (row) => row.status,
     sortable: true,
     cell: (row) => row.status,
-    omit: hideColumns.Status,
+    omit: !showColumns.Status,
   },
   {
     name: "Profit",
@@ -92,7 +92,7 @@ const overviewColumns = ({
         +parseFloat(row.profit)?.toFixed(6)
       )),
     sortable: true,
-    omit: hideColumns.Profit,
+    omit: !showColumns.Profit,
   },
   {
     name: "Date",
@@ -118,7 +118,7 @@ const overviewColumns = ({
     sortable: true,
     grow: 2,
     compact: true,
-    omit: hideColumns.Date,
+    omit: !showColumns.Date,
   },
 ];
 

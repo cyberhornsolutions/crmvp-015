@@ -9,20 +9,31 @@ import Calendar from "../components/Calendar";
 import MainBoard from "../components/MainBoard";
 import Symbols from "../components/Symbols";
 import { ToastContainer } from "react-toastify";
-import { getAllDeposits } from "../utills/firebaseHelpers";
+import { getAllDeposits, getColumnsById } from "../utills/firebaseHelpers";
 import { setDepositsState } from "../redux/slicer/transactionSlicer";
-import { useDispatch } from "react-redux";
+import { setColumnsState } from "../redux/slicer/columnsSlicer";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function Home() {
   const dispatch = useDispatch();
+  const userId = useSelector((state) => state.user.user.id);
   const [tab, setTab] = useState("Dashboard");
 
   const setDeposits = useCallback((data) => {
     dispatch(setDepositsState(data));
   }, []);
+  const setColumns = useCallback((data) => {
+    dispatch(setColumnsState(data));
+  }, []);
 
   useEffect(() => {
-    getAllDeposits(setDeposits);
+    const unsubDeposits = getAllDeposits(setDeposits);
+    const unsubColumns = getColumnsById(userId, setColumns);
+
+    return () => {
+      unsubDeposits();
+      unsubColumns();
+    };
   }, []);
 
   return (

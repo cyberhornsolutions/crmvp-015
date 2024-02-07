@@ -1,12 +1,22 @@
+import { useEffect } from "react";
 import { Modal, Form } from "react-bootstrap";
+import { updateShowColumnsById } from "../utills/firebaseHelpers";
+import { useSelector } from "react-redux";
 
 const SelectColumnsModal = ({
+  columnKey,
   setModal,
   columns,
   setColumns = () => {},
   position = "",
 } = {}) => {
-  const closeModal = () => setModal(false);
+  const userId = useSelector((state) => state.user.user.id);
+  const closeModal = () => {
+    if (columnKey) updateShowColumnsById(userId, { [columnKey]: columns });
+    setModal(false);
+  };
+
+  console.log("columsn key = ", columnKey);
 
   return (
     <Modal

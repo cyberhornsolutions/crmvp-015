@@ -10,14 +10,14 @@ import { convertTimestamptToDate } from "../../utills/helpers";
 const dealsColumns = ({
   handleEditOrder,
   handleCloseOrder,
-  hideColumns = {},
+  showColumns = {},
 } = {}) => [
   {
     name: "ID",
     selector: (row, i) => row && i + 1,
     sortable: true,
     width: "70px",
-    omit: !hideColumns.ID,
+    omit: !showColumns.ID,
   },
   {
     name: "Date",
@@ -26,14 +26,14 @@ const dealsColumns = ({
     sortable: true,
     compact: true,
     minWidth: "180px",
-    omit: !hideColumns.Date,
+    omit: !showColumns.Date,
   },
   {
     name: "Symbol",
     selector: (row) => row.symbol,
     sortable: true,
     minWidth: "fit-content",
-    omit: !hideColumns.Symbol,
+    omit: !showColumns.Symbol,
   },
   {
     name: "Type",
@@ -51,21 +51,21 @@ const dealsColumns = ({
         </div>
       )),
     sortable: true,
-    omit: !hideColumns.Type,
+    omit: !showColumns.Type,
   },
   {
     name: "Volume",
     selector: (row) => row && +parseFloat(row.volume)?.toFixed(6),
     sortable: true,
     compact: true,
-    omit: !hideColumns.Volume,
+    omit: !showColumns.Volume,
   },
   {
     name: "Open Price",
     selector: (row) => row && +parseFloat(row.symbolValue)?.toFixed(6),
     sortable: true,
     compact: true,
-    omit: !hideColumns["Open Price"],
+    omit: !showColumns["Open Price"],
   },
   {
     name: "SL / TP",
@@ -75,7 +75,7 @@ const dealsColumns = ({
         +parseFloat(row.tp)?.toFixed(6) || ""
       }`,
     minWidth: "180px",
-    omit: !hideColumns["SL / TP"],
+    omit: !showColumns["SL / TP"],
   },
   {
     name: "Additional parameters",
@@ -87,14 +87,14 @@ const dealsColumns = ({
     minWidth: "320px",
     compact: true,
     sortable: true,
-    omit: !hideColumns["Additional parameters"],
+    omit: !showColumns["Additional parameters"],
   },
   {
     name: "Pledge",
     selector: (row) => row && +parseFloat(row.pledge)?.toFixed(6),
     sortable: true,
     minWidth: "120px",
-    omit: !hideColumns.Pledge,
+    omit: !showColumns.Pledge,
   },
   {
     name: "Current Price",
@@ -102,7 +102,7 @@ const dealsColumns = ({
     sortable: true,
     compact: true,
     minWidth: "120px",
-    omit: !hideColumns["Current Price"],
+    omit: !showColumns["Current Price"],
   },
   {
     name: "Profit",
@@ -114,7 +114,7 @@ const dealsColumns = ({
       ),
     sortable: true,
     compact: true,
-    omit: !hideColumns.Profit,
+    omit: !showColumns.Profit,
   },
   {
     name: "Action",
@@ -132,7 +132,7 @@ const dealsColumns = ({
       ),
     sortable: false,
     compact: true,
-    omit: !hideColumns.Action,
+    omit: !showColumns.Action,
   },
 ];
 

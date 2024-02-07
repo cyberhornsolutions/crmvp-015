@@ -3,16 +3,7 @@ import placeholder from "../acc-img-placeholder.png";
 import { Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
 import { getAllSymbols, getAllDeposits } from "../utills/firebaseHelpers";
-import {
-  getDocs,
-  collection,
-  query,
-  where,
-  onSnapshot,
-  doc,
-  updateDoc,
-  orderBy,
-} from "firebase/firestore";
+import { onSnapshot, doc, updateDoc } from "firebase/firestore";
 import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
 import { ToastContainer, toast } from "react-toastify";
@@ -33,7 +24,6 @@ import overviewColumns from "./columns/overviewColumns";
 import depositsColumns from "./columns/depositsColumns";
 import {
   calculateProfit,
-  convertTimestamptToDate,
   fillArrayWithEmptyRows,
   getAskValue,
   getBidValue,
@@ -41,16 +31,31 @@ import {
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
 
+const overviewColumnsNames = overviewColumns().reduce(
+  (p, { name }) => ({ ...p, [name]: true }),
+  {}
+);
+
+const dealsColumnsNames = dealsColumns().reduce(
+  (p, { name }) => ({ ...p, [name]: true }),
+  {}
+);
+
+const delayedColumnsNames = delayedColumns().reduce(
+  (p, { name }) => ({ ...p, [name]: true }),
+  {}
+);
+
 export default function MainBoard() {
   const dispatch = useDispatch();
   const userOrders = useSelector((state) => state?.userOrders?.orders);
   const symbols = useSelector((state) => state?.symbols);
+  const columns = useSelector((state) => state?.columns);
   const { selectedUser } = useSelector((state) => state?.user);
   const deposits = useSelector((state) =>
     state.deposits.filter(({ userId }) => userId === selectedUser.id)
   );
   const [tab, setTab] = useState("info");
-  const [users, setUsers] = useState([]);
   const idInputRef = useRef(null);
   const locationInputRef = useRef(null);
   const mapInputRef = useRef(null);
@@ -71,7 +76,7 @@ export default function MainBoard() {
   const [userOrderData, setUserOrderData] = useState(userOrders);
   const [isUserEdit, setIsUserEdit] = useState(false);
   const [showColumnsModal, setShowColumnsModal] = useState(false);
-  const [hideColumns, setHideColumns] = useState({});
+  const [showColumns, setShowColumns] = useState({});
 
   const setDeposits = useCallback((data) => {
     dispatch(setDepositsState(data));
@@ -87,29 +92,20 @@ export default function MainBoard() {
     let cols;
     switch (tab) {
       case "overview":
-        cols = overviewColumns().reduce(
-          (p, { name }) => ({ ...p, [name]: false }),
-          {}
-        );
+        cols = columns.overviewColumns || overviewColumnsNames;
         break;
       case "deals":
-        cols = dealsColumns().reduce(
-          (p, { name }) => ({ ...p, [name]: false }),
-          {}
-        );
+        cols = columns.dealsColumns || dealsColumnsNames;
         break;
       case "delayed":
-        cols = delayedColumns().reduce(
-          (p, { name }) => ({ ...p, [name]: false }),
-          {}
-        );
+        cols = columns.delayedColumns || delayedColumnsNames;
         break;
       default:
         return;
     }
     const header = document.querySelector(".rdt_TableHead");
     if (!header) return;
-    setHideColumns(cols);
+    setShowColumns(cols);
     const handleRightClick = (e) => {
       e.preventDefault();
       setShowColumnsModal(true);
@@ -150,29 +146,6 @@ export default function MainBoard() {
     Confirmed: { variant: "warning", now: 75 },
     Closed: { variant: "danger", now: 100 },
   };
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const querySnapshot = await getDocs(
-          query(
-            collection(db, "users"),
-            where("useRefCode", "==", newUserData.refCode)
-          )
-        );
-        const userData = [];
-
-        querySnapshot.forEach((doc) => {
-          userData.push({ id: doc.id, ...doc.data() });
-        });
-
-        setUsers(userData);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
-    fetchUsers();
-  }, []);
 
   const getSelectedUserData = () => {
     const userDocRef = doc(db, "users", selectedUser.id);
@@ -1218,14 +1191,14 @@ export default function MainBoard() {
                 columns={overviewColumns({
                   isEdit,
                   handleEditOrder: handleEditOverviewOrders,
-                  hideColumns,
+                  showColumns,
                 })}
                 data={fillArrayWithEmptyRows(closedOrders, 5)}
                 highlightOnHover
                 pointerOnHover
                 pagination
                 paginationPerPage={10}
-                paginationRowsPerPageOptions={[10, 20, 50]}
+                paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 // responsive
               />
             </div>
@@ -1236,14 +1209,14 @@ export default function MainBoard() {
                 columns={dealsColumns({
                   handleEditOrder,
                   handleCloseOrder,
-                  hideColumns,
+                  showColumns,
                 })}
                 data={fillArrayWithEmptyRows(activeOrders, 5)}
                 highlightOnHover
                 pointerOnHover
                 pagination
                 paginationPerPage={10}
-                paginationRowsPerPageOptions={[10, 20, 50]}
+                paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 // responsive
               />
             </div>
@@ -1255,14 +1228,14 @@ export default function MainBoard() {
                 columns={delayedColumns({
                   handleEditOrder,
                   handleCancelOrder,
-                  hideColumns,
+                  showColumns,
                 })}
                 data={fillArrayWithEmptyRows(delayedOrders, 5)}
                 highlightOnHover
                 pointerOnHover
                 pagination
                 paginationPerPage={10}
-                paginationRowsPerPageOptions={[10, 20, 50]}
+                paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 // responsive
               />
             </div>
@@ -1277,7 +1250,7 @@ export default function MainBoard() {
                 pointerOnHover
                 pagination
                 paginationPerPage={10}
-                paginationRowsPerPageOptions={[10, 20, 50]}
+                paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 // responsive
               />
             </div>
@@ -1342,9 +1315,18 @@ export default function MainBoard() {
       {isUserEdit && <EditUserModal onClose={handleClose} show={isUserEdit} />}
       {showColumnsModal && (
         <SelectColumnsModal
+          columnKey={
+            tab === "overview"
+              ? "overviewColumns"
+              : tab === "deals"
+              ? "dealsColumns"
+              : tab === "delayed"
+              ? "delayedColumns"
+              : ""
+          }
           setModal={setShowColumnsModal}
-          columns={hideColumns}
-          setColumns={setHideColumns}
+          columns={showColumns}
+          setColumns={setShowColumns}
         />
       )}
     </div>

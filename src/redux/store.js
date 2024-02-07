@@ -17,6 +17,7 @@ import transactionSlicer from "./slicer/transactionSlicer";
 import playersSlicer from "./slicer/playersSlicer";
 import managersSlice from "./slicer/managersSlice";
 import teamsSlice from "./slicer/teamsSlice";
+import columnsSlicer from "./slicer/columnsSlicer";
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ export const store = configureStore({
     players: playersSlicer,
     managers: managersSlice,
     teams: teamsSlice,
+    columns: columnsSlicer,
   },
   middleware: getDefaultMiddleware({
     serializableCheck: {

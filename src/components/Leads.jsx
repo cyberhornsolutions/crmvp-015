@@ -23,7 +23,6 @@ import {
   fetchPlayers,
   getAllSymbols,
   fetchManagers,
-  getColumnsById,
 } from "../utills/firebaseHelpers";
 import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
@@ -52,6 +51,7 @@ export default function Leads({ setTab }) {
   const selectedUser = useSelector((state) => state.user.selectedUser);
   const symbols = useSelector((state) => state?.symbols);
   const managers = useSelector((state) => state.managers);
+  const columns = useSelector((state) => state.columns);
   const [selected, setSelected] = useState();
   const [searchBy, setSearchBy] = useState("");
   const [searchText, setSearchText] = useState("");
@@ -108,23 +108,24 @@ export default function Leads({ setTab }) {
 
     const headers = document.querySelectorAll(".rdt_TableHead");
     if (!headers.length) return;
-    const dealsCols = dealsColumns().reduce(
-      (p, { name }) => ({ ...p, [name]: true }),
-      {}
-    );
-    const playersCols = userColumns.reduce(
-      (p, { name }) => ({ ...p, [name]: true }),
-      {}
-    );
-    getColumnsById(user.id).then((res) => {
-      if (res) {
-        setShowPlayersColumns(res.playersColumns || playersCols);
-        setShowDealsColumns(res.dealsColumns || dealsCols);
-      } else {
-        setShowPlayersColumns(playersCols);
-        setShowDealsColumns(dealsCols);
-      }
-    });
+    if (columns.dealsColumns) {
+      setShowDealsColumns(columns.dealsColumns);
+    } else {
+      const dealsCols = dealsColumns().reduce(
+        (p, { name }) => ({ ...p, [name]: true }),
+        {}
+      );
+      setShowDealsColumns(dealsCols);
+    }
+    if (columns.playersColumns) {
+      setShowPlayersColumns(columns.playersColumns);
+    } else {
+      const playersCols = userColumns.reduce(
+        (p, { name }) => ({ ...p, [name]: true }),
+        {}
+      );
+      setShowPlayersColumns(playersCols);
+    }
     const handlePlayersRightClick = (e) => {
       e.preventDefault();
       setShowColumnsModal("players");
@@ -530,7 +531,7 @@ export default function Leads({ setTab }) {
             columns={dealsColumns({
               handleEditOrder,
               handleCloseOrder,
-              hideColumns: showDealsColumns,
+              showColumns: showDealsColumns,
             })}
             data={fillArrayWithEmptyRows(deals, 3)}
             pagination
