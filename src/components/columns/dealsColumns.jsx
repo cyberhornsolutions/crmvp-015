@@ -90,7 +90,7 @@ const dealsColumns = ({
     omit: !showColumns["Additional parameters"],
   },
   {
-    name: "Pledge",
+    name: "Margin",
     selector: (row) => row && +parseFloat(row.pledge)?.toFixed(6),
     sortable: true,
     minWidth: "120px",
