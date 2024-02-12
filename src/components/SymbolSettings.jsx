@@ -6,6 +6,7 @@ import { updateSymbol } from "../utills/firebaseHelpers";
 const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
   const symbolSettings = selectedSymbol.settings || {};
   const [title, setTitle] = useState(selectedSymbol?.symbol);
+  const [price, setPrice] = useState(selectedSymbol?.price);
   const [settings, setSettings] = useState({
     description: symbolSettings?.description || "",
     swapShort: symbolSettings?.swapShort || "",
@@ -13,6 +14,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     swapLong: symbolSettings?.swapLong || "",
     swapLongUnit: symbolSettings?.swapLongUnit || "%",
     contractSize: symbolSettings?.contractSize || "",
+    gapLevel: symbolSettings?.gapLevel || "",
+    stopLevel: symbolSettings?.stopLevel || "",
     group: symbolSettings?.group || "crypto",
     bidSpread: symbolSettings?.bidSpread || "1",
     bidSpreadUnit: symbolSettings?.bidSpreadUnit || "%",
@@ -28,11 +31,18 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     const payload = {
       settings,
     };
-    if (selectedSymbol.duplicate) payload.symbol = title;
+    if (selectedSymbol.duplicate) {
+      if (!price)
+        return toast.error("Please enter current price for the symbol");
+      else if (price <= 0)
+        return toast.error("Symbol Price must be greater than 0");
+      payload.symbol = title;
+      payload.price = price;
+    }
+    setLoading(true);
     try {
       await updateSymbol(selectedSymbol.id, payload);
       toast.success("Symbol settings updated successfully");
@@ -101,6 +111,7 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     id="swap-short"
                     name="swapShort"
                     type="number"
+                    step="any"
                     className="w-50"
                     min={0}
                     max={100}
@@ -130,6 +141,7 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     id="swap-long"
                     name="swapLong"
                     type="number"
+                    step="any"
                     className="w-50"
                     min={0}
                     max={100}
@@ -159,10 +171,29 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     id="contract-size"
                     name="contractSize"
                     type="number"
+                    step="any"
                     min={1}
                     placeholder="Contract Size"
                     required
                     value={settings.contractSize}
+                    onChange={handleChange}
+                  />
+                </div>
+              </Form.Group>
+              <Form.Group className="row align-items-center mb-2">
+                <Form.Label htmlFor="gap-level" className="col-4">
+                  Gap Level
+                </Form.Label>
+                <div className="col">
+                  <Form.Control
+                    id="gap-level"
+                    name="gapLevel"
+                    type="number"
+                    step="any"
+                    min={0}
+                    placeholder="Gap Level"
+                    required
+                    value={settings.gapLevel}
                     onChange={handleChange}
                   />
                 </div>
@@ -214,8 +245,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     id="bid-spread"
                     name="bidSpread"
                     type="number"
+                    step="any"
                     className="w-50"
-                    step={0.1}
                     min={0}
                     max={50}
                     placeholder="0-50%"
@@ -244,8 +275,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     id="ask-spread"
                     name="askSpread"
                     type="number"
+                    step="any"
                     className="w-50"
-                    step={0.1}
                     min={0}
                     max={50}
                     placeholder="0-50%"
@@ -274,6 +305,7 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     id="fee"
                     name="fee"
                     type="number"
+                    step="any"
                     className="w-50"
                     min={0}
                     max={100}
@@ -295,21 +327,47 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                 </InputGroup>
               </Form.Group>
               <Form.Group className="row align-items-center mb-2">
-                <Form.Label htmlFor="fee" className="col-4">
+                <Form.Label htmlFor="price" className="col-4">
                   Current Price
                 </Form.Label>
                 <div className="col">
                   <Form.Control
+                    name="price"
+                    id="price"
                     type="number"
+                    step="any"
+                    min={0}
                     placeholder="Current Price"
-                    value={+selectedSymbol.price}
-                    readOnly
+                    value={price ? +price : price}
+                    required
+                    readOnly={!selectedSymbol.duplicate}
+                    onChange={(e) =>
+                      selectedSymbol.duplicate && setPrice(e.target.value)
+                    }
+                  />
+                </div>
+              </Form.Group>
+              <Form.Group className="row align-items-center mb-2">
+                <Form.Label htmlFor="stop-level" className="col-4">
+                  Stop Level
+                </Form.Label>
+                <div className="col">
+                  <Form.Control
+                    name="stopLevel"
+                    id="stop-level"
+                    type="number"
+                    step="any"
+                    min={0}
+                    placeholder="Stop Level"
+                    required
+                    value={settings.stopLevel}
+                    onChange={handleChange}
                   />
                 </div>
               </Form.Group>
               {symbolSettings?.group === "commodities" && (
-                <Form.Group className="d-flex align-items-center gap-3">
-                  <Form.Label htmlFor="closed-trading">
+                <Form.Group className="d-flex align-items-center gap-3 pt-2">
+                  <Form.Label htmlFor="closed-trading" className="mb-0">
                     Closed market trading
                   </Form.Label>
                   <Form.Check
