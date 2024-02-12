@@ -54,7 +54,7 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
         centered
       >
         <Modal.Header closeButton>
-          <h5 className="m-0">Symbol settings {selectedSymbol.symbol}</h5>
+          <h5 className="m-0">Asset settings {selectedSymbol.symbol}</h5>
         </Modal.Header>
         <Modal.Body>
           <Form className="row row-gap-3" onSubmit={handleSubmit}>
@@ -167,6 +167,21 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                   />
                 </div>
               </Form.Group>
+              {symbolSettings?.group === "commodities" && (
+                <Form.Group className="row align-items-center mb-2">
+                  <Form.Label htmlFor="market-open" className="col-4">
+                    Market open
+                  </Form.Label>
+                  <div className="col">
+                    <Form.Control
+                      id="market-open"
+                      type="text"
+                      disabled
+                      value="Mon-Fri: 9AM-23PM"
+                    />
+                  </div>
+                </Form.Group>
+              )}
             </div>
             <div className="col">
               <Form.Group className="row align-items-center mb-2">
@@ -279,7 +294,7 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                   </Form.Select>
                 </InputGroup>
               </Form.Group>
-              <Form.Group className="row align-items-center">
+              <Form.Group className="row align-items-center mb-2">
                 <Form.Label htmlFor="fee" className="col-4">
                   Current Price
                 </Form.Label>
@@ -292,6 +307,19 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                   />
                 </div>
               </Form.Group>
+              {symbolSettings?.group === "commodities" && (
+                <Form.Group className="d-flex align-items-center gap-3">
+                  <Form.Label htmlFor="closed-trading">
+                    Closed market trading
+                  </Form.Label>
+                  <Form.Check
+                    id="closed-trading"
+                    name="closedMarket"
+                    checked={selectedSymbol.closedMarket}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
+              )}
             </div>
             <Button type="submit" disabled={loading}>
               Save
