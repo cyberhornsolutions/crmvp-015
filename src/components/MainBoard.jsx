@@ -444,7 +444,7 @@ export default function MainBoard() {
     let freeMarginOpened = totalBalance;
     const dealSum = pendingOrders.reduce((p, v) => p + v.sum, 0);
     freeMarginOpened -= parseFloat(dealSum);
-    return freeMarginOpened < 0 ? 0.0 : freeMarginOpened;
+    return freeMarginOpened;
   };
   const freeMarginData = calculateFreeMargin();
 
