@@ -262,7 +262,8 @@ export default function Leads({ setTab }) {
       return {
         ...order,
         currentPrice,
-        enableOpenPrice,
+				currentMarketPrice: parseFloat(symbol.price),
+        enableOpenPrice: order.enableOpenPrice,
         pledge: parseFloat(pledge),
         spread: parseFloat(spread),
         swap: parseFloat(swapValue),
