@@ -613,7 +613,7 @@ export default function MainBoard() {
                 Level
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+parseFloat(level)?.toFixed(6)}
+                {`${+parseFloat(level)?.toFixed(6)}%`}
               </h4>
             </div>
             <div>
