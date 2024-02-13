@@ -67,8 +67,7 @@ const EditOrder = ({ onClose, selectedOrder }) => {
       const { seconds } = makeServerDate(
         new Date(dateOpened + " " + timeOpened)
       );
-      const payload = { ...record };
-      if (volume != selectedOrder.volume) payload.sum = volume * symbolValue;
+      const payload = { ...record, sum: volume * symbolValue };
       if (seconds !== createdTime.seconds)
         payload.createdTime = { ...createdTime, seconds };
       const updatedData = doc(db, "orders", selectedOrder.id);
