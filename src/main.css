@@ -581,6 +581,11 @@ td {
   justify-content: space-between;
   padding: 10px;
 }
+
+.b-bottom {
+  border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+}
+
 #profile-info-inputs1 {
   display: flex;
   flex-direction: column;

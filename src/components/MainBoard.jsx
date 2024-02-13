@@ -721,133 +721,55 @@ export default function MainBoard() {
         <div className="tab-content">
           {tab === "info" && (
             <div id="menu0">
-              <div id="menu0-main">
-                <div
-                  id="profile-info-titles1"
-                  className="justify-content-start"
-                  style={{ gap: 14 }}
-                >
-                  <h5
-                    className="f-s-inherit f-w-inherit"
-                    style={{ lineHeight: 1.1 }}
-                  >
-                    Имя
-                  </h5>
-                  <h5
-                    className="f-s-inherit f-w-inherit"
-                    style={{ lineHeight: 1.1 }}
-                  >
-                    Имейл
-                  </h5>
-                  <h5
-                    className="f-s-inherit f-w-inherit"
-                    style={{ lineHeight: 1.1 }}
-                  >
-                    Пароль
-                  </h5>
-                  <h5
-                    className="f-s-inherit f-w-inherit"
-                    style={{ lineHeight: 1.1 }}
-                  >
-                    Телефон
-                  </h5>
-                  <h5
-                    className="f-s-inherit f-w-inherit"
-                    style={{ lineHeight: 1.1 }}
-                  >
-                    Страна
-                  </h5>
-                  <button
-                    id="editButton"
-                    onClick={() => {
-                      const inputFields = document.querySelectorAll(
-                        'input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="date"]'
-                      );
-                      inputFields.forEach(function (input) {
-                        input.removeAttribute("disabled");
-                      });
-                    }}
-                  >
-                    Изменить
-                  </button>
+              <div className="b-bottom d-flex flex-1 justify-content-around pt-2">
+                <div className="d-flex flex-column justify-content-start gap-3">
+                  <span className="b-bottom">Name</span>
+                  <span className="b-bottom">Surname</span>
+                  <span className="b-bottom">Email</span>
+                  <span className="b-bottom">Phone</span>
+                  <span className="b-bottom">Country</span>
+                  <span className="b-bottom">City</span>
+                  <span className="b-bottom">Date registered</span>
+                  <span className="b-bottom">Comment</span>
+                  <button id="editButton">Change</button>
                 </div>
-                <div
-                  id="profile-info-inputs1"
-                  className="justify-content-start"
-                  style={{ gap: 10 }}
-                >
+                <div className="d-flex flex-column justify-content-start gap-3">
                   <input
-                    id="profile-name"
                     type="text"
-                    placeholder="Тест"
+                    placeholder="Name"
                     disabled="true"
+                    value={newUserData.name}
                   />
-                  <input type="email" placeholder="Тест" disabled="true" />
-                  <input type="password" placeholder="Тест" disabled="true" />
-                  <input type="tel" placeholder={+9010101010} disabled="true" />
-                  <input type="text" placeholder="Тест" disabled="true" />
-                  <button
-                    id="saveButton"
-                    onClick={() => {
-                      const inputFields = document.querySelectorAll(
-                        'input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="date"]'
-                      );
-
-                      inputFields.forEach(function (input) {
-                        input.setAttribute("disabled", true);
-                      });
-                    }}
-                  >
-                    Сохранить
-                  </button>
+                  <input type="text" placeholder="Surname" disabled="true" />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    disabled="true"
+                    value={newUserData.email}
+                  />
+                  <input type="tel" placeholder="Phone" disabled="true" />
+                  <input type="text" placeholder="Country" disabled="true" />
+                  <input type="text" placeholder="City" disabled="true" />
+                  <input
+                    type="text"
+                    placeholder="Date Registered"
+                    // disabled="true"
+                    value={moment(
+                      newUserData?.createdAt?.seconds * 1000
+                    )?.format("MM/DD/YYYY")}
+                  />
+                  <input type="text" placeholder="Comment" disabled="true" />
+                  <button id="saveButton">Save</button>
                 </div>
-                <div
-                  id="profile-info-titles2"
-                  className="justify-content-start"
-                  style={{ gap: 14 }}
-                >
-                  <h5
-                    className="f-s-inherit f-w-inherit"
-                    style={{ lineHeight: 1.1 }}
-                  >
-                    Сейл статус
-                  </h5>
-                  <h5
-                    className="f-s-inherit f-w-inherit"
-                    style={{ lineHeight: 1.1 }}
-                  >
-                    Ретен статус
-                  </h5>
-                  <h5
-                    className="f-s-inherit f-w-inherit"
-                    style={{ lineHeight: 1.1 }}
-                  >
-                    Менеджер
-                  </h5>
-                  <h5
-                    className="f-s-inherit f-w-inherit"
-                    style={{ lineHeight: 1.1 }}
-                  >
-                    Аффилиат
-                  </h5>
-                  <h5
-                    className="f-s-inherit f-w-inherit"
-                    style={{ lineHeight: 1.1 }}
-                  >
-                    Зарегистрирован
-                  </h5>
-                  <h5
-                    className="f-s-inherit f-w-inherit"
-                    style={{ lineHeight: 1.1 }}
-                  >
-                    Комментарий
-                  </h5>
+                <div className="d-flex flex-column justify-content-start gap-3">
+                  <span className="b-bottom">Сейл статус</span>
+                  <span className="b-bottom">Ретен статус</span>
+                  <span className="b-bottom">Менеджер</span>
+                  <span className="b-bottom">Аффилиат</span>
+                  <span className="b-bottom">Зарегистрирован</span>
+                  <span className="b-bottom">Комментарий</span>
                 </div>
-                <div
-                  id="profile-info-inputs2"
-                  className="justify-content-start"
-                  style={{ gap: 10 }}
-                >
+                <div className="d-flex flex-column justify-content-start gap-3">
                   <input type="text" placeholder="Тест" disabled="true" />
                   <input type="text" placeholder="Тест" disabled="true" />
                   <input type="text" placeholder="Тест" disabled="true" />
