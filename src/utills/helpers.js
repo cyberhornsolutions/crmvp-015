@@ -18,9 +18,15 @@ export const filterSearchObjects = (search = "", data = []) =>
         .search(RegExp(search, "i")) > -1
   );
 
-export const convertTimestamptToDate = (date) => {
-  const jsDate = new Date(date.seconds * 1000 + date.nanoseconds / 1000000);
-  return moment(jsDate).format("MM/DD/YYYY hh:mm:ss A");
+export const convertTimestamptToDate = (date) =>
+  moment(date.seconds * 1000 + date.nanoseconds / 1000000).format(
+    "MM/DD/YYYY hh:mm:ss A"
+  );
+
+export const makeServerDate = (currentDate) => {
+  const seconds = Math.floor(currentDate.getTime() / 1000);
+  const nanoseconds = currentDate.getMilliseconds();
+  return { seconds, nanoseconds };
 };
 
 export const fillArrayWithEmptyRows = (arr, size) =>
