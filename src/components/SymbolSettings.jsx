@@ -24,6 +24,9 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     fee: symbolSettings?.fee || "",
     feeUnit: symbolSettings?.feeUnit || "%",
   });
+  const [closedMarket, setClosedMarket] = useState(
+    symbolSettings?.closedMarket ?? false
+  );
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
@@ -34,6 +37,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     const payload = {
       settings,
     };
+    if (settings.group === "commodities")
+      payload.settings.closedMarket = closedMarket;
     if (selectedSymbol.duplicate) {
       if (!price)
         return toast.error("Please enter current price for the symbol");
@@ -372,9 +377,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                   </Form.Label>
                   <Form.Check
                     id="closed-trading"
-                    name="closedMarket"
-                    checked={selectedSymbol.closedMarket}
-                    onChange={handleChange}
+                    checked={closedMarket}
+                    onChange={(e) => setClosedMarket(e.target.checked)}
                   />
                 </Form.Group>
               )}
