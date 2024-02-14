@@ -180,6 +180,7 @@ export default function MainBoard() {
   }, [userOrders]);
 
   const saveOrders = async () => {
+    let profit = 0;
     for (let i = 0; i < userOrderData.length; i++) {
       if (userOrderData[i].sum <= 0) {
         toast.error("Sum value should be greater than 0");
@@ -189,6 +190,17 @@ export default function MainBoard() {
         toast.error("Open Price value should be greater than 0");
         return;
       }
+      if (!userOrderData[i].profit) {
+        toast.error("Enter profit value in all deals");
+        return;
+      }
+      profit += +userOrderData[i].profit;
+    }
+    if (profit < 0) {
+      const eq = +totalBalance + profit;
+      if (eq < 0) return toast.error("This profit makes equity less than 0");
+      if (eq < newUserData?.settings?.stopOut)
+        return toast.error("This profit makes equity less than stop out value");
     }
     let status = "success";
     userOrderData.forEach(async (order) => {
@@ -454,13 +466,13 @@ export default function MainBoard() {
   const userLevel = newUserData?.settings?.level || 100;
   const level = pledge && (totalBalance / pledge) * (userLevel / 100);
 
-  const calculateEquity = () => {
-    let equity = freeMarginData + pledge - ordersFee;
-    if (allowBonus) equity -= bonus;
-    return equity;
-  };
+  // const calculateEquity = () => {
+  //   let equity = freeMarginData + pledge - ordersFee;
+  //   if (allowBonus) equity -= bonus;
+  //   return equity;
+  // };
 
-  const equity = calculateEquity();
+  // const equity = calculateEquity();
 
   return (
     <div id="mainboard">
