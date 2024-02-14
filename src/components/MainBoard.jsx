@@ -68,6 +68,7 @@ export default function MainBoard() {
   const [modalShow, setModalShow] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
+  const [isInfoEdit, setIsInfoEdit] = useState(false);
   const [newUserData, setNewUserData] = useState(selectedUser);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [showCancelOrderModal, setShowCancelOrderModal] = useState(false);
@@ -721,63 +722,90 @@ export default function MainBoard() {
         <div className="tab-content">
           {tab === "info" && (
             <div id="menu0">
-              <div className="b-bottom d-flex flex-1 justify-content-around pt-2">
+              <div className="d-flex flex-1 justify-content-around pt-2">
                 <div className="d-flex flex-column justify-content-start gap-3">
                   <span className="b-bottom">Name</span>
                   <span className="b-bottom">Surname</span>
                   <span className="b-bottom">Email</span>
                   <span className="b-bottom">Phone</span>
-                  <span className="b-bottom">Country</span>
-                  <span className="b-bottom">City</span>
-                  <span className="b-bottom">Date registered</span>
-                  <span className="b-bottom">Comment</span>
-                  <button id="editButton">Change</button>
                 </div>
                 <div className="d-flex flex-column justify-content-start gap-3">
                   <input
                     type="text"
                     placeholder="Name"
-                    disabled="true"
+                    disabled={!isInfoEdit}
                     value={newUserData.name}
                   />
-                  <input type="text" placeholder="Surname" disabled="true" />
+                  <input
+                    type="text"
+                    placeholder="Surname"
+                    disabled={!isInfoEdit}
+                  />
                   <input
                     type="email"
                     placeholder="Email"
-                    disabled="true"
+                    disabled={!isInfoEdit}
                     value={newUserData.email}
                   />
-                  <input type="tel" placeholder="Phone" disabled="true" />
-                  <input type="text" placeholder="Country" disabled="true" />
-                  <input type="text" placeholder="City" disabled="true" />
+                  <input
+                    type="tel"
+                    placeholder="Phone"
+                    disabled={!isInfoEdit}
+                  />
+                  {/* <button id="saveButton">Save</button> */}
+                </div>
+                <div className="d-flex flex-column justify-content-start gap-3">
+                  <span className="b-bottom">Country</span>
+                  <span className="b-bottom">City</span>
+                  <span className="b-bottom">Date registered</span>
+                  <span className="b-bottom">Comment</span>
+                </div>
+                <div className="d-flex flex-column justify-content-start gap-3">
+                  <input
+                    type="text"
+                    placeholder="Country"
+                    disabled={!isInfoEdit}
+                  />
+                  <input
+                    type="text"
+                    placeholder="City"
+                    disabled={!isInfoEdit}
+                  />
                   <input
                     type="text"
                     placeholder="Date Registered"
-                    // disabled="true"
+                    disabled
                     value={moment(
                       newUserData?.createdAt?.seconds * 1000
                     )?.format("MM/DD/YYYY")}
                   />
-                  <input type="text" placeholder="Comment" disabled="true" />
-                  <button id="saveButton">Save</button>
-                </div>
-                <div className="d-flex flex-column justify-content-start gap-3">
-                  <span className="b-bottom">Сейл статус</span>
-                  <span className="b-bottom">Ретен статус</span>
-                  <span className="b-bottom">Менеджер</span>
-                  <span className="b-bottom">Аффилиат</span>
-                  <span className="b-bottom">Зарегистрирован</span>
-                  <span className="b-bottom">Комментарий</span>
-                </div>
-                <div className="d-flex flex-column justify-content-start gap-3">
-                  <input type="text" placeholder="Тест" disabled="true" />
-                  <input type="text" placeholder="Тест" disabled="true" />
-                  <input type="text" placeholder="Тест" disabled="true" />
-                  <input type="text" placeholder="Тест" disabled="true" />
-                  <input type="date" placeholder="01/01/2022" disabled="true" />
-                  <input type="text" placeholder="Тест" disabled="true" />
+                  <input
+                    type="text"
+                    placeholder="Comment"
+                    disabled={!isInfoEdit}
+                  />
                 </div>
               </div>
+              <section className="d-flex justify-content-center gap-4 b-bottom pb-2">
+                <button
+                  id="editButton"
+                  className="w-25 rounded"
+                  onClick={(e) => {
+                    if (!isInfoEdit) setIsInfoEdit(true);
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  id="saveButton"
+                  className="w-25 rounded"
+                  onClick={(e) => {
+                    if (isInfoEdit) setIsInfoEdit(false);
+                  }}
+                >
+                  Save
+                </button>
+              </section>
               <div id="menu0-extra">
                 <table className="table table-hover table-striped">
                   <thead>
