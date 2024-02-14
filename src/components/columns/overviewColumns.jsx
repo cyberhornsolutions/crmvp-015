@@ -29,6 +29,12 @@ const overviewColumns = ({
     omit: !showColumns.Symbol,
   },
   {
+    name: "Volume",
+    selector: (row) => row.volume,
+    compact: true,
+    omit: !showColumns.Volume,
+  },
+  {
     name: "Sum",
     selector: (row) =>
       row &&
@@ -68,6 +74,15 @@ const overviewColumns = ({
     compact: true,
     omit: !showColumns["Open Price"],
   },
+  {
+    name: "Closed price",
+    selector: (row) => row?.closedPrice,
+    omit: !showColumns.Symbol,
+  },
+  { name: "TP", selector: (row) => row.tp, omit: !showColumns.TP },
+  { name: "SL", selector: (row) => row.sl, omit: !showColumns.SL },
+  { name: "Swap", selector: (row) => row.swap, omit: !showColumns.Swap },
+  { name: "Fee", selector: (row) => row.fee, omit: !showColumns.Fee },
   {
     name: "Status",
     selector: (row) => row.status,
@@ -115,7 +130,6 @@ const overviewColumns = ({
       ) : (
         row.createdTime && convertTimestamptToDate(row.createdTime)
       ),
-    sortable: true,
     grow: 2,
     compact: true,
     omit: !showColumns.Date,
