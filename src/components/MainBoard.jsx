@@ -217,13 +217,11 @@ export default function MainBoard() {
     setIsEdit(false);
   };
 
-  const handleSaveVerification = async () => {
+  const updateUser = async () => {
     try {
-      const userDocRef = doc(db, "users", selectedUser.id);
-      await updateDoc(userDocRef, { allowTrading: newUserData.allowTrading });
-      toast.success("User info updated");
-
-      console.log("User updated successfully");
+      const userDocRef = doc(db, "users", newUserData.id);
+      await updateDoc(userDocRef, newUserData);
+      toast.success("Saved successfully");
     } catch (error) {
       console.log("error in updating user =", error);
     }
@@ -245,6 +243,10 @@ export default function MainBoard() {
     );
     setUserOrderData(updatedData);
   };
+
+  const handleUserInfoChange = (e) =>
+    setNewUserData((p) => ({ ...p, [e.target.name]: e.target.value }));
+
   const handleEditOverviewOrders = (id, field, value) => {
     const updatedData = userOrderData
       .filter(({ status }) => status !== "Pending")
@@ -435,7 +437,6 @@ export default function MainBoard() {
     0
   );
 
-  const allowBonus = newUserData?.settings?.allowBonus;
   const bonus = newUserData?.bonus;
 
   const activeOrders = pendingOrders.filter((order) => !order.enableOpenPrice);
@@ -743,28 +744,37 @@ export default function MainBoard() {
                 </div>
                 <div className="d-flex flex-column justify-content-start gap-3">
                   <input
+                    name="name"
                     type="text"
                     placeholder="Name"
                     disabled={!isInfoEdit}
                     value={newUserData.name}
+                    onChange={handleUserInfoChange}
                   />
                   <input
+                    name="surname"
                     type="text"
                     placeholder="Surname"
                     disabled={!isInfoEdit}
+                    value={newUserData.surname}
+                    onChange={handleUserInfoChange}
                   />
                   <input
+                    name="email"
                     type="email"
                     placeholder="Email"
                     disabled={!isInfoEdit}
                     value={newUserData.email}
+                    onChange={handleUserInfoChange}
                   />
                   <input
+                    name="phone"
                     type="tel"
                     placeholder="Phone"
                     disabled={!isInfoEdit}
+                    value={newUserData.phone}
+                    onChange={handleUserInfoChange}
                   />
-                  {/* <button id="saveButton">Save</button> */}
                 </div>
                 <div className="d-flex flex-column justify-content-start gap-3">
                   <span className="b-bottom">Country</span>
@@ -774,14 +784,20 @@ export default function MainBoard() {
                 </div>
                 <div className="d-flex flex-column justify-content-start gap-3">
                   <input
+                    name="country"
                     type="text"
                     placeholder="Country"
                     disabled={!isInfoEdit}
+                    value={newUserData.country}
+                    onChange={handleUserInfoChange}
                   />
                   <input
+                    name="city"
                     type="text"
                     placeholder="City"
                     disabled={!isInfoEdit}
+                    value={newUserData.city}
+                    onChange={handleUserInfoChange}
                   />
                   <input
                     type="text"
@@ -792,9 +808,12 @@ export default function MainBoard() {
                     )?.format("MM/DD/YYYY")}
                   />
                   <input
+                    name="comment"
                     type="text"
                     placeholder="Comment"
                     disabled={!isInfoEdit}
+                    value={newUserData.comment}
+                    onChange={handleUserInfoChange}
                   />
                 </div>
               </div>
@@ -803,16 +822,24 @@ export default function MainBoard() {
                   id="editButton"
                   className="w-25 rounded"
                   onClick={(e) => {
-                    if (!isInfoEdit) setIsInfoEdit(true);
+                    if (isInfoEdit) {
+                      setNewUserData(selectedUser);
+                      setIsInfoEdit(false);
+                    } else {
+                      setIsInfoEdit(true);
+                    }
                   }}
                 >
-                  Edit
+                  {isInfoEdit ? "Cancel" : "Edit"}
                 </button>
                 <button
                   id="saveButton"
                   className="w-25 rounded"
                   onClick={(e) => {
-                    if (isInfoEdit) setIsInfoEdit(false);
+                    if (isInfoEdit) {
+                      updateUser();
+                      setIsInfoEdit(false);
+                    }
                   }}
                 >
                   Save
@@ -1100,7 +1127,7 @@ export default function MainBoard() {
                   <h4 className="f-s-inherit" style={{ lineHeight: 1.1 }}>
                     Rights
                   </h4>
-                  <button onClick={handleSaveVerification}>Save</button>
+                  <button onClick={updateUser}>Save</button>
                 </div>
                 <div className="form-check form-switch">
                   <label className="form-check-label f-s-inherit f-w-700">
