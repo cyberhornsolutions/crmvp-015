@@ -81,6 +81,13 @@ const EditOrder = ({ onClose, selectedOrder }) => {
     setLoading(false);
   };
 
+  let potentialSL = 0,
+    potentialTP = 0;
+  if (selectedOrder.symbolValue) {
+    if (sl) potentialSL = selectedOrder.volume * sl - selectedOrder.fee;
+    if (tp) potentialTP = selectedOrder.volume * tp - selectedOrder.fee;
+  }
+
   return (
     <>
       <Modal size="md" show onHide={onClose} centered>
@@ -107,6 +114,9 @@ const EditOrder = ({ onClose, selectedOrder }) => {
                   value={sl}
                   onChange={handleChange}
                 />
+                <label className="text-muted">
+                  Potential: {+parseFloat(potentialSL)?.toFixed(6)}
+                </label>
               </div>
             </div>
             <div className="form-group row">
@@ -124,6 +134,9 @@ const EditOrder = ({ onClose, selectedOrder }) => {
                   value={tp}
                   onChange={handleChange}
                 />
+                <label className="text-muted">
+                  Potential: {+parseFloat(potentialTP)?.toFixed(6)}
+                </label>
               </div>
             </div>
             <div className="form-group row">
