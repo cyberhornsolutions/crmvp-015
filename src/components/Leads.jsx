@@ -309,23 +309,17 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Name",
-      cell: (row) => (row.surname ? row.name + " " + row.surname : row.name),
+      cell: (row) => row.name,
       sortable: true,
-      sortFunction: (rowA, rowB) => {
-        const a = rowA.name;
-        const b = rowB.name;
-
-        if (a > b) {
-          return 1;
-        }
-
-        if (b > a) {
-          return -1;
-        }
-
-        return 0;
-      },
+      sortFunction: (a, b) => (a.name > b.name ? 1 : -1),
       omit: !showPlayersColumns.Name,
+    },
+    {
+      name: "Surname",
+      cell: (row) => row.surname,
+      sortable: true,
+      sortFunction: (a, b) => (a.surname > b.surname ? 1 : -1),
+      omit: !showPlayersColumns.Surname,
     },
     {
       name: "Status",
