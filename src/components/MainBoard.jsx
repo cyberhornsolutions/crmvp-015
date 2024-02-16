@@ -404,7 +404,7 @@ export default function MainBoard() {
             ? order.volume * askSpread
             : (order.sum / 100) * askSpread;
       }
-      const feeValue = feeUnit === "$" ? fee : spread * fee;
+      const feeValue = feeUnit === "$" ? fee : (order.sum / 100) * fee;
       const pledge = order.sum;
 
       let profit = calculateProfit(
@@ -834,7 +834,7 @@ export default function MainBoard() {
                 </button>
                 <button
                   id="saveButton"
-									disabled={!isInfoEdit}
+                  disabled={!isInfoEdit}
                   className={`w-25 rounded ${!isInfoEdit && "stopClik"}`}
                   onClick={(e) => {
                     if (isInfoEdit) {
