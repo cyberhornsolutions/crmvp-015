@@ -12,6 +12,10 @@ const symbolsColumns = (
 ) => [
   { name: "Symbol", selector: (row) => row.symbol },
   {
+    name: "Origin",
+    selector: (row) => row && (row.duplicate ? "Duplicate" : "Original"),
+  },
+  {
     name: "Bid",
     selector: (row) => {
       if (!row) return;
