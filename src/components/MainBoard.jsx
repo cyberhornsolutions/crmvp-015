@@ -834,7 +834,8 @@ export default function MainBoard() {
                 </button>
                 <button
                   id="saveButton"
-                  className="w-25 rounded"
+									disabled={!isInfoEdit}
+                  className={`w-25 rounded ${!isInfoEdit && "stopClik"}`}
                   onClick={(e) => {
                     if (isInfoEdit) {
                       updateUser();
