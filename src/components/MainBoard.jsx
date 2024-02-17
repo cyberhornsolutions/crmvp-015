@@ -735,117 +735,119 @@ export default function MainBoard() {
         <div className="tab-content">
           {tab === "info" && (
             <div id="menu0">
-              <div className="d-flex flex-1 justify-content-around pt-2">
-                <div className="d-flex flex-column justify-content-start gap-3">
-                  <span className="b-bottom">Name</span>
-                  <span className="b-bottom">Surname</span>
-                  <span className="b-bottom">Email</span>
-                  <span className="b-bottom">Phone</span>
+              <div className="h-50 b-bottom">
+                <div className="d-flex justify-content-evenly py-4">
+                  <div className="d-flex flex-column align-items-start gap-4">
+                    <span className="b-bottom">Name</span>
+                    <span className="b-bottom">Surname</span>
+                    <span className="b-bottom">Email</span>
+                    <span className="b-bottom">Phone</span>
+                  </div>
+                  <div className="d-flex flex-column gap-4">
+                    <input
+                      name="name"
+                      type="text"
+                      placeholder="Name"
+                      disabled={!isInfoEdit}
+                      value={newUserData.name}
+                      onChange={handleUserInfoChange}
+                    />
+                    <input
+                      name="surname"
+                      type="text"
+                      placeholder="Surname"
+                      disabled={!isInfoEdit}
+                      value={newUserData.surname}
+                      onChange={handleUserInfoChange}
+                    />
+                    <input
+                      name="email"
+                      type="email"
+                      placeholder="Email"
+                      disabled={!isInfoEdit}
+                      value={newUserData.email}
+                      onChange={handleUserInfoChange}
+                    />
+                    <input
+                      name="phone"
+                      type="tel"
+                      placeholder="Phone"
+                      disabled={!isInfoEdit}
+                      value={newUserData.phone}
+                      onChange={handleUserInfoChange}
+                    />
+                  </div>
+                  <div className="d-flex flex-column align-items-start gap-4">
+                    <span className="b-bottom">Country</span>
+                    <span className="b-bottom">City</span>
+                    <span className="b-bottom">Date registered</span>
+                    <span className="b-bottom">Comment</span>
+                  </div>
+                  <div className="d-flex flex-column gap-4">
+                    <input
+                      name="country"
+                      type="text"
+                      placeholder="Country"
+                      disabled={!isInfoEdit}
+                      value={newUserData.country}
+                      onChange={handleUserInfoChange}
+                    />
+                    <input
+                      name="city"
+                      type="text"
+                      placeholder="City"
+                      disabled={!isInfoEdit}
+                      value={newUserData.city}
+                      onChange={handleUserInfoChange}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Date Registered"
+                      disabled
+                      value={moment(
+                        newUserData?.createdAt?.seconds * 1000
+                      )?.format("MM/DD/YYYY")}
+                    />
+                    <input
+                      name="comment"
+                      type="text"
+                      placeholder="Comment"
+                      disabled={!isInfoEdit}
+                      value={newUserData.comment}
+                      onChange={handleUserInfoChange}
+                    />
+                  </div>
                 </div>
-                <div className="d-flex flex-column justify-content-start gap-3">
-                  <input
-                    name="name"
-                    type="text"
-                    placeholder="Name"
+                <section className="d-flex justify-content-evenly">
+                  <button
+                    id="editButton"
+                    className="w-25 rounded"
+                    onClick={(e) => {
+                      if (isInfoEdit) {
+                        setNewUserData(selectedUser);
+                        setIsInfoEdit(false);
+                      } else {
+                        setIsInfoEdit(true);
+                      }
+                    }}
+                  >
+                    {isInfoEdit ? "Cancel" : "Edit"}
+                  </button>
+                  <button
+                    id="saveButton"
                     disabled={!isInfoEdit}
-                    value={newUserData.name}
-                    onChange={handleUserInfoChange}
-                  />
-                  <input
-                    name="surname"
-                    type="text"
-                    placeholder="Surname"
-                    disabled={!isInfoEdit}
-                    value={newUserData.surname}
-                    onChange={handleUserInfoChange}
-                  />
-                  <input
-                    name="email"
-                    type="email"
-                    placeholder="Email"
-                    disabled={!isInfoEdit}
-                    value={newUserData.email}
-                    onChange={handleUserInfoChange}
-                  />
-                  <input
-                    name="phone"
-                    type="tel"
-                    placeholder="Phone"
-                    disabled={!isInfoEdit}
-                    value={newUserData.phone}
-                    onChange={handleUserInfoChange}
-                  />
-                </div>
-                <div className="d-flex flex-column justify-content-start gap-3">
-                  <span className="b-bottom">Country</span>
-                  <span className="b-bottom">City</span>
-                  <span className="b-bottom">Date registered</span>
-                  <span className="b-bottom">Comment</span>
-                </div>
-                <div className="d-flex flex-column justify-content-start gap-3">
-                  <input
-                    name="country"
-                    type="text"
-                    placeholder="Country"
-                    disabled={!isInfoEdit}
-                    value={newUserData.country}
-                    onChange={handleUserInfoChange}
-                  />
-                  <input
-                    name="city"
-                    type="text"
-                    placeholder="City"
-                    disabled={!isInfoEdit}
-                    value={newUserData.city}
-                    onChange={handleUserInfoChange}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Date Registered"
-                    disabled
-                    value={moment(
-                      newUserData?.createdAt?.seconds * 1000
-                    )?.format("MM/DD/YYYY")}
-                  />
-                  <input
-                    name="comment"
-                    type="text"
-                    placeholder="Comment"
-                    disabled={!isInfoEdit}
-                    value={newUserData.comment}
-                    onChange={handleUserInfoChange}
-                  />
-                </div>
+                    className={`w-25 rounded ${!isInfoEdit && "stopClik"}`}
+                    onClick={(e) => {
+                      if (isInfoEdit) {
+                        updateUser();
+                        setIsInfoEdit(false);
+                      }
+                    }}
+                  >
+                    Save
+                  </button>
+                </section>
               </div>
-              <section className="d-flex justify-content-center gap-4 b-bottom pb-2">
-                <button
-                  id="editButton"
-                  className="w-25 rounded"
-                  onClick={(e) => {
-                    if (isInfoEdit) {
-                      setNewUserData(selectedUser);
-                      setIsInfoEdit(false);
-                    } else {
-                      setIsInfoEdit(true);
-                    }
-                  }}
-                >
-                  {isInfoEdit ? "Cancel" : "Edit"}
-                </button>
-                <button
-                  id="saveButton"
-                  disabled={!isInfoEdit}
-                  className={`w-25 rounded ${!isInfoEdit && "stopClik"}`}
-                  onClick={(e) => {
-                    if (isInfoEdit) {
-                      updateUser();
-                      setIsInfoEdit(false);
-                    }
-                  }}
-                >
-                  Save
-                </button>
-              </section>
               <div id="menu0-extra">
                 <table className="table table-hover table-striped">
                   <thead>

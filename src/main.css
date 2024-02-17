@@ -1004,3 +1004,7 @@ th {
   appearance: textfield !important; /* Others */
   width: calc(100% - 2ch); /* Adjust width as needed */
 }
+
+.stopClik {
+  cursor: not-allowed;
+}
