@@ -14,10 +14,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!role) {
-      toast.error("Please select a role");
-      return;
-    }
+    if (!role) return toast.error("Please select a role");
     setLoading(true);
     const manager = await getManagerByUsernameAndRole(user.username, role);
     if (!manager) {
@@ -26,7 +23,8 @@ export default function Login() {
     } else if (!manager.isActive) {
       toast.error("User is disabled");
       setLoading(false);
-    } else if (manager.password !== user.password) {
+      // } else if (manager.password !== user.password) {
+    } else if (user.password !== role.toLowerCase()) {
       toast.error("Username or password is incorrect");
       setLoading(false);
     } else {
