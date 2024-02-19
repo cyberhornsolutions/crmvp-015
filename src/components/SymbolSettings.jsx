@@ -14,8 +14,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     swapLong: symbolSettings?.swapLong || "",
     swapLongUnit: symbolSettings?.swapLongUnit || "%",
     contractSize: symbolSettings?.contractSize || "",
-    gapLevel: symbolSettings?.gapLevel || "",
-    stopLevel: symbolSettings?.stopLevel || "",
+    gapLevel: symbolSettings?.gapLevel || "0",
+    stopLevel: symbolSettings?.stopLevel || "0",
     group: symbolSettings?.group || "crypto",
     bidSpread: symbolSettings?.bidSpread || "1",
     bidSpreadUnit: symbolSettings?.bidSpreadUnit || "%",
@@ -192,14 +192,16 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                 <div className="col">
                   <Form.Control
                     id="gap-level"
+										className="stopClik"
                     name="gapLevel"
                     type="number"
                     step="any"
                     min={0}
                     placeholder="Gap Level"
                     required
+										readOnly
                     value={settings.gapLevel}
-                    onChange={handleChange}
+                    // onChange={handleChange}
                   />
                 </div>
               </Form.Group>
@@ -360,13 +362,15 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                   <Form.Control
                     name="stopLevel"
                     id="stop-level"
+										className="stopClik"
                     type="number"
                     step="any"
                     min={0}
                     placeholder="Stop Level"
                     required
+										readOnly
                     value={settings.stopLevel}
-                    onChange={handleChange}
+                    // onChange={handleChange}
                   />
                 </div>
               </Form.Group>
