@@ -449,6 +449,7 @@ export default function MainBoard() {
     let balance = parseFloat(newUserData.totalBalance) - ordersFee;
     if (closedOrdersProfit) balance += closedOrdersProfit;
     if (activeOrdersProfit) balance += activeOrdersProfit;
+		if (newUserData?.settings?.allowBonus) balance += bonus
     return balance;
   };
 

@@ -25,11 +25,7 @@ function AddBalanceModal({ setShowModal }) {
 
     const userPayload = {};
     if (balanceType === "Bonus") {
-      if (selectedUser?.settings?.allowBonus) {
-        userPayload.totalBalance = selectedUser.totalBalance + newBalance;
-      } else {
-        userPayload.bonus = selectedUser.bonus + newBalance;
-      }
+      userPayload.bonus = selectedUser.bonus + newBalance;
     } else if (balanceType === "Withdraw") {
       userPayload.totalBalance = selectedUser.totalBalance - newBalance;
     } else {

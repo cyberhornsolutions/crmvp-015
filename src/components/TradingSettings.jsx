@@ -28,10 +28,10 @@ const TradingSettings = ({ setShowModal }) => {
     e.preventDefault();
     setLoading(true);
     const userPayload = { settings };
-    if (settings.allowBonus) {
-      userPayload.bonus = 0;
-      userPayload.totalBalance = selectedUser.totalBalance + selectedUser.bonus;
-    }
+    // if (settings.allowBonus) {
+    //   userPayload.bonus = 0;
+    //   userPayload.totalBalance = selectedUser.totalBalance + selectedUser.bonus;
+    // }
     try {
       await updateUserById(selectedUser.id, userPayload);
       toast.success("Trading settings saved successfully");
