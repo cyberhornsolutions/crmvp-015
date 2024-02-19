@@ -15,7 +15,11 @@ import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import { setDepositsState } from "../redux/slicer/transactionSlicer";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
@@ -60,6 +64,7 @@ export default function MainBoard() {
   const locationInputRef = useRef(null);
   const mapInputRef = useRef(null);
   const placeInputRef = useRef(null);
+	const [passwordShown, setPasswordShown] = useState(false);
   const [isBalOpen, setIsBalOpen] = useState(false);
   const [idFiles, setIdFiles] = useState([]);
   const [locationFiles, setLocationFiles] = useState([]);
@@ -449,7 +454,7 @@ export default function MainBoard() {
     let balance = parseFloat(newUserData.totalBalance) - ordersFee;
     if (closedOrdersProfit) balance += closedOrdersProfit;
     if (activeOrdersProfit) balance += activeOrdersProfit;
-		if (newUserData?.settings?.allowBonus) balance += bonus
+    if (newUserData?.settings?.allowBonus) balance += bonus;
     return balance;
   };
 
@@ -743,6 +748,7 @@ export default function MainBoard() {
                     <span className="b-bottom">Surname</span>
                     <span className="b-bottom">Email</span>
                     <span className="b-bottom">Phone</span>
+                    <span className="b-bottom">Password</span>
                   </div>
                   <div className="d-flex flex-column gap-4">
                     <input
@@ -777,6 +783,23 @@ export default function MainBoard() {
                       value={newUserData.phone}
                       onChange={handleUserInfoChange}
                     />
+                    <div className="position-relative">
+                      <input
+                        name="password"
+                        type={passwordShown ? "text" : "password"}
+                        placeholder="Password"
+                        disabled={!isInfoEdit}
+                        value={newUserData.password}
+                        onChange={handleUserInfoChange}
+                      />
+                      <FontAwesomeIcon
+                        cursor="pointer"
+                        className="position-absolute ms-1"
+                        style={{ top: 4 }}
+                        icon={passwordShown ? faEyeSlash : faEye}
+                        onClick={() => setPasswordShown(!passwordShown)}
+                      />
+                    </div>
                   </div>
                   <div className="d-flex flex-column align-items-start gap-4">
                     <span className="b-bottom">Country</span>
@@ -819,7 +842,7 @@ export default function MainBoard() {
                     />
                   </div>
                 </div>
-                <section className="d-flex justify-content-evenly">
+                <section className="d-flex justify-content-around">
                   <button
                     id="editButton"
                     className="w-25 rounded"
