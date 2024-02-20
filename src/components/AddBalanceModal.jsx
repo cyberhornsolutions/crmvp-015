@@ -11,7 +11,6 @@ function AddBalanceModal({ setShowModal }) {
   const { selectedUser, user } = useSelector((state) => state.user);
 
   const handleAddNewBalance = async (amount) => {
-    setLoading(true);
     const newDeposit = {
       player: selectedUser.name,
       userId: selectedUser.id,
@@ -31,7 +30,7 @@ function AddBalanceModal({ setShowModal }) {
     } else {
       userPayload.totalBalance = selectedUser.totalBalance + newBalance;
     }
-
+		setLoading(true);
     try {
       await addNewDepsit(newDeposit);
       await updateUserById(selectedUser.id, userPayload);
@@ -47,7 +46,7 @@ function AddBalanceModal({ setShowModal }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     // const minDeposit = selectedUser?.settings?.minDeposit;
-    if (!newBalance) {
+    if (!newBalance || newBalance <= 0 ) {
       toast.error("Please enter amount");
     }
     // else if (newBalance < +minDeposit) {
