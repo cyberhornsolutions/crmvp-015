@@ -48,7 +48,7 @@ const overviewColumns = ({
           }}
         />
       ) : (
-        +parseFloat(row.sum)?.toFixed(6)
+        +parseFloat(row.sum)?.toFixed(2)
       )),
     sortable: true,
     omit: !showColumns.Sum,
@@ -67,7 +67,7 @@ const overviewColumns = ({
           }}
         />
       ) : (
-        +parseFloat(row.symbolValue)?.toFixed(6)
+        +parseFloat(row.symbolValue)?.toFixed(2)
       )),
     sortable: true,
     grow: 1.5,
@@ -104,7 +104,7 @@ const overviewColumns = ({
           }}
         />
       ) : (
-        +parseFloat(row.profit)?.toFixed(6)
+        +parseFloat(row.profit)?.toFixed(2)
       )),
     sortable: true,
     omit: !showColumns.Profit,

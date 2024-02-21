@@ -558,7 +558,7 @@ export default function MainBoard() {
                   setIsBalOpen(true);
                 }}
               >
-                {+parseFloat(newUserData.totalBalance)?.toFixed(6)}
+                {+parseFloat(newUserData.totalBalance)?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -566,7 +566,7 @@ export default function MainBoard() {
                 {/* Профит */}Profit
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+parseFloat(activeOrdersProfit)?.toFixed(6)}
+                {+parseFloat(activeOrdersProfit)?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -575,7 +575,7 @@ export default function MainBoard() {
                 Bonus
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+bonus?.toFixed(6)}
+                {+bonus?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -584,7 +584,7 @@ export default function MainBoard() {
                 Free
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+parseFloat(freeMarginData - bonus)?.toFixed(6)}
+                {+parseFloat(freeMarginData - bonus)?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -606,7 +606,7 @@ export default function MainBoard() {
                 Margin
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+pledge?.toFixed(6)}
+                {+pledge?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -615,7 +615,7 @@ export default function MainBoard() {
                 Equity
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+totalBalance?.toFixed(6)}
+                {+totalBalance?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -624,7 +624,7 @@ export default function MainBoard() {
                 Free margin
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+freeMarginData?.toFixed(6)}
+                {+freeMarginData?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -633,7 +633,7 @@ export default function MainBoard() {
                 Level
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {`${+parseFloat(level)?.toFixed(6)}%`}
+                {`${+parseFloat(level)?.toFixed(2)}%`}
               </h4>
             </div>
             <div>

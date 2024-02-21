@@ -115,7 +115,7 @@ const EditOrder = ({ onClose, selectedOrder }) => {
                   onChange={handleChange}
                 />
                 <label className="text-muted">
-                  Potential: {+parseFloat(potentialSL)?.toFixed(6)}
+                  Potential: {+parseFloat(potentialSL)?.toFixed(2)}
                 </label>
               </div>
             </div>
@@ -135,7 +135,7 @@ const EditOrder = ({ onClose, selectedOrder }) => {
                   onChange={handleChange}
                 />
                 <label className="text-muted">
-                  Potential: {+parseFloat(potentialTP)?.toFixed(6)}
+                  Potential: {+parseFloat(potentialTP)?.toFixed(2)}
                 </label>
               </div>
             </div>

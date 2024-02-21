@@ -55,14 +55,14 @@ const dealsColumns = ({
   },
   {
     name: "Volume",
-    selector: (row) => row && +parseFloat(row.volume)?.toFixed(6),
+    selector: (row) => row && +parseFloat(row.volume)?.toFixed(2),
     sortable: true,
     compact: true,
     omit: !showColumns.Volume,
   },
   {
     name: "Open Price",
-    selector: (row) => row && +parseFloat(row.symbolValue)?.toFixed(6),
+    selector: (row) => row && +parseFloat(row.symbolValue)?.toFixed(2),
     sortable: true,
     compact: true,
     omit: !showColumns["Open Price"],
@@ -71,8 +71,8 @@ const dealsColumns = ({
     name: "SL / TP",
     selector: (row) =>
       row &&
-      `${+parseFloat(row.sl)?.toFixed(6) || ""}/${
-        +parseFloat(row.tp)?.toFixed(6) || ""
+      `${+parseFloat(row.sl)?.toFixed(2) || ""}/${
+        +parseFloat(row.tp)?.toFixed(2) || ""
       }`,
     minWidth: "180px",
     omit: !showColumns["SL / TP"],
@@ -91,14 +91,14 @@ const dealsColumns = ({
   },
   {
     name: "Margin",
-    selector: (row) => row && +parseFloat(row.pledge)?.toFixed(6),
+    selector: (row) => row && +parseFloat(row.pledge)?.toFixed(2),
     sortable: true,
     minWidth: "120px",
     omit: !showColumns.Pledge,
   },
   {
     name: "Current Price",
-    selector: (row) => row && +parseFloat(row.currentPrice)?.toFixed(6),
+    selector: (row) => row && +parseFloat(row.currentPrice)?.toFixed(2),
     sortable: true,
     compact: true,
     minWidth: "120px",
@@ -109,7 +109,7 @@ const dealsColumns = ({
     selector: (row) =>
       row && (
         <div style={{ color: `${row.profit < 0 ? "red" : "green"}` }}>
-          {+parseFloat(row.profit).toFixed(6)}
+          {+parseFloat(row.profit).toFixed(2)}
         </div>
       ),
     sortable: true,
