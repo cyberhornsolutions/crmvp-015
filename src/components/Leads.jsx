@@ -201,10 +201,6 @@ export default function Leads({ setTab }) {
     .map((order) => {
       const symbol = symbols.find((s) => s.symbol === order.symbol);
       if (!symbol) return order;
-      let enableOpenPrice = false;
-      if (order.enableOpenPrice && order.openPriceValue !== symbol.price) {
-        enableOpenPrice = true;
-      }
       const {
         bidSpread,
         bidSpreadUnit,
@@ -216,6 +212,7 @@ export default function Leads({ setTab }) {
         swapShortUnit,
         swapLong,
         swapLongUnit,
+        maintenanceMargin,
       } = symbol.settings;
 
       let swapValue = 0;
@@ -258,6 +255,11 @@ export default function Leads({ setTab }) {
         order.volume
       );
       profit = profit - swapValue - feeValue;
+
+      const leverage = selectedUser?.settings?.leverage;
+      if (leverage > 1 && maintenanceMargin > 0) {
+        profit = (profit / leverage) * (maintenanceMargin / 100);
+      }
 
       return {
         ...order,

@@ -23,6 +23,7 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     askSpreadUnit: symbolSettings?.askSpreadUnit || "%",
     fee: symbolSettings?.fee || "",
     feeUnit: symbolSettings?.feeUnit || "%",
+    maintenanceMargin: symbolSettings?.maintenanceMargin || "100",
   });
   const [closedMarket, setClosedMarket] = useState(
     symbolSettings?.closedMarket ?? false
@@ -192,14 +193,14 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                 <div className="col">
                   <Form.Control
                     id="gap-level"
-										className="stopClik"
+                    className="stopClik"
                     name="gapLevel"
                     type="number"
                     step="any"
                     min={0}
                     placeholder="Gap Level"
                     required
-										readOnly
+                    readOnly
                     value={settings.gapLevel}
                     // onChange={handleChange}
                   />
@@ -220,6 +221,24 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                   </div>
                 </Form.Group>
               )}
+              <Form.Group className="row align-items-center mb-2">
+                <Form.Label htmlFor="maintenance-margin" className="col-4">
+                  Maintenance margin
+                </Form.Label>
+                <div className="col">
+                  <Form.Control
+                    id="maintenance-margin"
+                    name="maintenanceMargin"
+                    type="number"
+                    min={1}
+                    max={100}
+                    placeholder="Maintenance margin"
+                    required
+                    value={settings.maintenanceMargin}
+                    onChange={handleChange}
+                  />
+                </div>
+              </Form.Group>
             </div>
             <div className="col">
               <Form.Group className="row align-items-center mb-2">
@@ -362,13 +381,13 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                   <Form.Control
                     name="stopLevel"
                     id="stop-level"
-										className="stopClik"
+                    className="stopClik"
                     type="number"
                     step="any"
                     min={0}
                     placeholder="Stop Level"
                     required
-										readOnly
+                    readOnly
                     value={settings.stopLevel}
                     // onChange={handleChange}
                   />

@@ -10,7 +10,6 @@ const TradingSettings = ({ setShowModal }) => {
   const [settings, setSettings] = useState({
     group: tradingSettings?.group || "general",
     leverage: tradingSettings?.leverage || "1",
-    maintenanceMargin: tradingSettings?.maintenanceMargin || "0",
     level: tradingSettings?.level || "100",
     stopOut: tradingSettings?.stopOut || "",
     minDealSum: tradingSettings?.minDealSum || "",
@@ -58,6 +57,7 @@ const TradingSettings = ({ setShowModal }) => {
               <div className="col">
                 <Form.Select
                   id="group"
+                  name="group"
                   placeholder="Group"
                   required
                   value={settings.group}
@@ -82,34 +82,6 @@ const TradingSettings = ({ setShowModal }) => {
                   placeholder="Leverage"
                   required
                   value={settings.leverage}
-                  onChange={(e) => {
-                    const { name, value } = e.target;
-                    setSettings((p) => ({
-                      ...p,
-                      [name]: value,
-                      maintenanceMargin: value <= 1 ? 0 : p.maintenanceMargin,
-                    }));
-                  }}
-                />
-              </div>
-            </Form.Group>
-            <Form.Group className="row align-items-center mb-3">
-              <div className="col-5 text-left">
-                <Form.Label htmlFor="maintenance-margin">
-                  Maintenance margin
-                </Form.Label>
-              </div>
-              <div className="col">
-                <Form.Control
-                  id="maintenance-margin"
-                  name="maintenanceMargin"
-                  type="number"
-                  min={0}
-                  max={100}
-                  placeholder="Maintenance margin"
-                  disabled={settings.leverage <= 1}
-                  required
-                  value={settings.maintenanceMargin}
                   onChange={handleChange}
                 />
               </div>

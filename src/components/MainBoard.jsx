@@ -16,10 +16,7 @@ import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import { setDepositsState } from "../redux/slicer/transactionSlicer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEye,
-  faEyeSlash,
-} from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
@@ -64,7 +61,7 @@ export default function MainBoard() {
   const locationInputRef = useRef(null);
   const mapInputRef = useRef(null);
   const placeInputRef = useRef(null);
-	const [passwordShown, setPasswordShown] = useState(false);
+  const [passwordShown, setPasswordShown] = useState(false);
   const [isBalOpen, setIsBalOpen] = useState(false);
   const [idFiles, setIdFiles] = useState([]);
   const [locationFiles, setLocationFiles] = useState([]);
@@ -377,6 +374,7 @@ export default function MainBoard() {
         swapShortUnit,
         swapLong,
         swapLongUnit,
+        maintenanceMargin,
       } = symbol.settings;
 
       let swapValue = 0;
@@ -419,6 +417,11 @@ export default function MainBoard() {
         order.volume
       );
       profit = profit - swapValue - feeValue;
+
+      const leverage = newUserData?.settings?.leverage;
+      if (leverage > 1 && maintenanceMargin > 0) {
+        profit = (profit / leverage) * (maintenanceMargin / 100);
+      }
 
       return {
         ...order,
