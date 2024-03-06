@@ -833,7 +833,7 @@ export default function MainBoard() {
                       disabled
                       value={moment(
                         newUserData?.createdAt?.seconds * 1000
-                      )?.format("MM/DD/YYYY")}
+                      )?.format("DD/MM/YYYY")}
                     />
                     <input
                       name="comment"

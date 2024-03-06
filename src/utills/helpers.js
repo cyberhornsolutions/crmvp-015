@@ -20,7 +20,7 @@ export const filterSearchObjects = (search = "", data = []) =>
 
 export const convertTimestamptToDate = (date) =>
   moment(date.seconds * 1000 + date.nanoseconds / 1000000).format(
-    "MM/DD/YYYY hh:mm:ss A"
+    "DD/MM/YYYY hh:mm:ss A"
   );
 
 export const makeServerDate = (currentDate) => {
