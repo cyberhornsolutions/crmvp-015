@@ -9,7 +9,7 @@ const transactionsColumns = [
     name: "Player",
     selector: (row) => row.player,
     sortable: true,
-    grow: 2,
+    grow: 1.5,
     compact: true,
   },
   {
@@ -42,12 +42,18 @@ const transactionsColumns = [
     name: "Desk",
     selector: (row) => row.desk,
     sortable: true,
+    compact: true,
   },
   {
     name: "Date",
     selector: (row) => row.createdAt,
     sortable: true,
-    grow: 2,
+    grow: 1.5,
+  },
+  {
+    name: "Comment",
+    grow: 1.5,
+    selector: (row) => row.comment,
     compact: true,
   },
 ];

@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 
 function AddBalanceModal({ setShowModal }) {
   const [newBalance, setNewBalance] = useState(0);
+  const [comment, setComment] = useState("");
   const [balanceType, setBalanceType] = useState("Bonus");
   const [loading, setLoading] = useState(false);
   const { selectedUser, user } = useSelector((state) => state.user);
@@ -20,6 +21,7 @@ function AddBalanceModal({ setShowModal }) {
       manager: user.username,
       team: user.team || "",
       desk: user.desk || "",
+      comment,
     };
 
     const userPayload = {};
@@ -30,7 +32,7 @@ function AddBalanceModal({ setShowModal }) {
     } else {
       userPayload.totalBalance = selectedUser.totalBalance + newBalance;
     }
-		setLoading(true);
+    setLoading(true);
     try {
       await addNewDepsit(newDeposit);
       await updateUserById(selectedUser.id, userPayload);
@@ -46,7 +48,7 @@ function AddBalanceModal({ setShowModal }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     // const minDeposit = selectedUser?.settings?.minDeposit;
-    if (!newBalance || newBalance <= 0 ) {
+    if (!newBalance || newBalance <= 0) {
       toast.error("Balance should be greater than 0");
     }
     // else if (newBalance < +minDeposit) {
@@ -64,9 +66,11 @@ function AddBalanceModal({ setShowModal }) {
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
-          <Form.Group className="row mb-3">
+          <Form.Group className="row mb-3 align-items-center">
             <div className="col-3">
-              <Form.Label htmlFor="balance">Balance</Form.Label>
+              <Form.Label className="mb-0" htmlFor="balance">
+                Balance
+              </Form.Label>
             </div>
             <div className="col">
               <Form.Control
@@ -82,9 +86,11 @@ function AddBalanceModal({ setShowModal }) {
               />
             </div>
           </Form.Group>
-          <Form.Group className="row mb-3">
+          <Form.Group className="row mb-3 align-items-center">
             <div className="col-3">
-              <Form.Label htmlFor="balance-type">Type</Form.Label>
+              <Form.Label className="mb-0" htmlFor="balance-type">
+                Type
+              </Form.Label>
             </div>
             <div className="col">
               <Form.Select
@@ -98,6 +104,22 @@ function AddBalanceModal({ setShowModal }) {
                 <option value="Deposit">Deposit</option>
                 <option value="Withdraw">Withdraw</option>
               </Form.Select>
+            </div>
+          </Form.Group>
+          <Form.Group className="row mb-3 align-items-center">
+            <div className="col-3">
+              <Form.Label className="mb-0" htmlFor="comment">
+                Comment
+              </Form.Label>
+            </div>
+            <div className="col">
+              <Form.Control
+                id="comment"
+                type="text"
+                placeholder="Comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
             </div>
           </Form.Group>
           <button
