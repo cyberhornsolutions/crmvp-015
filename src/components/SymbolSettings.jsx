@@ -274,8 +274,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     step="any"
                     className="w-50"
                     min={0}
-                    max={50}
-                    placeholder="0-50%"
+                    max={10000}
+                    placeholder="0-10000"
                     required
                     value={settings.bidSpread}
                     onChange={handleChange}
@@ -304,8 +304,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     step="any"
                     className="w-50"
                     min={0}
-                    max={50}
-                    placeholder="0-50%"
+                    max={10000}
+                    placeholder="0-10000"
                     required
                     value={settings.askSpread}
                     onChange={handleChange}
