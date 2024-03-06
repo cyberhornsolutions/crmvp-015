@@ -246,7 +246,7 @@ export default function Leads({ setTab }) {
             : (order.sum / 100) * askSpread;
       }
       const feeValue = feeUnit === "$" ? fee : (order.sum / 100) * fee;
-      const pledge = order.sum;
+      const margin = order.sum;
 
       let profit = calculateProfit(
         order.type,
@@ -266,7 +266,7 @@ export default function Leads({ setTab }) {
         currentPrice,
         currentMarketPrice: parseFloat(symbol.price),
         enableOpenPrice: order.enableOpenPrice,
-        pledge: parseFloat(pledge),
+        margin: parseFloat(margin),
         spread: parseFloat(spread),
         swap: parseFloat(swapValue),
         fee: parseFloat(feeValue),

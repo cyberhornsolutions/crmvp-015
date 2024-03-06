@@ -408,7 +408,7 @@ export default function MainBoard() {
             : (order.sum / 100) * askSpread;
       }
       const feeValue = feeUnit === "$" ? fee : (order.sum / 100) * fee;
-      const pledge = order.sum;
+      const margin = order.sum;
 
       let profit = calculateProfit(
         order.type,
@@ -428,7 +428,7 @@ export default function MainBoard() {
         currentPrice,
         currentMarketPrice: parseFloat(symbol.price),
         enableOpenPrice: order.enableOpenPrice,
-        pledge: parseFloat(pledge),
+        margin: parseFloat(margin),
         spread: parseFloat(spread),
         swap: parseFloat(swapValue),
         fee: parseFloat(feeValue),
@@ -471,13 +471,13 @@ export default function MainBoard() {
   };
   const freeMarginData = calculateFreeMargin();
 
-  const pledge = pendingOrders.reduce((p, v) => p + v.pledge, 0);
+  const totalMargin = pendingOrders.reduce((p, v) => p + v.margin, 0);
 
   const userLevel = newUserData?.settings?.level || 100;
-  const level = pledge && (totalBalance / pledge) * (userLevel / 100);
+  const level = totalMargin && (totalBalance / totalMargin) * (userLevel / 100);
 
   // const calculateEquity = () => {
-  //   let equity = freeMarginData + pledge - ordersFee;
+  //   let equity = freeMarginData + margin - ordersFee;
   //   if (allowBonus) equity -= bonus;
   //   return equity;
   // };
@@ -609,7 +609,7 @@ export default function MainBoard() {
                 Margin
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+pledge?.toFixed(2)}
+                {+totalMargin?.toFixed(2)}
               </h4>
             </div>
             <div>
