@@ -311,10 +311,11 @@ export default function Leads({ setTab }) {
       name: "Balance",
       selector: (row) => {
         if (!row) return;
-        let equity = row.totalBalance + row.activeOrdersProfit;
-        if (row?.settings?.allowBonus) equity += row.bonus;
-        const balance = equity + row.totalMargin;
-        return balance;
+        let equity =
+          parseFloat(row.totalBalance) + parseFloat(row.activeOrdersProfit);
+        if (row?.settings?.allowBonus) equity += parseFloat(row.bonus);
+        const balance = equity + parseFloat(row.totalMargin);
+        return +parseFloat(balance)?.toFixed(2);
       },
       omit: !showPlayersColumns.Balance,
     },
