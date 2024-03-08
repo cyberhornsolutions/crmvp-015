@@ -91,7 +91,7 @@ const dealsColumns = ({
   },
   {
     name: "Margin",
-    selector: (row) => row && +parseFloat(row.margin)?.toFixed(2),
+    selector: (row) => row && +parseFloat(row.sum)?.toFixed(2),
     sortable: true,
     minWidth: "120px",
     omit: !showColumns.Margin,

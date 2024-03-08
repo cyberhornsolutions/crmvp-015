@@ -196,83 +196,9 @@ export default function Leads({ setTab }) {
     }
   };
 
-  const deals = userOrders
-    .filter((order) => order.status === "Pending" && !order.enableOpenPrice)
-    .map((order) => {
-      const symbol = symbols.find((s) => s.symbol === order.symbol);
-      if (!symbol) return order;
-      const {
-        bidSpread,
-        bidSpreadUnit,
-        askSpread,
-        askSpreadUnit,
-        fee,
-        feeUnit,
-        swapShort,
-        swapShortUnit,
-        swapLong,
-        swapLongUnit,
-        maintenanceMargin,
-      } = symbol.settings;
-
-      let swapValue = 0;
-      if (order.createdTime) {
-        const swap = order.type === "Buy" ? swapShort : swapLong;
-        const swapUnit = order.type === "Buy" ? swapShortUnit : swapLongUnit;
-        const jsDate = new Date(order.createdTime.seconds * 1000).setHours(
-          0,
-          0,
-          0
-        );
-        const days = swap * moment().diff(jsDate, "d");
-        swapValue = swapUnit === "$" ? swap * days : (order.sum / 100) * days;
-      }
-
-      const currentPrice =
-        order.type === "Buy"
-          ? getBidValue(symbol.price, bidSpread, bidSpreadUnit === "$")
-          : getAskValue(symbol.price, askSpread, askSpreadUnit === "$");
-
-      let spread;
-      if (order.type === "Buy") {
-        spread =
-          bidSpreadUnit === "$"
-            ? order.volume * bidSpread
-            : (order.sum / 100) * bidSpread;
-      } else {
-        spread =
-          askSpreadUnit === "$"
-            ? order.volume * askSpread
-            : (order.sum / 100) * askSpread;
-      }
-      const feeValue = feeUnit === "$" ? fee : (order.sum / 100) * fee;
-      const margin = order.sum;
-
-      let profit = calculateProfit(
-        order.type,
-        currentPrice,
-        order.symbolValue,
-        order.volume
-      );
-      profit = profit - swapValue - feeValue;
-
-      const leverage = selectedUser?.settings?.leverage;
-      if (leverage > 1 && maintenanceMargin > 0) {
-        profit = (profit / leverage) * (maintenanceMargin / 100);
-      }
-
-      return {
-        ...order,
-        currentPrice,
-        currentMarketPrice: parseFloat(symbol.price),
-        enableOpenPrice: order.enableOpenPrice,
-        margin: parseFloat(margin),
-        spread: parseFloat(spread),
-        swap: parseFloat(swapValue),
-        fee: parseFloat(feeValue),
-        profit,
-      };
-    });
+  const deals = userOrders.filter(
+    (order) => order.status === "Pending" && !order.enableOpenPrice
+  );
 
   const onUserDoubleClick = async (row) => {
     const u = await getUserById(row.id);
@@ -383,7 +309,13 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Balance",
-      selector: (row) => row.totalBalance,
+      selector: (row) => {
+        if (!row) return;
+        let equity = row.totalBalance + row.activeOrdersProfit;
+        if (row?.settings?.allowBonus) equity += row.bonus;
+        const balance = equity + row.totalMargin;
+        return balance;
+      },
       omit: !showPlayersColumns.Balance,
     },
     {

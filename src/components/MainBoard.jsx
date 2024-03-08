@@ -199,7 +199,7 @@ export default function MainBoard() {
       profit += +userOrderData[i].profit;
     }
     if (profit < 0) {
-      const eq = +totalBalance + profit;
+      const eq = +equity + profit;
       if (eq < 0) return toast.error("This profit makes equity less than 0");
       if (eq < newUserData?.settings?.stopOut)
         return toast.error("This profit makes equity less than stop out value");
@@ -358,91 +358,12 @@ export default function MainBoard() {
     },
   ];
 
-  const pendingOrders = userOrderData
-    ?.filter(({ status }) => status === "Pending")
-    .map((order) => {
-      const symbol = symbols.find((s) => s.symbol === order.symbol);
-      if (!symbol) return order;
-      const {
-        bidSpread,
-        bidSpreadUnit,
-        askSpread,
-        askSpreadUnit,
-        fee,
-        feeUnit,
-        swapShort,
-        swapShortUnit,
-        swapLong,
-        swapLongUnit,
-        maintenanceMargin,
-      } = symbol.settings;
-
-      let swapValue = 0;
-      if (order.createdTime) {
-        const swap = order.type === "Buy" ? swapShort : swapLong;
-        const swapUnit = order.type === "Buy" ? swapShortUnit : swapLongUnit;
-        const jsDate = new Date(order.createdTime.seconds * 1000).setHours(
-          0,
-          0,
-          0
-        );
-        const days = swap * moment().diff(jsDate, "d");
-        swapValue = swapUnit === "$" ? swap * days : (order.sum / 100) * days;
-      }
-
-      const currentPrice =
-        order.type === "Buy"
-          ? getBidValue(symbol.price, bidSpread, bidSpreadUnit === "$")
-          : getAskValue(symbol.price, askSpread, askSpreadUnit === "$");
-
-      let spread;
-      if (order.type === "Buy") {
-        spread =
-          bidSpreadUnit === "$"
-            ? order.volume * bidSpread
-            : (order.sum / 100) * bidSpread;
-      } else {
-        spread =
-          askSpreadUnit === "$"
-            ? order.volume * askSpread
-            : (order.sum / 100) * askSpread;
-      }
-      const feeValue = feeUnit === "$" ? fee : (order.sum / 100) * fee;
-      const margin = order.sum;
-
-      let profit = calculateProfit(
-        order.type,
-        currentPrice,
-        order.symbolValue,
-        order.volume
-      );
-      profit = profit - swapValue - feeValue;
-
-      const leverage = newUserData?.settings?.leverage;
-      if (leverage > 1 && maintenanceMargin > 0) {
-        profit = (profit / leverage) * (maintenanceMargin / 100);
-      }
-
-      return {
-        ...order,
-        currentPrice,
-        currentMarketPrice: parseFloat(symbol.price),
-        enableOpenPrice: order.enableOpenPrice,
-        margin: parseFloat(margin),
-        spread: parseFloat(spread),
-        swap: parseFloat(swapValue),
-        fee: parseFloat(feeValue),
-        profit,
-      };
-    });
+  const pendingOrders = userOrderData?.filter(
+    ({ status }) => status === "Pending"
+  );
 
   const closedOrders = userOrderData?.filter(
     ({ status }) => status !== "Pending"
-  );
-
-  const ordersFee = [...pendingOrders, ...closedOrders].reduce(
-    (p, v) => p + parseFloat(v.spread) + parseFloat(v.swap) + parseFloat(v.fee),
-    0
   );
 
   const bonus = newUserData?.bonus;
@@ -450,39 +371,29 @@ export default function MainBoard() {
   const activeOrders = pendingOrders.filter((order) => !order.enableOpenPrice);
   const delayedOrders = pendingOrders.filter((order) => order.enableOpenPrice);
 
-  const activeOrdersProfit = activeOrders.reduce((p, v) => p + +v.profit, 0);
-  const closedOrdersProfit = closedOrders.reduce((p, v) => p + +v.profit, 0);
+  const activeOrdersProfit = newUserData.activeOrdersProfit;
 
-  const calculateTotalBalance = () => {
-    let balance = parseFloat(newUserData.totalBalance) - ordersFee;
-    if (closedOrdersProfit) balance += closedOrdersProfit;
-    if (activeOrdersProfit) balance += activeOrdersProfit;
-    if (newUserData?.settings?.allowBonus) balance += bonus;
-    return balance;
+  const calculateEquity = () => {
+    let equity = newUserData?.totalBalance + activeOrdersProfit;
+    if (newUserData?.settings?.allowBonus) equity += bonus;
+    return equity;
   };
+  const equity = calculateEquity();
+  const totalMargin = newUserData.totalMargin;
 
-  const totalBalance = calculateTotalBalance();
+  const totalBalance = equity + totalMargin;
 
   const calculateFreeMargin = () => {
-    let freeMarginOpened = totalBalance;
+    let freeMarginOpened = equity;
     const dealSum = pendingOrders.reduce((p, v) => p + v.sum, 0);
     freeMarginOpened -= parseFloat(dealSum);
     return freeMarginOpened;
   };
   const freeMarginData = calculateFreeMargin();
 
-  const totalMargin = pendingOrders.reduce((p, v) => p + v.margin, 0);
-
   const userLevel = newUserData?.settings?.level || 100;
-  const level = totalMargin && (totalBalance / totalMargin) * (userLevel / 100);
-
-  // const calculateEquity = () => {
-  //   let equity = freeMarginData + margin - ordersFee;
-  //   if (allowBonus) equity -= bonus;
-  //   return equity;
-  // };
-
-  // const equity = calculateEquity();
+  const level =
+    totalMargin > 0 ? (equity / totalMargin) * (userLevel / 100) : 0;
 
   return (
     <div id="mainboard">
@@ -561,7 +472,7 @@ export default function MainBoard() {
                   setIsBalOpen(true);
                 }}
               >
-                {+parseFloat(newUserData.totalBalance)?.toFixed(2)}
+                {+parseFloat(totalBalance)?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -578,7 +489,7 @@ export default function MainBoard() {
                 Bonus
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+bonus?.toFixed(2)}
+                {+parseFloat(bonus)?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -609,7 +520,7 @@ export default function MainBoard() {
                 Margin
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+totalMargin?.toFixed(2)}
+                {+parseFloat(totalMargin)?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -618,7 +529,7 @@ export default function MainBoard() {
                 Equity
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+totalBalance?.toFixed(2)}
+                {+parseFloat(equity)?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -627,7 +538,7 @@ export default function MainBoard() {
                 Free margin
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {+freeMarginData?.toFixed(2)}
+                {+parseFloat(freeMarginData)?.toFixed(2)}
               </h4>
             </div>
             <div>
@@ -1332,6 +1243,7 @@ export default function MainBoard() {
         <CancelOrderModal
           selectedOrder={selectedOrder}
           setShow={setShowCancelOrderModal}
+          userProfile={newUserData}
         />
       )}
       {isDealEdit && (

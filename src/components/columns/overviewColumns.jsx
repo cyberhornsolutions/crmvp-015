@@ -81,13 +81,27 @@ const overviewColumns = ({
   },
   { name: "TP", selector: (row) => row.tp, omit: !showColumns.TP },
   { name: "SL", selector: (row) => row.sl, omit: !showColumns.SL },
+  { name: "Spread", selector: (row) => row.spread, omit: !showColumns.Spread },
   { name: "Swap", selector: (row) => row.swap, omit: !showColumns.Swap },
   { name: "Fee", selector: (row) => row.fee, omit: !showColumns.Fee },
   {
     name: "Status",
-    selector: (row) => row.status,
+    selector: (row) =>
+      row && (
+        <div
+          className={
+            row.status == "Success"
+              ? "text-success"
+              : row.status == "Closed"
+              ? "text-danger"
+              : ""
+          }
+        >
+          {row.status}
+        </div>
+      ),
     sortable: true,
-    cell: (row) => row.status,
+    compact: true,
     omit: !showColumns.Status,
   },
   {

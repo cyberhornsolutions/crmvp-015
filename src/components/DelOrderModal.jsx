@@ -13,6 +13,7 @@ import {
 import { calculateProfit } from "../utills/helpers";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { updateUserById } from "../utills/firebaseHelpers";
 
 const DelOrderModal = ({ onClose, selectedOrder }) => {
   const [volume, setVolume] = useState(selectedOrder?.volume);
@@ -24,23 +25,40 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
   const updateOrderStatus = async (orderId, newStatus, newVolume) => {
     const orderRef = doc(db, "orders", orderId);
     const docSnapshot = await getDoc(orderRef);
+    if (!docSnapshot.exists()) return toast.error("Order doesn't exist");
+
+    const userRef = doc(db, "users", selectedOrder.userId);
+    const userSnapshot = await getDoc(userRef);
+    if (!userSnapshot.exists()) return toast.error("User doesn't exist");
+    const userProfile = userSnapshot.data();
 
     const newData = {
       status: newStatus,
       closedDate: serverTimestamp(),
       closedPrice,
-      profit: selectedOrder.profit,
-      spread: selectedOrder.spread,
-      swap: selectedOrder.swap,
-      fee: selectedOrder.fee,
     };
 
     if (newVolume) {
       newData.volume = newVolume;
       newData.sum = newVolume * closedPrice;
     }
+
+    let totalMargin = parseFloat(userProfile?.totalMargin);
+    if (newVolume) {
+      totalMargin = +(userProfile?.totalMargin - newData.sum).toFixed(2);
+    } else {
+      totalMargin = +(userProfile?.totalMargin - selectedOrder.sum).toFixed(2);
+    }
+
     if (docSnapshot.exists()) {
       await updateDoc(orderRef, newData);
+      await updateUserById(userProfile.id, {
+        totalBalance: userProfile?.totalBalance + selectedOrder.profit,
+        totalMargin,
+        activeOrdersProfit: +parseFloat(
+          userProfile?.activeOrdersProfit - selectedOrder.profit
+        ).toFixed(2),
+      });
       toast.success("Order status updated successfully");
     } else {
       toast.error("Order does not exist");
