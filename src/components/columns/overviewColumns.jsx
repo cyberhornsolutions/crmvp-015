@@ -118,7 +118,17 @@ const overviewColumns = ({
           }}
         />
       ) : (
-        +parseFloat(row.profit)?.toFixed(2)
+        <div
+          className={
+            row.profit > 0
+              ? "text-success"
+              : row.profit < 0
+              ? "text-danger"
+              : ""
+          }
+        >
+          {row.profit}
+        </div>
       )),
     sortable: true,
     omit: !showColumns.Profit,

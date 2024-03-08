@@ -109,7 +109,7 @@ const dealsColumns = ({
     selector: (row) =>
       row && (
         <div style={{ color: `${row.profit < 0 ? "red" : "green"}` }}>
-          {+parseFloat(row.profit).toFixed(2)}
+          {row.profit}
         </div>
       ),
     sortable: true,

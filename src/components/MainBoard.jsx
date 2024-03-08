@@ -24,10 +24,7 @@ import delayedColumns from "./columns/delayedColumns";
 import overviewColumns from "./columns/overviewColumns";
 import depositsColumns from "./columns/depositsColumns";
 import {
-  calculateProfit,
   fillArrayWithEmptyRows,
-  getAskValue,
-  getBidValue,
 } from "../utills/helpers";
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
