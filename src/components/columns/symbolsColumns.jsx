@@ -21,7 +21,14 @@ const symbolsColumns = (
       if (!row) return;
       const { settings = {} } = row;
       const isDirectPrice = settings.bidSpreadUnit === "$";
-      return getBidValue(row.price, settings.bidSpread, isDirectPrice);
+      const bidValue = getBidValue(
+        row.price,
+        settings.bidSpread,
+        isDirectPrice
+      );
+      return row?.settings?.group === "currencies"
+        ? +parseFloat(bidValue)?.toFixed(6)
+        : +parseFloat(bidValue)?.toFixed(2);
     },
     right: true,
   },
@@ -31,7 +38,15 @@ const symbolsColumns = (
       if (!row) return;
       const { settings = {} } = row;
       const isDirectPrice = settings.askSpreadUnit === "$";
-      return getAskValue(row.price, settings.askSpread, isDirectPrice);
+
+      const askValue = getAskValue(
+        row.price,
+        settings.askSpread,
+        isDirectPrice
+      );
+      return row?.settings?.group === "currencies"
+        ? +parseFloat(askValue)?.toFixed(6)
+        : +parseFloat(askValue)?.toFixed(2);
     },
     right: true,
   },

@@ -30,12 +30,9 @@ import { setSelectedUser } from "../redux/slicer/userSlice";
 import AddBalanceModal from "./AddBalanceModal";
 import TradingSettings from "./TradingSettings";
 import {
-  calculateProfit,
   convertTimestamptToDate,
   fillArrayWithEmptyRows,
   filterSearchObjects,
-  getAskValue,
-  getBidValue,
 } from "../utills/helpers";
 import dealsColumns from "./columns/dealsColumns";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
