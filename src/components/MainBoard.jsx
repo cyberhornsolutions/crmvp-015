@@ -201,7 +201,7 @@ export default function MainBoard() {
     if (profit < 0) {
       const eq = +equity + profit;
       if (eq < 0) return toast.error("This profit makes equity less than 0");
-      if (eq < newUserData?.settings?.stopOut)
+      if (eq < parseFloat(newUserData?.settings?.stopOut))
         return toast.error("This profit makes equity less than stop out value");
     }
     let status = "success";
@@ -366,32 +366,32 @@ export default function MainBoard() {
     ({ status }) => status !== "Pending"
   );
 
-  const bonus = newUserData?.bonus;
+  const bonus = parseFloat(newUserData?.bonus);
 
   const activeOrders = pendingOrders.filter((order) => !order.enableOpenPrice);
   const delayedOrders = pendingOrders.filter((order) => order.enableOpenPrice);
 
-  const activeOrdersProfit = newUserData.activeOrdersProfit;
+  const activeOrdersProfit = parseFloat(newUserData.activeOrdersProfit);
 
   const calculateEquity = () => {
-    let equity = newUserData?.totalBalance + activeOrdersProfit;
+    let equity = parseFloat(newUserData?.totalBalance) + activeOrdersProfit;
     if (newUserData?.settings?.allowBonus) equity += bonus;
     return equity;
   };
   const equity = calculateEquity();
-  const totalMargin = newUserData.totalMargin;
+  const totalMargin = parseFloat(newUserData.totalMargin);
 
   const totalBalance = equity + totalMargin;
 
   const calculateFreeMargin = () => {
     let freeMarginOpened = equity;
-    const dealSum = pendingOrders.reduce((p, v) => p + v.sum, 0);
+    const dealSum = pendingOrders.reduce((p, v) => p + +v.sum, 0);
     freeMarginOpened -= parseFloat(dealSum);
     return freeMarginOpened;
   };
   const freeMarginData = calculateFreeMargin();
 
-  const userLevel = newUserData?.settings?.level || 100;
+  const userLevel = parseFloat(newUserData?.settings?.level) || 100;
   const level =
     totalMargin > 0 ? (equity / totalMargin) * (userLevel / 100) : 0;
 
