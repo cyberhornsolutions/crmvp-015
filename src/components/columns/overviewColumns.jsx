@@ -81,7 +81,11 @@ const overviewColumns = ({
   },
   { name: "TP", selector: (row) => row.tp, omit: !showColumns.TP },
   { name: "SL", selector: (row) => row.sl, omit: !showColumns.SL },
-  { name: "Spread", selector: (row) => row.spread, omit: !showColumns.Spread },
+  {
+    name: "Spread",
+    selector: (row) => row && +parseFloat(row.spread)?.toFixed(6),
+    omit: !showColumns.Spread,
+  },
   { name: "Swap", selector: (row) => row.swap, omit: !showColumns.Swap },
   { name: "Fee", selector: (row) => row.fee, omit: !showColumns.Fee },
   {
@@ -94,7 +98,7 @@ const overviewColumns = ({
               ? "text-success"
               : row.status == "Closed"
               ? "text-danger"
-              : ""
+              : "text-warning"
           }
         >
           {row.status}
