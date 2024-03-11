@@ -86,7 +86,11 @@ const overviewColumns = ({
     selector: (row) => row && +parseFloat(row.spread)?.toFixed(6),
     omit: !showColumns.Spread,
   },
-  { name: "Swap", selector: (row) => row.swap, omit: !showColumns.Swap },
+  {
+    name: "Swap",
+    selector: (row) => row && +parseFloat(row.swap)?.toFixed(4),
+    omit: !showColumns.Swap,
+  },
   { name: "Fee", selector: (row) => row.fee, omit: !showColumns.Fee },
   {
     name: "Status",
