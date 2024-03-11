@@ -477,6 +477,17 @@ export default function Leads({ setTab }) {
             paginationRowsPerPageOptions={[5, 10, 20, 50]}
             highlightOnHover
             pointerOnHover
+            onRowClicked={(row) => row && setSelectedOrder(row)}
+            onRowDoubleClicked={(row) => row && setShowEditOrderModal(true)}
+            conditionalRowStyles={[
+              {
+                when: (row) => row && row.id === selectedOrder?.id,
+                style: {
+                  backgroundColor: "#D1FFBD",
+                  userSelect: "none",
+                },
+              },
+            ]}
           />
         </div>
       </div>

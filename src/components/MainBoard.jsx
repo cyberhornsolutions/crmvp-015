@@ -1157,7 +1157,17 @@ export default function MainBoard() {
                 pagination
                 paginationPerPage={10}
                 paginationRowsPerPageOptions={[5, 10, 20, 50]}
-                // responsive
+                onRowClicked={(row) => row && setSelectedOrder(row)}
+                onRowDoubleClicked={(row) => row && setIsDealEdit(true)}
+                conditionalRowStyles={[
+                  {
+                    when: (row) => row && row.id === selectedOrder?.id,
+                    style: {
+                      backgroundColor: "#D1FFBD",
+                      userSelect: "none",
+                    },
+                  },
+                ]}
               />
             </div>
           )}
@@ -1176,7 +1186,17 @@ export default function MainBoard() {
                 pagination
                 paginationPerPage={10}
                 paginationRowsPerPageOptions={[5, 10, 20, 50]}
-                // responsive
+                onRowClicked={(row) => row && setSelectedOrder(row)}
+                onRowDoubleClicked={(row) => row && setIsDealEdit(true)}
+                conditionalRowStyles={[
+                  {
+                    when: (row) => row && row.id === selectedOrder?.id,
+                    style: {
+                      backgroundColor: "#D1FFBD",
+                      userSelect: "none",
+                    },
+                  },
+                ]}
               />
             </div>
           )}
