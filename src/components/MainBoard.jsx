@@ -23,9 +23,7 @@ import dealsColumns from "./columns/dealsColumns";
 import delayedColumns from "./columns/delayedColumns";
 import overviewColumns from "./columns/overviewColumns";
 import depositsColumns from "./columns/depositsColumns";
-import {
-  fillArrayWithEmptyRows,
-} from "../utills/helpers";
+import { fillArrayWithEmptyRows } from "../utills/helpers";
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
 
@@ -368,10 +366,14 @@ export default function MainBoard() {
   const activeOrders = pendingOrders.filter((order) => !order.enableOpenPrice);
   const delayedOrders = pendingOrders.filter((order) => order.enableOpenPrice);
 
-  const activeOrdersProfit = parseFloat(newUserData.activeOrdersProfit);
+  const activeOrdersProfit = parseFloat(newUserData?.activeOrdersProfit) || 0;
+  const activeOrdersSwap = parseFloat(newUserData?.activeOrdersSwap) || 0;
 
   const calculateEquity = () => {
-    let equity = parseFloat(newUserData?.totalBalance) + activeOrdersProfit;
+    let equity =
+      parseFloat(newUserData?.totalBalance) +
+      activeOrdersProfit -
+      activeOrdersSwap;
     if (newUserData?.settings?.allowBonus) equity += bonus;
     return equity;
   };

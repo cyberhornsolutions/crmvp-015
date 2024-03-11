@@ -53,11 +53,15 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
     if (docSnapshot.exists()) {
       await updateDoc(orderRef, newData);
       await updateUserById(userProfile.id, {
-        totalBalance: userProfile?.totalBalance + selectedOrder.profit,
+        totalBalance:
+          userProfile?.totalBalance + selectedOrder.profit - selectedOrder.swap,
         totalMargin,
         activeOrdersProfit: +parseFloat(
           userProfile?.activeOrdersProfit - selectedOrder.profit
         ).toFixed(2),
+        activeOrdersSwap: +parseFloat(
+          userProfile?.activeOrdersSwap - selectedOrder.swap
+        )?.toFixed(2),
       });
       toast.success("Order status updated successfully");
     } else {
