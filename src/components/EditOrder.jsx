@@ -35,27 +35,23 @@ const EditOrder = ({ onClose, selectedOrder }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if ((sl && !tp) || (tp && !sl))
-      return toast.error("Please enter both SL and TP");
-    else if (sl && tp) {
-      if (
-        selectedOrder.type === "Buy" &&
-        (sl >= selectedOrder.currentPrice ||
-          tp <= selectedOrder.currentMarketPrice)
-      ) {
-        return toast.error(
-          "In buy case SL should be less than current price and TP should be greater than current price"
-        );
-      }
-      if (
-        selectedOrder.type === "Sell" &&
-        (sl <= selectedOrder.currentPrice ||
-          tp >= selectedOrder.currentMarketPrice)
-      ) {
-        return toast.error(
-          "In sell case TP should be less than current price and SL should be greater than current price"
-        );
-      }
+    if (
+      selectedOrder.type === "Buy" &&
+      ((sl && sl >= selectedOrder.currentPrice) ||
+        (tp && tp <= selectedOrder.currentMarketPrice))
+    ) {
+      return toast.error(
+        "In buy case SL should be less than current price and TP should be greater than current price"
+      );
+    }
+    if (
+      selectedOrder.type === "Sell" &&
+      ((sl && sl <= selectedOrder.currentPrice) ||
+        (tp && tp >= selectedOrder.currentMarketPrice))
+    ) {
+      return toast.error(
+        "In sell case TP should be less than current price and SL should be greater than current price"
+      );
     }
     if (!volume || volume <= 0)
       return toast.error("Volume should be greater than 0");
