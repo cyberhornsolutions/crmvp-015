@@ -23,8 +23,9 @@ import {
   fetchPlayers,
   getAllSymbols,
   fetchManagers,
+  fetchOrders,
 } from "../utills/firebaseHelpers";
-import { setUserOrders } from "../redux/slicer/orderSlicer";
+import { setOrdersState } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import AddBalanceModal from "./AddBalanceModal";
@@ -44,7 +45,8 @@ import { setManagersState } from "../redux/slicer/managersSlice";
 export default function Leads({ setTab }) {
   const user = useSelector((state) => state.user.user);
   const players = useSelector((state) => state.players);
-  const userOrders = useSelector((state) => state?.userOrders?.orders);
+  const orders = useSelector((state) => state.orders);
+  // const [userOrders, setUserOrders] = useState([]);
   const selectedUser = useSelector((state) => state.user.selectedUser);
   const symbols = useSelector((state) => state?.symbols);
   const managers = useSelector((state) => state.managers);
@@ -78,10 +80,8 @@ export default function Leads({ setTab }) {
     setIsDelModalOpen(true);
   };
 
-  const setPlayers = useCallback((players) => {
-    if (user.role !== "Admin")
-      players = players.filter(({ manager }) => manager === user.id);
-    dispatch(setPlayersState(players));
+  const setOrders = useCallback((orders) => {
+    dispatch(setOrdersState(orders));
   }, []);
 
   const setSymbols = useCallback((symbolsData) => {
@@ -99,7 +99,11 @@ export default function Leads({ setTab }) {
     filteredUsers = filterSearchObjects(searchText, filteredUsers);
 
   useEffect(() => {
-    if (!players.length) fetchPlayers(setPlayers);
+    if (!orders.length)
+      fetchOrders(
+        setOrders,
+        players.map((p) => p.id)
+      );
     if (!symbols.length) getAllSymbols(setSymbols);
     if (!managers.length && user.role === "Admin") fetchManagers(setManagers);
 
@@ -143,36 +147,6 @@ export default function Leads({ setTab }) {
     };
   }, []);
 
-  const fetchOrders = async (row, isOk) => {
-    try {
-      const q = query(
-        collection(db, "orders"),
-        orderBy("createdTime", "desc"),
-        where("userId", "==", row?.id)
-      );
-
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const orders = [];
-
-        querySnapshot.forEach((doc) => {
-          orders.push({ id: doc.id, ...doc.data() });
-        });
-        dispatch(setUserOrders(orders));
-        if (isOk === true) {
-          setTab("Player Card");
-        }
-      });
-      dispatch(setSelectedUser(row));
-      setSelected(row?.id);
-
-      return () => {
-        unsubscribe();
-      };
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-  };
-
   const handleDropdownItemClick = async (val, userId) => {
     try {
       const userRef = doc(db, "users", userId);
@@ -193,15 +167,12 @@ export default function Leads({ setTab }) {
     }
   };
 
-  const deals = userOrders.filter(
-    (order) => order.status === "Pending" && !order.enableOpenPrice
+  const deals = orders.filter(
+    (o) =>
+      o.userId === selectedUser?.id &&
+      o.status === "Pending" &&
+      !o.enableOpenPrice
   );
-
-  const onUserDoubleClick = async (row) => {
-    const u = await getUserById(row.id);
-    dispatch(setSelectedUser(u));
-    await fetchOrders(row, true);
-  };
 
   let userColumns = [
     {
@@ -309,9 +280,16 @@ export default function Leads({ setTab }) {
       selector: (row) => {
         if (!row) return;
         let equity =
-          parseFloat(row.totalBalance) + parseFloat(row.activeOrdersProfit);
+          parseFloat(row.totalBalance) +
+          parseFloat(row.activeOrdersProfit) -
+          parseFloat(row.activeOrdersSwap);
         if (row?.settings?.allowBonus) equity += parseFloat(row.bonus);
-        const balance = equity + parseFloat(row.totalMargin);
+        const dealSum = orders
+          .filter((o) => o.userId === row.id && o.status === "Pending")
+          .reduce((p, v) => p + +v.sum, 0);
+        const freeMargin = equity - dealSum;
+        const balance =
+          freeMargin + parseFloat(row.totalMargin) + parseFloat(row.bonus);
         return +parseFloat(balance)?.toFixed(2);
       },
       omit: !showPlayersColumns.Balance,
@@ -455,8 +433,8 @@ export default function Leads({ setTab }) {
             paginationPerPage={5}
             paginationRowsPerPageOptions={[5, 10, 20, 50]}
             conditionalRowStyles={conditionalRowStyles}
-            onRowClicked={(row) => fetchOrders(row, false)}
-            onRowDoubleClicked={onUserDoubleClick}
+            onRowClicked={(row) => row && dispatch(setSelectedUser(row))}
+            onRowDoubleClicked={(row) => row && setTab("Player Card")}
             // responsive
           />
         </div>

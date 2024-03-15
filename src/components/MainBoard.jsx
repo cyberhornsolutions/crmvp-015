@@ -11,7 +11,6 @@ import DelOrderModal from "./DelOrderModal";
 import CancelOrderModal from "./CancelOrderModal";
 import EditOrder from "./EditOrder";
 import { useDispatch, useSelector } from "react-redux";
-import { setUserOrders } from "../redux/slicer/orderSlicer";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import { setDepositsState } from "../redux/slicer/transactionSlicer";
@@ -44,8 +43,8 @@ const delayedColumnsNames = delayedColumns().reduce(
 
 export default function MainBoard() {
   const dispatch = useDispatch();
-  const userOrders = useSelector((state) => state?.userOrders?.orders);
-  const symbols = useSelector((state) => state?.symbols);
+  const orders = useSelector((state) => state.orders);
+  const [userOrders, setUserOrders] = useState([]);
   const columns = useSelector((state) => state?.columns);
   const { selectedUser } = useSelector((state) => state?.user);
   const deposits = useSelector((state) =>
@@ -71,21 +70,20 @@ export default function MainBoard() {
   const [showCancelOrderModal, setShowCancelOrderModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
-  const [userOrderData, setUserOrderData] = useState(userOrders);
+  const [closedOrders, setClosedOrders] = useState([]);
   const [isUserEdit, setIsUserEdit] = useState(false);
   const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [showColumns, setShowColumns] = useState({});
 
-  const setDeposits = useCallback((data) => {
-    dispatch(setDepositsState(data));
-  }, []);
-  const setSymbols = useCallback((symbolsData) => {
-    dispatch(setSymbolsState(symbolsData));
-  }, []);
+  useEffect(() => {
+    const _orders = orders.filter((o) => o.userId === selectedUser?.id);
+    setUserOrders(_orders);
+    const closed = _orders.filter(({ status }) => status !== "Pending");
+    if (closed.length !== closedOrders.length) setClosedOrders(closed);
+  }, [orders]);
 
   useEffect(() => {
-    if (!symbols.length) getAllSymbols(setSymbols);
-    if (!deposits.length) getAllDeposits(setDeposits);
+    const unsubSelectedUser = getSelectedUserData();
 
     let cols;
     switch (tab) {
@@ -109,18 +107,21 @@ export default function MainBoard() {
       setShowColumnsModal(true);
     };
     header.addEventListener("contextmenu", handleRightClick);
-    return () => header.removeEventListener("contextmenu", handleRightClick);
+    return () => {
+      header.removeEventListener("contextmenu", handleRightClick);
+      unsubSelectedUser();
+    };
   }, [tab]);
 
-  const handleKeyPress = (event) => {
-    const keyCode = event.keyCode || event.which;
-    const keyValue = String.fromCharCode(keyCode);
+  // const handleKeyPress = (event) => {
+  //   const keyCode = event.keyCode || event.which;
+  //   const keyValue = String.fromCharCode(keyCode);
 
-    // Allow only numeric keys (0-9)
-    if (!/^\d+$/.test(keyValue)) {
-      event.preventDefault();
-    }
-  };
+  //   // Allow only numeric keys (0-9)
+  //   if (!/^\d+$/.test(keyValue)) {
+  //     event.preventDefault();
+  //   }
+  // };
 
   const handleImageClick = (image) => {
     console.log("Image", image);
@@ -165,33 +166,19 @@ export default function MainBoard() {
         console.error("Error fetching user:", error);
       }
     );
-    return () => unsubscribe();
+    return unsubscribe;
   };
 
-  useEffect(() => {
-    return getSelectedUserData();
-  }, []);
-
-  useEffect(() => {
-    setUserOrderData(userOrders);
-  }, [userOrders]);
-
-  const saveOrders = async () => {
+  const saveClosedOrders = async () => {
     let profit = 0;
-    for (let i = 0; i < userOrderData.length; i++) {
-      if (userOrderData[i].sum <= 0) {
-        toast.error("Sum value should be greater than 0");
-        return;
-      }
-      if (userOrderData[i].symbolValue <= 0) {
-        toast.error("Open Price value should be greater than 0");
-        return;
-      }
-      if (!userOrderData[i].profit) {
-        toast.error("Enter profit value in all deals");
-        return;
-      }
-      profit += +userOrderData[i].profit;
+    for (let i = 0; i < closedOrders.length; i++) {
+      if (closedOrders[i].sum <= 0)
+        return toast.error("Sum value should be greater than 0");
+      if (closedOrders[i].symbolValue <= 0)
+        return toast.error("Open Price value should be greater than 0");
+      if (!closedOrders[i].profit)
+        return toast.error("Please enter profit value in all deals");
+      profit += +closedOrders[i].profit;
     }
     if (profit < 0) {
       const eq = +equity + profit;
@@ -200,7 +187,7 @@ export default function MainBoard() {
         return toast.error("This profit makes equity less than stop out value");
     }
     let status = "success";
-    userOrderData.forEach(async (order) => {
+    closedOrders.forEach(async (order) => {
       const docRef = doc(db, "orders", order.id);
       try {
         await updateDoc(docRef, order);
@@ -224,31 +211,14 @@ export default function MainBoard() {
     }
   };
 
-  const updateOrderState = (id) => {
-    const orders = userOrders?.map((el) => {
-      if (el?.id == id) {
-        return { ...el, status: "Closed" };
-      } else {
-        return el;
-      }
-    });
-    setUserOrderData(orders);
-  };
-  const handleEdit = (id, field, value) => {
-    const updatedData = userOrders?.map((item) =>
-      item.id === id ? { ...item, [field]: value } : item
-    );
-    setUserOrderData(updatedData);
-  };
-
   const handleUserInfoChange = (e) =>
     setNewUserData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleEditOverviewOrders = (id, field, value) => {
-    const updatedData = userOrderData
-      .filter(({ status }) => status !== "Pending")
-      .map((item) => (item.id === id ? { ...item, [field]: value } : item));
-    setUserOrderData(updatedData);
+    const updatedData = closedOrders.map((item) =>
+      item.id === id ? { ...item, [field]: value } : item
+    );
+    setClosedOrders(updatedData);
   };
   const handleEditOrder = (row) => {
     setSelectedOrder(row);
@@ -353,12 +323,8 @@ export default function MainBoard() {
     },
   ];
 
-  const pendingOrders = userOrderData?.filter(
+  const pendingOrders = userOrders?.filter(
     ({ status }) => status === "Pending"
-  );
-
-  const closedOrders = userOrderData?.filter(
-    ({ status }) => status !== "Pending"
   );
 
   const bonus = parseFloat(newUserData?.bonus);
@@ -380,15 +346,13 @@ export default function MainBoard() {
   const equity = calculateEquity();
   const totalMargin = parseFloat(newUserData.totalMargin);
 
-  const totalBalance = equity + totalMargin;
-
   const calculateFreeMargin = () => {
-    let freeMarginOpened = equity;
     const dealSum = pendingOrders.reduce((p, v) => p + +v.sum, 0);
-    freeMarginOpened -= parseFloat(dealSum);
-    return freeMarginOpened;
+    return equity - dealSum;
   };
   const freeMarginData = calculateFreeMargin();
+
+  const totalBalance = freeMarginData + totalMargin + bonus;
 
   const userLevel = parseFloat(newUserData?.settings?.level) || 100;
   const level =
@@ -1109,7 +1073,9 @@ export default function MainBoard() {
                   className="btn btn-secondary"
                   onClick={() => {
                     if (isEdit) {
-                      setUserOrderData(userOrders);
+                      setClosedOrders(
+                        userOrders.filter(({ status }) => status !== "Pending")
+                      );
                       setIsEdit(false);
                     } else {
                       setIsEdit(true);
@@ -1121,7 +1087,7 @@ export default function MainBoard() {
                 <button
                   id="menu3-save"
                   className="btn btn-secondary"
-                  onClick={saveOrders}
+                  onClick={saveClosedOrders}
                   disabled={!isEdit}
                 >
                   Save

@@ -32,21 +32,48 @@ export const getData = async (collectionName) => {
 };
 
 export const fetchPlayers = (setState) => {
-  const usersRef = collection(db, "users");
-  const unsubscribe = onSnapshot(
-    usersRef,
-    (snapshot) => {
-      const userData = [];
-      snapshot.forEach((doc) => {
-        userData.push({ id: doc.id, ...doc.data() });
+  try {
+    const usersRef = collection(db, "users");
+    const unsubscribe = onSnapshot(
+      usersRef,
+      (snapshot) => {
+        const userData = [];
+        snapshot.forEach((doc) => {
+          userData.push({ id: doc.id, ...doc.data() });
+        });
+        setState(userData);
+      },
+      (error) => {
+        console.error("Error fetching users:", error);
+      }
+    );
+    return unsubscribe;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const fetchOrders = (setState, playersList) => {
+  try {
+    const q = query(
+      collection(db, "orders"),
+      where("userId", "in", playersList),
+      orderBy("createdTime", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const orders = [];
+
+      querySnapshot.forEach((doc) => {
+        orders.push({ id: doc.id, ...doc.data() });
       });
-      setState(userData);
-    },
-    (error) => {
-      console.error("Error fetching users:", error);
-    }
-  );
-  return () => unsubscribe();
+
+      setState(orders);
+      return unsubscribe;
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+  }
 };
 
 export const fetchManagers = (setState) => {

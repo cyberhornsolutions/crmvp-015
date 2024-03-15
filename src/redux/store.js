@@ -23,7 +23,7 @@ export const store = configureStore({
   reducer: {
     calendar: calendarReducer,
     symbols: symbolsSlicer,
-    userOrders: orderSlicer,
+    orders: orderSlicer,
     user: userSlicer,
     deposits: transactionSlicer,
     players: playersSlicer,

@@ -9,14 +9,15 @@ import Calendar from "../components/Calendar";
 import MainBoard from "../components/MainBoard";
 import Symbols from "../components/Symbols";
 import { ToastContainer } from "react-toastify";
-import { getAllDeposits, getColumnsById } from "../utills/firebaseHelpers";
+import { fetchPlayers, getAllDeposits, getColumnsById } from "../utills/firebaseHelpers";
 import { setDepositsState } from "../redux/slicer/transactionSlicer";
 import { setColumnsState } from "../redux/slicer/columnsSlicer";
 import { useSelector, useDispatch } from "react-redux";
+import { setPlayersState } from "../redux/slicer/playersSlicer";
 
 export default function Home() {
   const dispatch = useDispatch();
-  const userId = useSelector((state) => state.user.user.id);
+  const user = useSelector((state) => state.user.user);
   const [tab, setTab] = useState("Dashboard");
 
   const setDeposits = useCallback((data) => {
@@ -25,14 +26,21 @@ export default function Home() {
   const setColumns = useCallback((data) => {
     dispatch(setColumnsState(data));
   }, []);
+  const setPlayers = useCallback((players) => {
+    if (user.role !== "Admin")
+      players = players.filter(({ manager }) => manager === user.id);
+    dispatch(setPlayersState(players));
+  }, []);
 
   useEffect(() => {
     const unsubDeposits = getAllDeposits(setDeposits);
-    const unsubColumns = getColumnsById(userId, setColumns);
+    const unsubColumns = getColumnsById(user.id, setColumns);
+    const unsubPlayers = fetchPlayers(setPlayers)
 
     return () => {
       unsubDeposits();
       unsubColumns();
+      unsubPlayers();
     };
   }, []);
 
