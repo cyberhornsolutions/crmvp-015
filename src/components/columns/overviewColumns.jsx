@@ -93,6 +93,11 @@ const overviewColumns = ({
   },
   { name: "Fee", selector: (row) => row.fee, omit: !showColumns.Fee },
   {
+    name: "Balance",
+    selector: (row) => row.balance,
+    omit: !showColumns.Balance,
+  },
+  {
     name: "Status",
     selector: (row) =>
       row && (
