@@ -77,6 +77,8 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
       )?.toFixed(2);
     }
 
+    newData.balance = +parseFloat(userPayload.totalBalance)?.toFixed(2);
+
     if (docSnapshot.exists()) {
       await updateDoc(orderRef, newData);
       await updateUserById(userProfile.id, userPayload);
