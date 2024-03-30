@@ -11,11 +11,14 @@ import {
   setDoc,
   onSnapshot,
   addDoc,
+  writeBatch,
   serverTimestamp,
   orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { convertTimestamptToDate } from "./helpers";
+
+const batch = writeBatch(db);
 
 export const getData = async (collectionName) => {
   try {
@@ -203,6 +206,40 @@ export const updateSymbol = async (id, payload) => {
     const symbolRef = doc(db, "symbols", id);
     await updateDoc(symbolRef, payload);
     console.log("Symbol is updated successfully");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updateSymbolAndPriceHistory = async (id, payload) => {
+  try {
+    const symbolRef = doc(db, "symbols", id);
+    const priceHistoryCollectionRef = collection(symbolRef, "priceHistory");
+    const dateCollectionDoc = (
+      await getDocs(
+        query(priceHistoryCollectionRef, orderBy("updatedAt", "desc"), limit(1))
+      )
+    ).docs.at(0);
+
+    if (!dateCollectionDoc) throw new Error("Date collection not found");
+    const hourDataDoc = (
+      await getDocs(
+        query(
+          collection(dateCollectionDoc.ref, "hours"),
+          orderBy("updatedAt", "desc"),
+          limit(1)
+        )
+      )
+    ).docs.at(0);
+
+    if (!hourDataDoc) throw new Error("Hour collection not found");
+    const hourData = hourDataDoc.data()?.data;
+    hourData.at(-1).close = +payload.price;
+    batch.update(symbolRef, payload);
+    batch.update(hourDataDoc.ref, {
+      data: hourData,
+    });
+    await batch.commit();
   } catch (error) {
     console.log(error);
   }

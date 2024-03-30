@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Button, Modal, Form, InputGroup } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { updateSymbol } from "../utills/firebaseHelpers";
+import {
+  updateSymbol,
+  updateSymbolAndPriceHistory,
+} from "../utills/firebaseHelpers";
 
 const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
   const symbolSettings = selectedSymbol.settings || {};
@@ -40,17 +43,23 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     };
     if (settings.group === "commodities")
       payload.settings.closedMarket = closedMarket;
+    let updatePriceHistory = false;
     if (selectedSymbol.duplicate) {
       if (!price)
         return toast.error("Please enter current price for the symbol");
       else if (price <= 0)
         return toast.error("Symbol Price must be greater than 0");
       payload.symbol = title;
-      payload.price = price;
+      if (price !== selectedSymbol.price) {
+        payload.price = price;
+        updatePriceHistory = true;
+      }
     }
     setLoading(true);
     try {
-      await updateSymbol(selectedSymbol.id, payload);
+      if (updatePriceHistory)
+        await updateSymbolAndPriceHistory(selectedSymbol.id, payload);
+      else await updateSymbol(selectedSymbol.id, payload);
       toast.success("Symbol settings updated successfully");
       setSelectedSymbol(false);
     } catch (error) {

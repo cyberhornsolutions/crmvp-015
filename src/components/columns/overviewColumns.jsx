@@ -98,26 +98,6 @@ const overviewColumns = ({
     omit: !showColumns.Balance,
   },
   {
-    name: "Status",
-    selector: (row) =>
-      row && (
-        <div
-          className={
-            row.status == "Success"
-              ? "text-success"
-              : row.status == "Closed"
-              ? "text-danger"
-              : "text-warning"
-          }
-        >
-          {row.status}
-        </div>
-      ),
-    sortable: true,
-    compact: true,
-    omit: !showColumns.Status,
-  },
-  {
     name: "Profit",
     selector: (row) =>
       row &&
@@ -145,6 +125,26 @@ const overviewColumns = ({
       )),
     sortable: true,
     omit: !showColumns.Profit,
+  },
+  {
+    name: "Status",
+    selector: (row) =>
+      row && (
+        <div
+          className={
+            row.status == "Success"
+              ? "text-success"
+              : row.status == "Closed"
+              ? "text-danger"
+              : "text-warning"
+          }
+        >
+          {row.status}
+        </div>
+      ),
+    sortable: true,
+    compact: true,
+    omit: !showColumns.Status,
   },
   {
     name: "Date",
