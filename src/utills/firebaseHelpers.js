@@ -18,8 +18,6 @@ import {
 import { db } from "../firebase";
 import { convertTimestamptToDate } from "./helpers";
 
-const batch = writeBatch(db);
-
 export const getData = async (collectionName) => {
   try {
     let result = [];
@@ -213,6 +211,7 @@ export const updateSymbol = async (id, payload) => {
 
 export const updateSymbolAndPriceHistory = async (id, payload) => {
   try {
+    const batch = writeBatch(db);
     const symbolRef = doc(db, "symbols", id);
     const priceHistoryCollectionRef = collection(symbolRef, "priceHistory");
     const dateCollectionDoc = (
