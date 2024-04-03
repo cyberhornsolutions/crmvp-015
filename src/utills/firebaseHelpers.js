@@ -16,7 +16,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { convertTimestamptToDate } from "./helpers";
+import { convertTimestamptToDate, getAskValue, getBidValue } from "./helpers";
 
 export const getData = async (collectionName) => {
   try {
@@ -209,7 +209,43 @@ export const updateSymbol = async (id, payload) => {
   }
 };
 
-export const updateSymbolAndPriceHistory = async (id, payload) => {
+const calculateProfit = (orderData, closedPrice, symbolExists) => {
+  let pnl = 0,
+    shouldClose = false;
+  if (symbolExists && orderData.type === "Buy") {
+    /// profit
+    if (orderData.tp && symbolExists.price >= parseFloat(orderData.tp)) {
+      pnl = (orderData.tp - orderData.symbolValue) * orderData.volume;
+      console.log("one pnl=", pnl);
+      if (pnl != 0) shouldClose = true;
+    }
+    // loss
+    else if (orderData.sl && orderData.sl >= closedPrice) {
+      pnl = (orderData.symbolValue - closedPrice) * orderData.volume;
+      console.log("two pnl=", pnl);
+      if (pnl != 0) shouldClose = true;
+    } else {
+      pnl = (closedPrice - orderData.symbolValue) * orderData.volume;
+    }
+  } else if (symbolExists && orderData.type === "Sell") {
+    /// profit
+    if (orderData.tp && symbolExists.price <= orderData.tp) {
+      pnl = (orderData.symbolValue - orderData.tp) * orderData.volume;
+      console.log("one pnl=", pnl);
+      if (pnl != 0) shouldClose = true;
+    } // loss
+    else if (orderData.sl && orderData.sl <= closedPrice) {
+      pnl = (orderData.symbolValue - closedPrice) * orderData.volume;
+      console.log("two pnl=", pnl);
+      if (pnl != 0) shouldClose = true;
+    } else {
+      pnl = (orderData.symbolValue - closedPrice) * orderData.volume;
+    }
+  }
+  return { pnl, shouldClose };
+};
+
+export const updateSymbolAndPriceHistory = async (id, symbol) => {
   try {
     const batch = writeBatch(db);
     const symbolRef = doc(db, "symbols", id);
@@ -233,8 +269,43 @@ export const updateSymbolAndPriceHistory = async (id, payload) => {
 
     if (!hourDataDoc) throw new Error("Hour collection not found");
     const hourData = hourDataDoc.data()?.data;
-    hourData.at(-1).close = +payload.price;
-    batch.update(symbolRef, payload);
+
+    const pendingOrdersQuery = query(
+      collection(db, "orders"),
+      where("status", "==", "Pending"),
+      where("symbolId", "==", id)
+    );
+
+    const pendingOrdersDocs = (await getDocs(pendingOrdersQuery)).docs;
+    for (let order of pendingOrdersDocs) {
+      const orderData = { id: order.id, ...order.data() };
+      const { bidSpread, askSpread, bidSpreadUnit, askSpreadUnit, group } =
+        symbol.settings;
+
+      let currentPrice =
+        orderData.type === "Buy"
+          ? getBidValue(+symbol.price, bidSpread, bidSpreadUnit === "$")
+          : getAskValue(+symbol.price, askSpread, askSpreadUnit === "$");
+      currentPrice =
+        group === "currencies"
+          ? +parseFloat(currentPrice)?.toFixed(6)
+          : +parseFloat(currentPrice)?.toFixed(2);
+
+      let { pnl: profit, shouldClose } = calculateProfit(
+        orderData,
+        currentPrice,
+        symbol
+      );
+
+      batch.update(order.ref, {
+        currentMarketPrice: +symbol.price,
+        currentPrice,
+        shouldClose,
+      });
+    }
+
+    hourData.at(-1).close = +symbol.price;
+    batch.update(symbolRef, symbol);
     batch.update(hourDataDoc.ref, {
       data: hourData,
     });

@@ -39,6 +39,7 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
+      ...setSelectedSymbol,
       settings,
     };
     if (settings.group === "commodities")
