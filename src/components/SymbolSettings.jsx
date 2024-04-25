@@ -45,17 +45,16 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     if (settings.group === "commodities")
       payload.settings.closedMarket = closedMarket;
     let updatePriceHistory = false;
-    if (selectedSymbol.duplicate) {
-      if (!price)
-        return toast.error("Please enter current price for the symbol");
-      else if (price <= 0)
-        return toast.error("Symbol Price must be greater than 0");
-      payload.symbol = title;
-      if (price !== selectedSymbol.price) {
-        payload.price = price;
-        updatePriceHistory = true;
-      }
+    // if (selectedSymbol.duplicate) {
+    if (!price) return toast.error("Please enter current price for the symbol");
+    else if (price <= 0)
+      return toast.error("Symbol Price must be greater than 0");
+    payload.symbol = title;
+    if (price !== selectedSymbol.price) {
+      payload.price = price;
+      updatePriceHistory = true;
     }
+    // }
     setLoading(true);
     try {
       if (updatePriceHistory)
@@ -376,9 +375,10 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     placeholder="Current Price"
                     value={price ? +price : price}
                     required
-                    readOnly={!selectedSymbol.duplicate}
-                    onChange={(e) =>
-                      selectedSymbol.duplicate && setPrice(e.target.value)
+                    // readOnly={!selectedSymbol.duplicate}
+                    onChange={
+                      (e) => setPrice(e.target.value)
+                      // selectedSymbol.duplicate && setPrice(e.target.value)
                     }
                   />
                 </div>

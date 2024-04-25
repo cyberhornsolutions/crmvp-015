@@ -11,10 +11,10 @@ const symbolsColumns = (
   }
 ) => [
   { name: "Symbol", selector: (row) => row.symbol },
-  {
-    name: "Origin",
-    selector: (row) => row && (row.duplicate ? "Duplicate" : "Original"),
-  },
+  // {
+  //   name: "Origin",
+  //   selector: (row) => row && (row.duplicate ? "Duplicate" : "Original"),
+  // },
   {
     name: "Bid",
     selector: (row) => {
@@ -55,18 +55,18 @@ const symbolsColumns = (
     selector: (row) =>
       row && (
         <div className="d-flex align-items-center gap-2">
-          {!row.duplicate && (
+          {/* {!row.duplicate && (
             <FontAwesomeIcon
               icon={faCopy}
               onClick={() => setSelectedSymbol(row)}
             />
-          )}
-          {row.duplicate && (
+          )} */}
+          {/* {row.duplicate && (
             <FontAwesomeIcon
               icon={faClose}
               onClick={() => setDeleteDuplicate(row)}
             />
-          )}
+          )} */}
           <BsGear size={18} onClick={() => setSymbolSettings(row)} />
         </div>
       ),
