@@ -18,6 +18,7 @@ import { BsGear } from "react-icons/bs";
 import DelOrderModal from "./DelOrderModal";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditOrder from "./EditOrder";
+import NewOrder from "./NewOrder";
 import {
   getUserById,
   fetchPlayers,
@@ -57,6 +58,7 @@ export default function Leads({ setTab }) {
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [showEditOrderModal, setShowEditOrderModal] = useState(false);
+  const [showNewOrderModal, setShowNewOrderModal] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
   const [isBalanceModal, setIsBalanceModal] = useState(false);
   const [tradingSettingsModal, setTradingSettingsModal] = useState(false);
@@ -456,7 +458,7 @@ export default function Leads({ setTab }) {
             highlightOnHover
             pointerOnHover
             onRowClicked={(row) => row && setSelectedOrder(row)}
-            onRowDoubleClicked={(row) => row && setShowEditOrderModal(true)}
+            onRowDoubleClicked={(row) => row && setShowNewOrderModal(true)}
             conditionalRowStyles={[
               {
                 when: (row) => row && row.id === selectedOrder?.id,
@@ -482,6 +484,12 @@ export default function Leads({ setTab }) {
       {showEditOrderModal && (
         <EditOrder
           onClose={() => setShowEditOrderModal(false)}
+          selectedOrder={selectedOrder}
+        />
+      )}
+      {showNewOrderModal && (
+        <NewOrder
+          onClose={() => setShowNewOrderModal(false)}
           selectedOrder={selectedOrder}
         />
       )}
