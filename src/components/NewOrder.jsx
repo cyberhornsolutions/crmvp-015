@@ -404,7 +404,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
               </div>
               <div className="col-1"></div>
             </div>
-            <div className="d-flex flex-column gap-2">
+            <div className="d-flex flex-column gap-2 mb-2">
               <Button
                 className="w-50 mx-auto"
                 variant="success"

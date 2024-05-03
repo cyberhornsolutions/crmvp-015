@@ -50,7 +50,7 @@ const Symbols = () => {
 
   return (
     <div>
-      <Navbar className="nav nav-tabs p-0">
+      <Navbar className="nav nav-tabs p-0 mx-2">
         <Nav>
           <Nav.Link
             className={tab === "cryptoTab" && "active"}
@@ -134,8 +134,8 @@ const Symbols = () => {
               rows: {
                 style: {
                   fontSize: "1rem",
-                  height: 44,
-                  minHeight: 44,
+                  height: 45,
+                  minHeight: 45,
                 },
               },
             }}
