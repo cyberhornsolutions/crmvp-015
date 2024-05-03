@@ -55,9 +55,29 @@ export default function Transactions() {
           />
         </div>
         <DataTable
-          data={fillArrayWithEmptyRows(filteredTransactions, 5)}
+          data={fillArrayWithEmptyRows(filteredTransactions, 15)}
           columns={transactionsColumns}
           pagination
+          highlightOnHover
+          // pointerOnHover
+          paginationPerPage={15}
+          // paginationRowsPerPageOptions={[5, 10, 20, 50]}
+          // dense
+          paginationComponentOptions={{
+            noRowsPerPage: 1,
+          }}
+          customStyles={{
+            headCells: {
+              style: {
+                fontSize: "1rem",
+              },
+            },
+            rows: {
+              style: {
+                fontSize: "1rem",
+              },
+            },
+          }}
         />
       </div>
     </div>

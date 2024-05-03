@@ -3,7 +3,7 @@ import { convertTimestamptToDate } from "../../utills/helpers";
 const teamsColumns = [
   {
     name: "ID",
-    selector: (row, i) => i + 1,
+    selector: (row, i) => row && i + 1,
   },
   {
     name: "Name", // Translate the header using your t function

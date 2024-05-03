@@ -182,7 +182,7 @@ export default function Users() {
             </Nav.Link>
           </Nav>
         </Navbar>
-        <div className="input-group input-group-sm w-auto gap-1">
+        <div className="input-group input-group-sm gap-1 my-2">
           <select
             className="input-group-text"
             value={searchBy}
@@ -207,7 +207,7 @@ export default function Users() {
             placeholder="Search.."
           />
         </div>
-        <div className="tab-content">
+        <div>
           {tab === "All" && (
             <DataTable
               columns={administratorsColumns({
@@ -216,10 +216,34 @@ export default function Users() {
                 toggleActiveManager,
                 teams,
               })}
-              data={fillArrayWithEmptyRows(filteredManagers, 5)}
+              data={fillArrayWithEmptyRows(filteredManagers, 10)}
               pagination
-              paginationPerPage={5}
-              paginationRowsPerPageOptions={[5, 10, 20, 50]}
+              paginationPerPage={10}
+              paginationComponentOptions={{
+                noRowsPerPage: 1,
+              }}
+              // paginationRowsPerPageOptions={[5, 10, 20, 50]}
+              dense
+              customStyles={{
+                pagination: {
+                  style: {
+                    minHeight: "min-content",
+                    height: "min-content",
+                  },
+                },
+                headCells: {
+                  style: {
+                    fontSize: "1rem",
+                  },
+                },
+                rows: {
+                  style: {
+                    fontSize: "1rem",
+                    // minHeight: "40px",
+                    height: 44,
+                  },
+                },
+              }}
               highlightOnHover
               pointerOnHover
               responsive
@@ -228,10 +252,34 @@ export default function Users() {
           {tab === "Teams" && (
             <DataTable
               columns={teamsColumns}
-              data={filteredTeams}
+              data={fillArrayWithEmptyRows(filteredTeams, 10)}
               pagination
-              paginationPerPage={5}
-              paginationRowsPerPageOptions={[5, 10, 20, 50]}
+              paginationPerPage={10}
+              // paginationRowsPerPageOptions={[10, 20, 50]}
+              paginationComponentOptions={{
+                noRowsPerPage: 1,
+              }}
+              dense
+              customStyles={{
+                pagination: {
+                  style: {
+                    minHeight: "min-content",
+                    height: "min-content",
+                  },
+                },
+                headCells: {
+                  style: {
+                    fontSize: "1rem",
+                  },
+                },
+                rows: {
+                  style: {
+                    fontSize: "1rem",
+                    // minHeight: "40px",
+                    height: 44,
+                  },
+                },
+              }}
               highlightOnHover
               pointerOnHover
               responsive

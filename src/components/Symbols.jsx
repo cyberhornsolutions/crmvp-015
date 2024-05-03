@@ -78,7 +78,7 @@ const Symbols = () => {
           </Nav.Link>
         </Nav>
       </Navbar>
-      <div className="tab-content">
+      <div className="m-2 mb-0">
         <div className="input-group input-group-sm gap-1">
           <select
             className="input-group-text"
@@ -110,46 +110,130 @@ const Symbols = () => {
         </div>
         {tab === "cryptoTab" && (
           <DataTable
-            data={fillArrayWithEmptyRows(crypto, 5)}
+            data={fillArrayWithEmptyRows(crypto, 15)}
             columns={symbolsColumns({
               setSelectedSymbol,
               setDeleteDuplicate,
               setSymbolSettings,
             })}
             pagination
+            paginationPerPage={15}
+            paginationComponentOptions={{
+              noRowsPerPage: 1,
+            }}
+            paginationTotalRows={crypto.length}
+            highlightOnHover
+            // dense
+            // pointerOnHover
+            customStyles={{
+              headCells: {
+                style: {
+                  fontSize: "1rem",
+                },
+              },
+              rows: {
+                style: {
+                  fontSize: "1rem",
+                  height: 44,
+                  minHeight: 44,
+                },
+              },
+            }}
           />
         )}
         {tab === "currenciesTab" && (
           <DataTable
-            data={fillArrayWithEmptyRows(currencies, 5)}
+            data={fillArrayWithEmptyRows(currencies, 15)}
             columns={symbolsColumns({
               setSelectedSymbol,
               setDeleteDuplicate,
               setSymbolSettings,
             })}
             pagination
+            paginationPerPage={15}
+            paginationComponentOptions={{
+              noRowsPerPage: 1,
+            }}
+            paginationTotalRows={currencies.length}
+            highlightOnHover
+            // pointerOnHover
+            customStyles={{
+              headCells: {
+                style: {
+                  fontSize: "1rem",
+                },
+              },
+              rows: {
+                style: {
+                  fontSize: "1rem",
+                  height: 44,
+                  minHeight: 44,
+                },
+              },
+            }}
           />
         )}
         {tab === "stocksTab" && (
           <DataTable
-            data={fillArrayWithEmptyRows(stocks, 5)}
+            data={fillArrayWithEmptyRows(stocks, 15)}
             columns={symbolsColumns({
               setSelectedSymbol,
               setDeleteDuplicate,
               setSymbolSettings,
             })}
             pagination
+            paginationPerPage={15}
+            paginationComponentOptions={{
+              noRowsPerPage: 1,
+            }}
+            paginationTotalRows={stocks.length}
+            highlightOnHover
+            // pointerOnHover
+            customStyles={{
+              headCells: {
+                style: {
+                  fontSize: "1rem",
+                },
+              },
+              rows: {
+                style: {
+                  fontSize: "1rem",
+                  height: 44,
+                  minHeight: 44,
+                },
+              },
+            }}
           />
         )}
         {tab === "commoditiesTab" && (
           <DataTable
-            data={fillArrayWithEmptyRows(commodities, 5)}
+            data={fillArrayWithEmptyRows(commodities, 15)}
             columns={symbolsColumns({
               setSelectedSymbol,
               setDeleteDuplicate,
               setSymbolSettings,
             })}
             pagination
+            paginationPerPage={15}
+            paginationComponentOptions={{
+              noRowsPerPage: 1,
+            }}
+            paginationTotalRows={commodities.length}
+            highlightOnHover
+            customStyles={{
+              headCells: {
+                style: {
+                  fontSize: "1rem",
+                },
+              },
+              rows: {
+                style: {
+                  fontSize: "1rem",
+                  height: 44,
+                  minHeight: 44,
+                },
+              },
+            }}
           />
         )}
       </div>

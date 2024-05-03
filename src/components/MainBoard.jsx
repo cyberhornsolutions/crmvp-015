@@ -113,6 +113,27 @@ export default function MainBoard() {
     };
   }, [tab]);
 
+  const customStyles = {
+    // pagination: {
+    // style: {
+    //   minHeight: "min-content",
+    //   height: "min-content",
+    // },
+    // },
+    headCells: {
+      style: {
+        fontSize: "1rem",
+      },
+    },
+    rows: {
+      style: {
+        fontSize: "1rem",
+        // minHeight: "min-content",
+        // height: "min-content",
+      },
+    },
+  };
+
   // const handleKeyPress = (event) => {
   //   const keyCode = event.keyCode || event.which;
   //   const keyValue = String.fromCharCode(keyCode);
@@ -1105,6 +1126,7 @@ export default function MainBoard() {
                 pagination
                 paginationPerPage={10}
                 paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                customStyles={customStyles}
                 // responsive
               />
             </div>
@@ -1134,6 +1156,7 @@ export default function MainBoard() {
                     },
                   },
                 ]}
+                customStyles={customStyles}
               />
             </div>
           )}
@@ -1163,6 +1186,7 @@ export default function MainBoard() {
                     },
                   },
                 ]}
+                customStyles={customStyles}
               />
             </div>
           )}
@@ -1178,6 +1202,7 @@ export default function MainBoard() {
                 paginationPerPage={10}
                 paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 // responsive
+                customStyles={customStyles}
               />
             </div>
           )}
@@ -1214,6 +1239,7 @@ export default function MainBoard() {
                   paginationPerPage={5}
                   paginationRowsPerPageOptions={[5, 10, 20, 50]}
                   responsive
+                  customStyles={customStyles}
                 />
               </div>
             </div>

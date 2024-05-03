@@ -428,20 +428,50 @@ export default function Leads({ setTab }) {
           </div>
           <DataTable
             columns={userColumns}
-            data={fillArrayWithEmptyRows(filteredUsers, 5)}
+            data={fillArrayWithEmptyRows(filteredUsers, 10)}
             highlightOnHover
             pointerOnHover
             pagination
-            paginationPerPage={5}
-            paginationRowsPerPageOptions={[5, 10, 20, 50]}
+            paginationComponentOptions={{
+              noRowsPerPage: 1,
+              // rowsPerPageText: "ok",
+              // rangeSeparatorText: "ok"
+            }}
+            paginationTotalRows={players.length}
+            paginationPerPage={10}
+            // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             conditionalRowStyles={conditionalRowStyles}
             onRowClicked={(row) => row && dispatch(setSelectedUser(row))}
             onRowDoubleClicked={(row) => row && setTab("Player Card")}
+            customStyles={{
+              pagination: {
+                style: {
+                  minHeight: "min-content",
+                  height: "min-content",
+                },
+              },
+              headCells: {
+                style: {
+                  fontSize: "1rem",
+                },
+              },
+              rows: {
+                style: {
+                  fontSize: "1rem",
+                  // minHeight: "min-content",
+                  // height: "min-content",
+                },
+              },
+            }}
             // responsive
+            // dense
+            // style={{
+            //   fontSize: 18
+            // }}
           />
         </div>
         <div id="lead-transactions">
-          <div className="d-flex gap-3 pt-2">
+          <div className="d-flex gap-3">
             <h6>Deals</h6>
             <h6>{selected}</h6>
           </div>
@@ -451,14 +481,37 @@ export default function Leads({ setTab }) {
               handleCloseOrder,
               showColumns: showDealsColumns,
             })}
-            data={fillArrayWithEmptyRows(deals, 3)}
+            data={fillArrayWithEmptyRows(deals, 5)}
             pagination
             paginationPerPage={5}
-            paginationRowsPerPageOptions={[5, 10, 20, 50]}
+            // paginationRowsPerPageOptions={[5, 10, 20, 50]}
+            paginationComponentOptions={{
+              noRowsPerPage: 1,
+            }}
+            paginationTotalRows={deals.length}
             highlightOnHover
             pointerOnHover
             onRowClicked={(row) => row && setSelectedOrder(row)}
             onRowDoubleClicked={(row) => row && setShowNewOrderModal(true)}
+            dense
+            customStyles={{
+              pagination: {
+                style: {
+                  minHeight: "min-content",
+                  height: "min-content",
+                },
+              },
+              headCells: {
+                style: {
+                  fontSize: "1rem",
+                },
+              },
+              rows: {
+                style: {
+                  fontSize: "1rem",
+                },
+              },
+            }}
             conditionalRowStyles={[
               {
                 when: (row) => row && row.id === selectedOrder?.id,
