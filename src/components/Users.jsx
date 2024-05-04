@@ -218,6 +218,7 @@ export default function Users() {
               })}
               data={fillArrayWithEmptyRows(filteredManagers, 10)}
               pagination
+              paginationTotalRows={managers.length}
               paginationPerPage={10}
               paginationComponentOptions={{
                 noRowsPerPage: 1,
@@ -254,6 +255,7 @@ export default function Users() {
               columns={teamsColumns}
               data={fillArrayWithEmptyRows(filteredTeams, 10)}
               pagination
+              paginationTotalRows={teams.length}
               paginationPerPage={10}
               // paginationRowsPerPageOptions={[10, 20, 50]}
               paginationComponentOptions={{
