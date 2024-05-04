@@ -58,6 +58,7 @@ export default function Dashboard() {
             highlightOnHover
             // pointerOnHover
             pagination
+            // paginationTotalRows={0}
             paginationPerPage={10}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             striped
@@ -96,6 +97,7 @@ export default function Dashboard() {
             highlightOnHover
             // pointerOnHover
             pagination
+            paginationTotalRows={allTransaction.length}
             paginationPerPage={10}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             striped

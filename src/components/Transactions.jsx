@@ -58,6 +58,7 @@ export default function Transactions() {
           data={fillArrayWithEmptyRows(filteredTransactions, 15)}
           columns={transactionsColumns}
           pagination
+          paginationTotalRows={deposits.length}
           highlightOnHover
           // pointerOnHover
           paginationPerPage={15}
