@@ -52,6 +52,28 @@ export default function Users() {
     if (!teams.length) fetchTeams(setTeams);
   }, []);
 
+  const customStyles = {
+    pagination: {
+      style: {
+        fontSize: "1rem",
+        minHeight: 28,
+        height: 28,
+      },
+    },
+    headCells: {
+      style: {
+        fontSize: "1rem",
+      },
+    },
+    rows: {
+      style: {
+        fontSize: "1rem",
+        // minHeight: "40px",
+        height: 34,
+      },
+    },
+  };
+
   const handleChangeUser = (e) =>
     setUser((p) => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -225,26 +247,7 @@ export default function Users() {
               }}
               // paginationRowsPerPageOptions={[5, 10, 20, 50]}
               dense
-              customStyles={{
-                pagination: {
-                  style: {
-                    minHeight: "min-content",
-                    height: "min-content",
-                  },
-                },
-                headCells: {
-                  style: {
-                    fontSize: "1rem",
-                  },
-                },
-                rows: {
-                  style: {
-                    fontSize: "1rem",
-                    // minHeight: "40px",
-                    height: 44,
-                  },
-                },
-              }}
+              customStyles={customStyles}
               highlightOnHover
               pointerOnHover
               responsive
@@ -262,26 +265,7 @@ export default function Users() {
                 noRowsPerPage: 1,
               }}
               dense
-              customStyles={{
-                pagination: {
-                  style: {
-                    minHeight: "min-content",
-                    height: "min-content",
-                  },
-                },
-                headCells: {
-                  style: {
-                    fontSize: "1rem",
-                  },
-                },
-                rows: {
-                  style: {
-                    fontSize: "1rem",
-                    // minHeight: "40px",
-                    height: 44,
-                  },
-                },
-              }}
+              customStyles={customStyles}
               highlightOnHover
               pointerOnHover
               responsive

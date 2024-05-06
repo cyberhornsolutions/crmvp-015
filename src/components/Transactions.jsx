@@ -68,6 +68,13 @@ export default function Transactions() {
             noRowsPerPage: 1,
           }}
           customStyles={{
+            pagination: {
+              style: {
+                fontSize: "1rem",
+                // minHeight: 38,
+                // height: 38,
+              },
+            },
             headCells: {
               style: {
                 fontSize: "1rem",
@@ -76,6 +83,8 @@ export default function Transactions() {
             rows: {
               style: {
                 fontSize: "1rem",
+                minHeight: 36,
+                height: 36,
               },
             },
           }}

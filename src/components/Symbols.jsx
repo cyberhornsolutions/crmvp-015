@@ -48,6 +48,28 @@ const Symbols = () => {
     else if (s?.settings?.group === "commodities") commodities.push(s);
   });
 
+  const customStyles = {
+    pagination: {
+      style: {
+        fontSize: "1rem",
+        minHeight: 30,
+        height: 30,
+      },
+    },
+    headCells: {
+      style: {
+        fontSize: "1rem",
+      },
+    },
+    rows: {
+      style: {
+        fontSize: "1rem",
+        height: 36,
+        minHeight: 36,
+      },
+    },
+  };
+
   return (
     <div>
       <Navbar className="nav nav-tabs p-0 mx-2">
@@ -125,20 +147,7 @@ const Symbols = () => {
             highlightOnHover
             // dense
             // pointerOnHover
-            customStyles={{
-              headCells: {
-                style: {
-                  fontSize: "1rem",
-                },
-              },
-              rows: {
-                style: {
-                  fontSize: "1rem",
-                  height: 45,
-                  minHeight: 45,
-                },
-              },
-            }}
+            customStyles={customStyles}
           />
         )}
         {tab === "currenciesTab" && (
@@ -157,20 +166,7 @@ const Symbols = () => {
             paginationTotalRows={currencies.length}
             highlightOnHover
             // pointerOnHover
-            customStyles={{
-              headCells: {
-                style: {
-                  fontSize: "1rem",
-                },
-              },
-              rows: {
-                style: {
-                  fontSize: "1rem",
-                  height: 44,
-                  minHeight: 44,
-                },
-              },
-            }}
+            customStyles={customStyles}
           />
         )}
         {tab === "stocksTab" && (
@@ -189,20 +185,7 @@ const Symbols = () => {
             paginationTotalRows={stocks.length}
             highlightOnHover
             // pointerOnHover
-            customStyles={{
-              headCells: {
-                style: {
-                  fontSize: "1rem",
-                },
-              },
-              rows: {
-                style: {
-                  fontSize: "1rem",
-                  height: 44,
-                  minHeight: 44,
-                },
-              },
-            }}
+            customStyles={customStyles}
           />
         )}
         {tab === "commoditiesTab" && (
@@ -220,20 +203,7 @@ const Symbols = () => {
             }}
             paginationTotalRows={commodities.length}
             highlightOnHover
-            customStyles={{
-              headCells: {
-                style: {
-                  fontSize: "1rem",
-                },
-              },
-              rows: {
-                style: {
-                  fontSize: "1rem",
-                  height: 44,
-                  minHeight: 44,
-                },
-              },
-            }}
+            customStyles={customStyles}
           />
         )}
       </div>

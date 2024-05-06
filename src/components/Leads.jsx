@@ -446,8 +446,9 @@ export default function Leads({ setTab }) {
             customStyles={{
               pagination: {
                 style: {
-                  minHeight: "min-content",
-                  height: "min-content",
+                  fontSize: "1rem",
+                  minHeight: 28,
+                  height: 28,
                 },
               },
               headCells: {
@@ -458,13 +459,13 @@ export default function Leads({ setTab }) {
               rows: {
                 style: {
                   fontSize: "1rem",
-                  // minHeight: "min-content",
-                  // height: "min-content",
+                  minHeight: 36,
+                  height: 36,
                 },
               },
             }}
             // responsive
-            // dense
+            dense
             // style={{
             //   fontSize: 18
             // }}
@@ -472,8 +473,8 @@ export default function Leads({ setTab }) {
         </div>
         <div id="lead-transactions">
           <div className="d-flex gap-3">
-            <h6>Deals</h6>
-            <h6>{selected}</h6>
+            <h6 className="m-0">Deals</h6>
+            <h6 className="m-0">{selectedUser?.id}</h6>
           </div>
           <DataTable
             columns={dealsColumns({
@@ -497,8 +498,9 @@ export default function Leads({ setTab }) {
             customStyles={{
               pagination: {
                 style: {
-                  minHeight: "min-content",
-                  height: "min-content",
+                  fontSize: "1rem",
+                  minHeight: 24,
+                  height: 24,
                 },
               },
               headCells: {
@@ -509,6 +511,8 @@ export default function Leads({ setTab }) {
               rows: {
                 style: {
                   fontSize: "1rem",
+                  minHeight: "auto !important",
+                  height: 30,
                 },
               },
             }}

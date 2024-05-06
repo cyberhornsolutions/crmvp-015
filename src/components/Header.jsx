@@ -20,13 +20,13 @@ export default function Header({ title }) {
         <button>
           {selectedLanguage === "en" ? (
             <img
-              width={40}
+              width={36}
               src={enFlagIcon}
               onClick={() => changeLanguage("ru")}
             />
           ) : (
             <img
-              width={40}
+              width={36}
               src={ruFlagIcon}
               onClick={() => changeLanguage("en")}
             />

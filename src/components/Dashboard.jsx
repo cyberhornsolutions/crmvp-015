@@ -67,13 +67,14 @@ export default function Dashboard() {
             paginationComponentOptions={{
               noRowsPerPage: 1,
             }}
+            dense
             customStyles={{
-              // pagination: {
-              // style: {
-              //   minHeight: "min-content",
-              //   height: "min-content",
-              // },
-              // },
+              pagination: {
+                style: {
+                  minHeight: 28,
+                  height: 28,
+                },
+              },
               headCells: {
                 style: {
                   fontSize: "1rem",
@@ -82,8 +83,6 @@ export default function Dashboard() {
               rows: {
                 style: {
                   fontSize: "1rem",
-                  height: 40,
-                  minHeight: 40,
                 },
               },
             }}
@@ -101,18 +100,18 @@ export default function Dashboard() {
             paginationPerPage={10}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             striped
-            // dense
+            dense
             // responsive
             paginationComponentOptions={{
               noRowsPerPage: 1,
             }}
             customStyles={{
-              // pagination: {
-              // style: {
-              //   minHeight: "min-content",
-              //   height: "min-content",
-              // },
-              // },
+              pagination: {
+                style: {
+                  minHeight: 28,
+                  height: 28,
+                },
+              },
               headCells: {
                 style: {
                   fontSize: "1rem",
@@ -121,8 +120,6 @@ export default function Dashboard() {
               rows: {
                 style: {
                   fontSize: "1rem",
-                  height: 40,
-                  minHeight: 40,
                 },
               },
             }}
