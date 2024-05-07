@@ -244,7 +244,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
       setLoading(true);
       await addDoc(ordersCollectionRef, dealPayload);
       await updateUserById(selectedUser.id, userPayload);
-      toast.success("Order added to Database", "success");
+      toast.success("Order created successfully", "success");
       onClose();
     } catch (error) {
       console.error("Error adding order: ", error);
@@ -298,16 +298,23 @@ const NewOrder = ({ onClose, selectedOrder }) => {
                   step="any"
                   placeholder="Price"
                   className="form-control"
-                  value={selectedSymbol.price}
+                  // value={selectedSymbol.price}
                   required
-                  readOnly
+                  readOnly={!enableOpenPrice}
+                  disabled={!enableOpenPrice}
+                  value={
+                    enableOpenPrice ? openPriceValue : selectedSymbol.price
+                  }
+                  onChange={(e) => setOpenPriceValue(e.target.value)}
                   // onChange={handleOrderChange}
                 />
               </div>
               <div className="col-1">
                 <FontAwesomeIcon
                   cursor="pointer"
-                  // onClick={() => getValue(orderData?.symbol)}
+                  onClick={() =>
+                    setOpenPriceValue(parseFloat(selectedSymbol.price))
+                  }
                   icon={faRefresh}
                 />
               </div>
@@ -334,33 +341,39 @@ const NewOrder = ({ onClose, selectedOrder }) => {
               </div>
               <div className="col-1"></div>
             </div>
-            <div className="form-group row align-items-center">
-              <label className="col-4" htmlFor="openPriceValue">
-                Open Price
-              </label>
-              <div className="col">
-                <input
-                  name="openPriceValue"
-                  id="openPriceValue"
-                  type="number"
-                  step="any"
-                  placeholder="Open Price"
-                  className="form-control"
-                  value={openPriceValue}
-                  disabled={!enableOpenPrice}
-                  onChange={(e) => setOpenPriceValue(e.target.value)}
-                />
+            <div className="form-group row">
+              <div className="col-4"></div>
+              <div className="col d-flex justify-content-center gap-5">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    id="market"
+                    checked={!enableOpenPrice}
+                    onClick={(e) => setEnableOpenPrice(false)}
+                  />
+                  <label className="form-check-label m-0" htmlFor="market">
+                    Market
+                  </label>
+                </div>
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    id="limit"
+                    checked={enableOpenPrice}
+                    onClick={(e) => {
+                      if (openPriceValue !== selectedSymbol.price)
+                        setOpenPriceValue(parseFloat(selectedSymbol.price));
+                      setEnableOpenPrice(true);
+                    }}
+                  />
+                  <label className="form-check-label m-0" htmlFor="limit">
+                    Limit
+                  </label>
+                </div>
               </div>
-              <div className="col-1 align-items-center">
-                <input
-                  type="checkbox"
-                  checked={enableOpenPrice}
-                  onChange={(e) => {
-                    setOpenPriceValue(parseFloat(selectedSymbol.price));
-                    setEnableOpenPrice(e.target.checked);
-                  }}
-                />
-              </div>
+              <div className="col-1" />
             </div>
             <div className="form-group row">
               <label className="col-4" htmlFor="sl">
