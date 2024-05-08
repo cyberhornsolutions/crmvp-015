@@ -67,7 +67,7 @@ const symbolsColumns = (
               onClick={() => setDeleteDuplicate(row)}
             />
           )} */}
-          <BsGear size={18} onClick={() => setSymbolSettings(row)} />
+          <BsGear size="1.2rem" onClick={() => setSymbolSettings(row)} />
         </div>
       ),
     center: true,

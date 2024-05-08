@@ -61,16 +61,18 @@ const NewOrder = ({ onClose, selectedOrder }) => {
   const calculateTotalSum = () => {
     let sum = 0.0;
     const leverage = selectedUser?.settings?.leverage || 1;
+    const settings = selectedSymbol?.settings || {};
+    const lot = settings.group === "commodities" ? +settings.lot || 1 : 1;
     if (selectedSymbol.symbol) {
       if (order.volume) {
         if (enableOpenPrice) {
-          sum = order.volume * openPriceValue;
+          sum = order.volume * lot * openPriceValue;
         } else {
-          sum = order.volume * selectedSymbol.price;
+          sum = order.volume * lot * selectedSymbol.price;
         }
       }
     }
-    const maintenanceMargin = selectedSymbol?.settings?.maintenanceMargin;
+    const maintenanceMargin = settings.maintenanceMargin;
     if (leverage > 1 && maintenanceMargin > 0) {
       return (sum / leverage) * (maintenanceMargin / 100);
     }
@@ -81,10 +83,15 @@ const NewOrder = ({ onClose, selectedOrder }) => {
   let potentialSL = 0,
     potentialTP = 0;
   if (selectedSymbol.symbol) {
-    if (order.sl)
-      potentialSL = order.volume * order.sl - selectedSymbol?.settings?.fee;
-    if (order.tp)
-      potentialTP = order.volume * order.tp - selectedSymbol?.settings?.fee;
+    const settings = selectedSymbol?.settings || {};
+    const lot = settings.group === "commodities" ? +settings.lot || 1 : 1;
+
+    const { fee = 0, feeUnit } = settings;
+    const symbolFee =
+      feeUnit === "$" ? fee : (selectedSymbol?.price / 100) * fee;
+
+    if (order.sl) potentialSL = +order.volume * lot * order.sl - symbolFee;
+    if (order.tp) potentialTP = +order.volume * lot * order.tp - symbolFee;
   }
 
   const placeOrder = async (e, type) => {
@@ -116,7 +123,12 @@ const NewOrder = ({ onClose, selectedOrder }) => {
       group,
       closedMarket,
       maintenanceMargin,
+      lot,
     } = selectedSymbol?.settings || {};
+    const volume =
+      group === "commodities" && +lot >= 1
+        ? +order.volume * +lot
+        : +order.volume;
 
     if (group === "commodities" && !closedMarket) {
       const today = moment();
@@ -165,13 +177,13 @@ const NewOrder = ({ onClose, selectedOrder }) => {
     if (type === "Buy") {
       spread =
         bidSpreadUnit === "$"
-          ? order.volume * bidSpread
-          : order.volume * selectedSymbol.price * (bidSpread / 100);
+          ? volume * bidSpread
+          : volume * selectedSymbol.price * (bidSpread / 100);
     } else {
       spread =
         askSpreadUnit === "$"
-          ? order.volume * askSpread
-          : order.volume * selectedSymbol.price * (askSpread / 100);
+          ? volume * askSpread
+          : volume * selectedSymbol.price * (askSpread / 100);
     }
 
     const feeValue =
@@ -182,7 +194,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
         type,
         closedPrice,
         selectedSymbol.price,
-        parseFloat(order.volume)
+        parseFloat(volume)
       ) - feeValue;
 
     const leverage = selectedUser?.settings?.leverage;
@@ -206,7 +218,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
       symbol: selectedSymbol.symbol,
       symbolId: selectedSymbol.id,
       symbolValue: selectedSymbol.price,
-      volume: parseFloat(order.volume),
+      volume,
       sum: calculatedSum,
       fee: feeValue,
       swap: 0,
@@ -241,6 +253,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
       userPayload.bonusSpent = +parseFloat(bonusSpent + spentBonus)?.toFixed(2);
     }
     try {
+      console.log("dealPayload", dealPayload);
       setLoading(true);
       await addDoc(ordersCollectionRef, dealPayload);
       await updateUserById(selectedUser.id, userPayload);
@@ -350,7 +363,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
                     type="radio"
                     id="market"
                     checked={!enableOpenPrice}
-                    onClick={(e) => setEnableOpenPrice(false)}
+                    onChange={(e) => setEnableOpenPrice(false)}
                   />
                   <label className="form-check-label m-0" htmlFor="market">
                     Market
@@ -362,7 +375,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
                     type="radio"
                     id="limit"
                     checked={enableOpenPrice}
-                    onClick={(e) => {
+                    onChange={(e) => {
                       if (openPriceValue !== selectedSymbol.price)
                         setOpenPriceValue(parseFloat(selectedSymbol.price));
                       setEnableOpenPrice(true);

@@ -27,6 +27,7 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     fee: symbolSettings?.fee || "",
     feeUnit: symbolSettings?.feeUnit || "%",
     maintenanceMargin: symbolSettings?.maintenanceMargin || "100",
+    lot: symbolSettings?.lot || "1",
   });
   const [closedMarket, setClosedMarket] = useState(
     symbolSettings?.closedMarket ?? false
@@ -404,16 +405,37 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                 </div>
               </Form.Group>
               {symbolSettings?.group === "commodities" && (
-                <Form.Group className="d-flex align-items-center gap-3 pt-2">
-                  <Form.Label htmlFor="closed-trading" className="mb-0">
-                    Closed market trading
-                  </Form.Label>
-                  <Form.Check
-                    id="closed-trading"
-                    checked={closedMarket}
-                    onChange={(e) => setClosedMarket(e.target.checked)}
-                  />
-                </Form.Group>
+                <>
+                  <Form.Group className="row align-items-center mb-2">
+                    <Form.Label htmlFor="lot" className="col-4 m-0">
+                      Lot
+                    </Form.Label>
+                    <div className="col">
+                      <Form.Control
+                        id="lot"
+                        name="lot"
+                        type="number"
+                        step="any"
+                        min={1}
+                        max={1000000}
+                        placeholder="1-1000000"
+                        value={settings.lot}
+                        required
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </Form.Group>
+                  <Form.Group className="d-flex align-items-center gap-3 pt-2">
+                    <Form.Label htmlFor="closed-trading" className="mb-0">
+                      Closed market trading
+                    </Form.Label>
+                    <Form.Check
+                      id="closed-trading"
+                      checked={closedMarket}
+                      onChange={(e) => setClosedMarket(e.target.checked)}
+                    />
+                  </Form.Group>
+                </>
               )}
             </div>
             <Button type="submit" disabled={loading}>
