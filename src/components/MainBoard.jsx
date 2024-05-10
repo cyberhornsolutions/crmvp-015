@@ -46,11 +46,18 @@ export default function MainBoard() {
   const orders = useSelector((state) => state.orders);
   const [userOrders, setUserOrders] = useState([]);
   const columns = useSelector((state) => state?.columns);
-  const { selectedUser } = useSelector((state) => state?.user);
+  const selectedUser = useSelector((state) => {
+    return (
+      state?.user.selectedUser ||
+      JSON.parse(localStorage.getItem("SELECTED_USER"))
+    );
+  });
   const deposits = useSelector((state) =>
     state.deposits.filter(({ userId }) => userId === selectedUser.id)
   );
-  const [tab, setTab] = useState("info");
+  const [tab, setTab] = useState(
+    () => localStorage.getItem("PLAYER_TAB") || "info"
+  );
   const idInputRef = useRef(null);
   const locationInputRef = useRef(null);
   const mapInputRef = useRef(null);
@@ -82,9 +89,10 @@ export default function MainBoard() {
     if (closed.length !== closedOrders.length) setClosedOrders(closed);
   }, [orders]);
 
-  useEffect(() => {
-    const unsubSelectedUser = getSelectedUserData();
+  useEffect(() => getSelectedUserData(), []);
 
+  useEffect(() => {
+    localStorage.setItem("PLAYER_TAB", tab);
     let cols;
     switch (tab) {
       case "overview":
@@ -109,7 +117,6 @@ export default function MainBoard() {
     header.addEventListener("contextmenu", handleRightClick);
     return () => {
       header.removeEventListener("contextmenu", handleRightClick);
-      unsubSelectedUser();
     };
   }, [tab]);
 

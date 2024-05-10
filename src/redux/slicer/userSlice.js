@@ -19,6 +19,7 @@ const userSlicer = createSlice({
     },
     setSelectedUser: (state, action) => {
       state.selectedUser = action.payload;
+      localStorage.setItem("SELECTED_USER", JSON.stringify(action.payload));
     },
   },
   // extraReducers: {},

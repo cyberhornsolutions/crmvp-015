@@ -21,12 +21,9 @@ import EditOrder from "./EditOrder";
 import NewOrder from "./NewOrder";
 import {
   getUserById,
-  fetchPlayers,
   getAllSymbols,
   fetchManagers,
-  fetchOrders,
 } from "../utills/firebaseHelpers";
-import { setOrdersState } from "../redux/slicer/orderSlicer";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import AddBalanceModal from "./AddBalanceModal";
@@ -47,12 +44,10 @@ export default function Leads({ setTab }) {
   const user = useSelector((state) => state.user.user);
   const players = useSelector((state) => state.players);
   const orders = useSelector((state) => state.orders);
-  // const [userOrders, setUserOrders] = useState([]);
   const selectedUser = useSelector((state) => state.user.selectedUser);
   const symbols = useSelector((state) => state?.symbols);
   const managers = useSelector((state) => state.managers);
   const columns = useSelector((state) => state.columns);
-  const [selected, setSelected] = useState();
   const [searchBy, setSearchBy] = useState("");
   const [searchText, setSearchText] = useState("");
   const [selectedOrder, setSelectedOrder] = useState();
@@ -82,10 +77,6 @@ export default function Leads({ setTab }) {
     setIsDelModalOpen(true);
   };
 
-  const setOrders = useCallback((orders) => {
-    dispatch(setOrdersState(orders));
-  }, []);
-
   const setSymbols = useCallback((symbolsData) => {
     dispatch(setSymbolsState(symbolsData));
   }, []);
@@ -101,11 +92,6 @@ export default function Leads({ setTab }) {
     filteredUsers = filterSearchObjects(searchText, filteredUsers);
 
   useEffect(() => {
-    if (!orders.length)
-      fetchOrders(
-        setOrders,
-        players.map((p) => p.id)
-      );
     if (!symbols.length) getAllSymbols(setSymbols);
     if (!managers.length && user.role === "Admin") fetchManagers(setManagers);
 
@@ -399,8 +385,10 @@ export default function Leads({ setTab }) {
                 <option className="dropdown-item" value="All">
                   All
                 </option>
-                {userColumns.map(({ name }) => (
-                  <option className="dropdown-item">{name}</option>
+                {userColumns.map(({ name }, i) => (
+                  <option key={i} className="dropdown-item">
+                    {name}
+                  </option>
                 ))}
               </select>
               <input
