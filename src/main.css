@@ -98,10 +98,6 @@ td:hover {
   background: #555;
 }
 #main {
-  flex: 6;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   padding: 5px;
   margin: 0;
   background-color: var(--main-light-blue);
@@ -167,6 +163,7 @@ td:hover {
 }
 
 #header {
+  height: 8%;
   border-radius: 5px;
   background-color: var(--main-elc2);
   color: var(--main-elc);
@@ -189,8 +186,8 @@ td:hover {
   border-radius: 4px 4px 0 0 !important;
 }
 .tab-content {
-  margin: 5px;
-  height: 100%;
+  padding: 5px;
+  height: 91%;
 }
 .tab-content input {
   border: 1px solid lightgray;
@@ -203,8 +200,10 @@ td:hover {
 #mainboard {
   display: flex;
   flex-direction: row;
-  /* height: 100%; */
+  gap: 0.5rem;
+  height: 100%;
   color: var(--main-elc2);
+  border: 3px solid whitesmoke;
   /* overflow-y: scroll; */
 }
 
@@ -222,24 +221,12 @@ td:hover {
 
 #profile {
   background-color: whitesmoke;
-  flex: 1;
-  border: 3px solid whitesmoke;
-  justify-content: center;
-  height: 100%;
-  border-radius: 5px;
-  margin-right: 10px;
-  /* overflow-y: scroll; */
-  /* width: 230px; */
-  /* min-width: 230px; */
+  width: 20%;
+  overflow: auto;
 }
 #profile-pic {
-  flex: 1;
-  padding: 20px;
-  padding-bottom: 5px;
-  max-width: 100%;
-}
-#profile-deals {
-  flex: 1;
+  max-width: 68%;
+  margin: auto;
 }
 #profile-balance {
   display: flex;
@@ -268,11 +255,8 @@ td:hover {
 }
 #board {
   background-color: whitesmoke;
-  flex: 4;
-  border: 3px solid whitesmoke;
-  border-radius: 5px;
-  padding: 7px;
-  width: calc(100% - 237px);
+  width: 80%;
+  padding: 8px;
 }
 #dashboard {
   display: flex;
@@ -471,7 +455,8 @@ td:hover {
 }
 #lead-transactions {
   border-radius: 5px;
-  max-height: 34%;
+  max-height: 35%;
+  overflow-y: auto;
 }
 #lead-transactions-header {
   display: flex;
@@ -513,9 +498,7 @@ td:hover {
 }
 
 #profile-deals {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding-top: 10px;
+  margin-block: 0.5rem;
 }
 #profile-deals h4 {
   font-weight: bold;
@@ -753,7 +736,7 @@ td.editing {
 #menu5 {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  /* height: 100%; */
 }
 #menu0-main {
   display: flex;

@@ -6,7 +6,7 @@ import { getAllSymbols, getAllDeposits } from "../utills/firebaseHelpers";
 import { onSnapshot, doc, updateDoc } from "firebase/firestore";
 import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import DelOrderModal from "./DelOrderModal";
 import CancelOrderModal from "./CancelOrderModal";
 import EditOrder from "./EditOrder";
@@ -114,12 +114,13 @@ export default function MainBoard() {
   }, [tab]);
 
   const customStyles = {
-    // pagination: {
-    // style: {
-    //   minHeight: "min-content",
-    //   height: "min-content",
-    // },
-    // },
+    pagination: {
+      style: {
+        fontSize: "1rem",
+        // minHeight: 28,
+        // height: 28,
+      },
+    },
     headCells: {
       style: {
         fontSize: "1rem",
@@ -128,8 +129,8 @@ export default function MainBoard() {
     rows: {
       style: {
         fontSize: "1rem",
-        // minHeight: "min-content",
-        // height: "min-content",
+        // minHeight: 36,
+        // height: 36,
       },
     },
   };
@@ -381,10 +382,9 @@ export default function MainBoard() {
 
   return (
     <div id="mainboard">
-      <ToastContainer />
       <div id="profile">
         <img id="profile-pic" src={placeholder} alt="" />
-        <div id="profile-i">
+        {/* <div id="profile-i">
           <h5 className="f-w-inherit f-s-inherit" style={{ lineHeight: 1.1 }}>
             {userOrders?.id}
           </h5>
@@ -395,7 +395,7 @@ export default function MainBoard() {
           >
             {userOrders?.name}
           </h4>
-        </div>
+        </div> */}
         <button
           className="btn btn-primary"
           onClick={() => {
@@ -1120,12 +1120,16 @@ export default function MainBoard() {
                   handleEditOrder: handleEditOverviewOrders,
                   showColumns,
                 })}
-                data={fillArrayWithEmptyRows(closedOrders, 5)}
+                data={fillArrayWithEmptyRows(closedOrders, 10)}
                 highlightOnHover
                 pointerOnHover
                 pagination
                 paginationPerPage={10}
-                paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                paginationTotalRows={closedOrders.length}
+                paginationComponentOptions={{
+                  noRowsPerPage: 1,
+                }}
+                // paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 customStyles={customStyles}
                 // responsive
               />
@@ -1139,12 +1143,16 @@ export default function MainBoard() {
                   handleCloseOrder,
                   showColumns,
                 })}
-                data={fillArrayWithEmptyRows(activeOrders, 5)}
+                data={fillArrayWithEmptyRows(activeOrders, 10)}
                 highlightOnHover
                 pointerOnHover
                 pagination
                 paginationPerPage={10}
-                paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                paginationTotalRows={activeOrders.length}
+                paginationComponentOptions={{
+                  noRowsPerPage: 1,
+                }}
+                // paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 onRowClicked={(row) => row && setSelectedOrder(row)}
                 onRowDoubleClicked={(row) => row && setIsDealEdit(true)}
                 conditionalRowStyles={[
@@ -1169,12 +1177,16 @@ export default function MainBoard() {
                   handleCancelOrder,
                   showColumns,
                 })}
-                data={fillArrayWithEmptyRows(delayedOrders, 5)}
+                data={fillArrayWithEmptyRows(delayedOrders, 10)}
                 highlightOnHover
                 pointerOnHover
                 pagination
                 paginationPerPage={10}
-                paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                paginationTotalRows={delayedOrders.length}
+                paginationComponentOptions={{
+                  noRowsPerPage: 1,
+                }}
+                // paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 onRowClicked={(row) => row && setSelectedOrder(row)}
                 onRowDoubleClicked={(row) => row && setIsDealEdit(true)}
                 conditionalRowStyles={[
@@ -1195,12 +1207,16 @@ export default function MainBoard() {
             <div id="menu">
               <DataTable
                 columns={depositsColumns}
-                data={fillArrayWithEmptyRows(deposits, 5)}
+                data={fillArrayWithEmptyRows(deposits, 10)}
                 highlightOnHover
                 pointerOnHover
                 pagination
                 paginationPerPage={10}
-                paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                paginationTotalRows={deposits.length}
+                paginationComponentOptions={{
+                  noRowsPerPage: 1,
+                }}
+                // paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 // responsive
                 customStyles={customStyles}
               />
@@ -1237,6 +1253,10 @@ export default function MainBoard() {
                   pointerOnHover
                   pagination
                   paginationPerPage={5}
+                  paginationTotalRows={userOrders.length}
+                  paginationComponentOptions={{
+                    noRowsPerPage: 1,
+                  }}
                   paginationRowsPerPageOptions={[5, 10, 20, 50]}
                   responsive
                   customStyles={customStyles}
