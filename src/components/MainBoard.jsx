@@ -638,7 +638,7 @@ export default function MainBoard() {
         </Navbar>
         <div className="tab-content">
           {tab === "info" && (
-            <div id="menu0">
+            <div id="menu0" className="h-100">
               <div className="h-50 b-bottom">
                 <div className="d-flex justify-content-evenly py-4">
                   <div className="d-flex flex-column align-items-start gap-4">
