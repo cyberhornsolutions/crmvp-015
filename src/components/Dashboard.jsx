@@ -6,9 +6,9 @@ import depositsColumns from "./columns/depositsColumns";
 import DataTable from "react-data-table-component";
 
 export default function Dashboard() {
-  const allTransaction = useSelector((state) =>
-    state.deposits.filter(({ manager }) => manager === state.user.user.username)
-  );
+  const username = useSelector((state) => state.user.user.username);
+  let allTransaction = useSelector((state) => state.deposits);
+  allTransaction = allTransaction.filter(({ manager }) => manager === username);
 
   const deposits = allTransaction.filter(({ type }) => type === "Deposit");
 
