@@ -33,7 +33,7 @@ export default function Sidebar({ setTab, tab }) {
         <ul id="tab-list">
           <li
             id="menu-dash"
-            className={tab === "Dashboard" && "active"}
+            className={tab === "Dashboard" ? "active" : undefined}
             onClick={() => {
               setTab("Dashboard");
             }}
@@ -42,7 +42,7 @@ export default function Sidebar({ setTab, tab }) {
           </li>
           <li
             id="menu-leads"
-            className={tab === "Players" && "active"}
+            className={tab === "Players" ? "active" : undefined}
             onClick={() => {
               setTab("Players");
             }}
@@ -52,7 +52,7 @@ export default function Sidebar({ setTab, tab }) {
           {user.role === "Admin" && (
             <li
               id="menu-transactions"
-              className={tab === "Transactions" && "active"}
+              className={tab === "Transactions" ? "active" : undefined}
               onClick={() => {
                 setTab("Transactions");
               }}
@@ -63,7 +63,7 @@ export default function Sidebar({ setTab, tab }) {
           {user.role !== "Sale" && (
             <li
               id="menu-users"
-              className={tab === "Assets" && "active"}
+              className={tab === "Assets" ? "active" : undefined}
               onClick={() => {
                 setTab("Assets");
               }}
@@ -73,7 +73,7 @@ export default function Sidebar({ setTab, tab }) {
           )}
           <li
             id="menu-calendar"
-            className={tab === "Calendar" && "active"}
+            className={tab === "Calendar" ? "active" : undefined}
             onClick={() => {
               setTab("Calendar");
             }}
@@ -83,7 +83,7 @@ export default function Sidebar({ setTab, tab }) {
           {user.role === "Admin" && (
             <li
               id="menu-users"
-              className={tab === "Administrator" && "active"}
+              className={tab === "Administrator" ? "active" : undefined}
               onClick={() => {
                 setTab("Administrator");
               }}
