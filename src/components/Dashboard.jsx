@@ -21,6 +21,25 @@ export default function Dashboard() {
       thisMonthDeposits.push(deposit);
   });
 
+  const customStyles = {
+    pagination: {
+      style: {
+        minHeight: 28,
+        height: 28,
+      },
+    },
+    headCells: {
+      style: {
+        fontSize: "1rem",
+      },
+    },
+    rows: {
+      style: {
+        fontSize: "1rem",
+      },
+    },
+  };
+
   return (
     <div id="dashboard">
       <div id="cards">
@@ -68,24 +87,7 @@ export default function Dashboard() {
               noRowsPerPage: 1,
             }}
             dense
-            customStyles={{
-              pagination: {
-                style: {
-                  minHeight: 28,
-                  height: 28,
-                },
-              },
-              headCells: {
-                style: {
-                  fontSize: "1rem",
-                },
-              },
-              rows: {
-                style: {
-                  fontSize: "1rem",
-                },
-              },
-            }}
+            customStyles={customStyles}
           />
         </div>
         <div className="details-item">
@@ -105,24 +107,7 @@ export default function Dashboard() {
             paginationComponentOptions={{
               noRowsPerPage: 1,
             }}
-            customStyles={{
-              pagination: {
-                style: {
-                  minHeight: 28,
-                  height: 28,
-                },
-              },
-              headCells: {
-                style: {
-                  fontSize: "1rem",
-                },
-              },
-              rows: {
-                style: {
-                  fontSize: "1rem",
-                },
-              },
-            }}
+            customStyles={customStyles}
           />
         </div>
       </div>

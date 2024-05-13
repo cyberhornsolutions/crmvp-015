@@ -216,8 +216,10 @@ export default function Users() {
             <option className="dropdown-item" value="All">
               All
             </option>
-            {searchOptions.map(({ name }) => (
-              <option className="dropdown-item">{name}</option>
+            {searchOptions.map(({ name }, i) => (
+              <option key={i} className="dropdown-item">
+                {name}
+              </option>
             ))}
           </select>
           <input
