@@ -40,7 +40,12 @@ export const fetchPlayers = (setState) => {
       (snapshot) => {
         const userData = [];
         snapshot.forEach((doc) => {
-          userData.push({ id: doc.id, ...doc.data() });
+          const data = doc.data();
+          userData.push({
+            id: doc.id,
+            ...data,
+            createdAt: { ...data.createdAt },
+          });
         });
         setState(userData);
       },
@@ -66,7 +71,14 @@ export const fetchOrders = (setState, playersList) => {
       const orders = [];
 
       querySnapshot.forEach((doc) => {
-        orders.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+        const order = {
+          id: doc.id,
+          ...data,
+          createdTime: { ...data.createdTime },
+        };
+        if (order.closedDate) order.closedDate = { ...data.closedDate };
+        orders.push(order);
       });
 
       setState(orders);
@@ -88,7 +100,11 @@ export const fetchManagers = (setState) => {
       const managerData = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        managerData.push({ ...data, id: doc.id });
+        managerData.push({
+          ...data,
+          id: doc.id,
+          date: { ...data.date },
+        });
       });
       setState(managerData);
     });
@@ -106,7 +122,7 @@ export const fetchTeams = (setState) => {
       const teamsData = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        teamsData.push({ ...data, id: doc.id });
+        teamsData.push({ ...data, id: doc.id, date: { ...data.date } });
       });
       setState(teamsData);
     });

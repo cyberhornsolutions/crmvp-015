@@ -136,6 +136,7 @@ export default function MainBoard() {
     rows: {
       style: {
         fontSize: "1rem",
+        userSelect: "none",
         // minHeight: 36,
         // height: 36,
       },
@@ -181,9 +182,11 @@ export default function MainBoard() {
       userDocRef,
       (userDocSnapshot) => {
         if (userDocSnapshot.exists()) {
+          const data = userDocSnapshot.data();
           const userData = {
             id: userDocSnapshot.id,
-            ...userDocSnapshot.data(),
+            ...data,
+            createdAt: { ...data.createdAt },
           };
           dispatch(setSelectedUser(userData));
           setNewUserData(userData);
