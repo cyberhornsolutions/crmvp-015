@@ -3,7 +3,7 @@ import { convertTimestamptToDate } from "../../utills/helpers";
 import { Timestamp } from "firebase/firestore";
 
 const overviewColumns = ({
-  isEdit,
+  selectedRow = {},
   handleEditOrder,
   showColumns = {},
 } = {}) => [
@@ -38,11 +38,11 @@ const overviewColumns = ({
     name: "Sum",
     selector: (row) =>
       row &&
-      (isEdit ? (
+      (row.isEdit ? (
         <input
           type="number"
           className="form-control"
-          value={row.sum}
+          value={selectedRow.sum}
           onChange={(e) => {
             handleEditOrder(row.id, "sum", e.target.value);
           }}
@@ -57,11 +57,11 @@ const overviewColumns = ({
     name: "Open Price",
     selector: (row) =>
       row &&
-      (isEdit ? (
+      (row.isEdit ? (
         <input
           type="number"
           className="form-control"
-          value={row.symbolValue}
+          value={selectedRow.symbolValue}
           onChange={(e) => {
             handleEditOrder(row.id, "symbolValue", e.target.value);
           }}
@@ -101,11 +101,11 @@ const overviewColumns = ({
     name: "Profit",
     selector: (row) =>
       row &&
-      (isEdit ? (
+      (row.isEdit ? (
         <input
           type="number"
           className="form-control"
-          value={row.profit}
+          value={selectedRow.profit}
           onChange={(e) => {
             handleEditOrder(row.id, "profit", e.target.value);
           }}
@@ -142,31 +142,63 @@ const overviewColumns = ({
           {row.status}
         </div>
       ),
+    // (
+    //   row.isEdit ? (
+    //     <select
+    //       className="form-select"
+    //       onChange={(e) => {
+    //         handleEditOrder(row.id, "status", "Pending");
+    //       }}
+    //       value={selectedRow.status}
+    //     >
+    //       <option disabled>{row.status}</option>
+    //       <option value="Open">Open</option>
+    //     </select>
+    //   ) : (
+    //     <div
+    //       className={
+    //         row.status == "Success"
+    //           ? "text-success"
+    //           : row.status == "Closed"
+    //           ? "text-danger"
+    //           : "text-warning"
+    //       }
+    //     >
+    //       {row.status}
+    //     </div>
+    //   )
+    // ),
     sortable: true,
     compact: true,
     omit: !showColumns.Status,
   },
   {
     name: "Date",
-    selector: (row) =>
-      row && isEdit ? (
-        <input
-          type="datetime-local"
-          className="form-control"
-          value={moment(convertTimestamptToDate(row.createdTime)).format(
-            "YYYY-MM-DDTHH:mm"
-          )}
-          onChange={(e) => {
-            handleEditOrder(
-              row.id,
-              "createdTime",
-              Timestamp.fromDate(new Date(e.target.value))
-            );
-          }}
-        />
-      ) : (
-        row.createdTime && convertTimestamptToDate(row.createdTime)
-      ),
+    selector: (row) => {
+      if (!row || !row?.createdTime) return;
+      if (row.isEdit && selectedRow.createdTime) {
+        const value = moment(
+          selectedRow.createdTime.seconds * 1000 +
+            selectedRow.createdTime.nanoseconds / 1000000
+        ).format("YYYY-MM-DDTHH:mm");
+        return (
+          <input
+            type="datetime-local"
+            className="form-control"
+            value={value}
+            onChange={(e) => {
+              console.log("e.target.value", e.target.value);
+              handleEditOrder(
+                row.id,
+                "createdTime",
+                Timestamp.fromDate(new Date(e.target.value))
+              );
+            }}
+          />
+        );
+      }
+      return convertTimestamptToDate(row.createdTime);
+    },
     grow: 2,
     compact: true,
     omit: !showColumns.Date,

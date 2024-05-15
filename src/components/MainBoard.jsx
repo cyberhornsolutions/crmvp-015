@@ -2,18 +2,17 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import placeholder from "../acc-img-placeholder.png";
 import { Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
-import { getAllSymbols, getAllDeposits } from "../utills/firebaseHelpers";
+import { updateUserById } from "../utills/firebaseHelpers";
 import { onSnapshot, doc, updateDoc } from "firebase/firestore";
 import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
 import { toast } from "react-toastify";
 import DelOrderModal from "./DelOrderModal";
+import SaveOrderModal from "./SaveOrderModal";
 import CancelOrderModal from "./CancelOrderModal";
 import EditOrder from "./EditOrder";
 import { useDispatch, useSelector } from "react-redux";
-import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import { setSelectedUser } from "../redux/slicer/userSlice";
-import { setDepositsState } from "../redux/slicer/transactionSlicer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import EditUserModal from "./EditUserModal";
@@ -59,6 +58,7 @@ export default function MainBoard() {
     () => localStorage.getItem("PLAYER_TAB") || "info"
   );
   const idInputRef = useRef(null);
+  const selectedRowRef = useRef(null);
   const locationInputRef = useRef(null);
   const mapInputRef = useRef(null);
   const placeInputRef = useRef(null);
@@ -74,8 +74,10 @@ export default function MainBoard() {
   const [isInfoEdit, setIsInfoEdit] = useState(false);
   const [newUserData, setNewUserData] = useState(selectedUser);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
+  const [isSaveOrderModalOpen, setIsSaveOrderModalOpen] = useState(false);
   const [showCancelOrderModal, setShowCancelOrderModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
+  const [selectedRow, setSelectedRow] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
   const [closedOrders, setClosedOrders] = useState([]);
   const [isUserEdit, setIsUserEdit] = useState(false);
@@ -84,9 +86,10 @@ export default function MainBoard() {
 
   useEffect(() => {
     const _orders = orders.filter((o) => o.userId === selectedUser?.id);
-    setUserOrders(_orders);
     const closed = _orders.filter(({ status }) => status !== "Pending");
-    if (closed.length !== closedOrders.length) setClosedOrders(closed);
+    setUserOrders(_orders);
+    // if (closed.length !== closedOrders.length)
+    setClosedOrders(closed);
   }, [orders]);
 
   useEffect(() => getSelectedUserData(), []);
@@ -116,9 +119,36 @@ export default function MainBoard() {
     };
     header.addEventListener("contextmenu", handleRightClick);
     return () => {
+      if (selectedRow) {
+        setClosedOrders(
+          userOrders.filter(({ status }) => status !== "Pending")
+        );
+        setSelectedRow();
+      }
       header.removeEventListener("contextmenu", handleRightClick);
     };
   }, [tab]);
+
+  const handleCloseSaveModal = (reset) => {
+    if (reset)
+      setClosedOrders(userOrders.filter(({ status }) => status !== "Pending"));
+    setIsSaveOrderModalOpen(false);
+    setSelectedRow();
+  };
+
+  useEffect(() => {
+    if (!selectedRowRef.current || tab !== "overview" || !selectedRow) return;
+    const handleOutsideClick = (e) => {
+      if (selectedRowRef.current.contains(e.target)) return;
+      selectedRowRef.current = null;
+      setIsSaveOrderModalOpen(true);
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+      selectedRowRef.current = null;
+    };
+  }, [selectedRowRef.current, tab]);
 
   const customStyles = {
     pagination: {
@@ -202,35 +232,48 @@ export default function MainBoard() {
   };
 
   const saveClosedOrders = async () => {
-    let profit = 0;
-    for (let i = 0; i < closedOrders.length; i++) {
-      if (closedOrders[i].sum <= 0)
-        return toast.error("Sum value should be greater than 0");
-      if (closedOrders[i].symbolValue <= 0)
-        return toast.error("Open Price value should be greater than 0");
-      if (!closedOrders[i].profit)
-        return toast.error("Please enter profit value in all deals");
-      profit += +closedOrders[i].profit;
-    }
-    if (profit < 0) {
-      const eq = +equity + profit;
-      if (eq < 0) return toast.error("This profit makes equity less than 0");
-      if (eq < parseFloat(newUserData?.settings?.stopOut))
-        return toast.error("This profit makes equity less than stop out value");
-    }
-    let status = "success";
-    closedOrders.forEach(async (order) => {
-      const docRef = doc(db, "orders", order.id);
-      try {
-        await updateDoc(docRef, order);
-        console.log(`Document with ID ${order.id} updated successfully`);
-      } catch (error) {
-        status = "error";
-        console.error(`Error updating document with ID ${order.id}:`, error);
+    const dealPayload = { ...selectedRow };
+    let { sum, symbolValue, profit, status } = dealPayload;
+    sum = +parseFloat(sum);
+    symbolValue = +parseFloat(symbolValue);
+    profit = +parseFloat(profit);
+    if (sum <= 0) return toast.error("Sum value should be greater than 0");
+    if (!symbolValue || symbolValue <= 0)
+      return toast.error("Open Price value should be greater than 0");
+    if (!profit && profit != 0) return toast.error("Profit is missing");
+    const eq = +equity + profit;
+    if (eq < 0) return toast.error("This profit makes equity less than 0");
+    if (eq < parseFloat(newUserData?.settings?.stopOut))
+      return toast.error("This profit makes equity less than stop out value");
+    try {
+      if (status === "Pending") {
+        delete dealPayload.closedPrice;
+        delete dealPayload.closedDate;
+
+        const userPayload = {
+          totalBalance: parseFloat(
+            newUserData?.totalBalance - dealPayload.fee - dealPayload.spread
+          ),
+          totalMargin: +(+totalMargin + +dealPayload.sum)?.toFixed(2),
+          activeOrdersProfit: +(
+            +activeOrdersProfit + +dealPayload.profit
+          )?.toFixed(2),
+          activeOrdersSwap: +(activeOrdersSwap - dealPayload.swap)?.toFixed(2),
+        };
+        await updateUserById(newUserData?.id, userPayload);
       }
-    });
-    toast[status]("Orders Updated");
-    setIsEdit(false);
+
+      const docRef = doc(db, "orders", dealPayload.id);
+      await updateDoc(docRef, dealPayload);
+      console.log(`Document with ID ${dealPayload.id} updated successfully`);
+      handleCloseSaveModal();
+    } catch (error) {
+      console.error(
+        `Error updating document with ID ${dealPayload.id}:`,
+        error
+      );
+    }
+    toast.success("Order updated successfully");
   };
 
   const updateUser = async () => {
@@ -247,10 +290,7 @@ export default function MainBoard() {
     setNewUserData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleEditOverviewOrders = (id, field, value) => {
-    const updatedData = closedOrders.map((item) =>
-      item.id === id ? { ...item, [field]: value } : item
-    );
-    setClosedOrders(updatedData);
+    setSelectedRow((p) => ({ ...p, [field]: value }));
   };
   const handleEditOrder = (row) => {
     setSelectedOrder(row);
@@ -1098,35 +1138,9 @@ export default function MainBoard() {
 
           {tab === "overview" && (
             <div id="menu2">
-              <div id="menu3-buttons">
-                <button
-                  id="menu3-edit"
-                  className="btn btn-secondary"
-                  onClick={() => {
-                    if (isEdit) {
-                      setClosedOrders(
-                        userOrders.filter(({ status }) => status !== "Pending")
-                      );
-                      setIsEdit(false);
-                    } else {
-                      setIsEdit(true);
-                    }
-                  }}
-                >
-                  {isEdit ? "Cancel" : "Edit"}
-                </button>
-                <button
-                  id="menu3-save"
-                  className="btn btn-secondary"
-                  onClick={saveClosedOrders}
-                  disabled={!isEdit}
-                >
-                  Save
-                </button>
-              </div>
               <DataTable
                 columns={overviewColumns({
-                  isEdit,
+                  selectedRow,
                   handleEditOrder: handleEditOverviewOrders,
                   showColumns,
                 })}
@@ -1138,6 +1152,18 @@ export default function MainBoard() {
                 paginationTotalRows={closedOrders.length}
                 paginationComponentOptions={{
                   noRowsPerPage: 1,
+                }}
+                onRowDoubleClicked={(row, event) => {
+                  if (!row || row.isEdit) return;
+                  selectedRowRef.current = event.target.parentElement;
+                  setClosedOrders((p) =>
+                    p.map((item) => {
+                      if (item.id === row.id) return { ...item, isEdit: true };
+                      delete item.isEdit;
+                      return item;
+                    })
+                  );
+                  setSelectedRow(row);
                 }}
                 // paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 customStyles={customStyles}
@@ -1279,6 +1305,13 @@ export default function MainBoard() {
       {isBalOpen && <AddBalanceModal setShowModal={setIsBalOpen} />}
       {isDelModalOpen && (
         <DelOrderModal selectedOrder={selectedOrder} onClose={handleClose} />
+      )}
+      {isSaveOrderModalOpen && (
+        <SaveOrderModal
+          selectedOrder={selectedRow}
+          handleSaveOrder={saveClosedOrders}
+          closeModal={handleCloseSaveModal}
+        />
       )}
       {showCancelOrderModal && (
         <CancelOrderModal
