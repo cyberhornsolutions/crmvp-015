@@ -129,7 +129,19 @@ const overviewColumns = ({
   {
     name: "Status",
     selector: (row) =>
-      row && (
+      row &&
+      (row.isEdit ? (
+        <select
+          className="form-select"
+          onChange={(e) => {
+            handleEditOrder(row.id, "status", "Pending");
+          }}
+          value={selectedRow.status}
+        >
+          <option disabled>{row.status}</option>
+          <option value="Open">Open</option>
+        </select>
+      ) : (
         <div
           className={
             row.status == "Success"
@@ -141,33 +153,7 @@ const overviewColumns = ({
         >
           {row.status}
         </div>
-      ),
-    // (
-    //   row.isEdit ? (
-    //     <select
-    //       className="form-select"
-    //       onChange={(e) => {
-    //         handleEditOrder(row.id, "status", "Pending");
-    //       }}
-    //       value={selectedRow.status}
-    //     >
-    //       <option disabled>{row.status}</option>
-    //       <option value="Open">Open</option>
-    //     </select>
-    //   ) : (
-    //     <div
-    //       className={
-    //         row.status == "Success"
-    //           ? "text-success"
-    //           : row.status == "Closed"
-    //           ? "text-danger"
-    //           : "text-warning"
-    //       }
-    //     >
-    //       {row.status}
-    //     </div>
-    //   )
-    // ),
+      )),
     sortable: true,
     compact: true,
     omit: !showColumns.Status,
