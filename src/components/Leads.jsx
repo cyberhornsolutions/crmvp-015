@@ -481,7 +481,7 @@ export default function Leads({ setTab }) {
             highlightOnHover
             pointerOnHover
             onRowClicked={(row) => row && setSelectedOrder(row)}
-            onRowDoubleClicked={(row) => row && setShowNewOrderModal(true)}
+            onRowDoubleClicked={(row) => setShowNewOrderModal(true)}
             dense
             customStyles={{
               pagination: {

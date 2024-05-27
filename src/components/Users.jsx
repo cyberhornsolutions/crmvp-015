@@ -94,6 +94,9 @@ export default function Users() {
       handleChangeManager(manager.id, "isEdit", false);
       return;
     }
+    for (let key in manager)
+      if (!manager[key]) return toast.error(key + " value cannot be empty");
+
     const isUserNameEdited = originalManager.username !== manager.username;
     try {
       if (isUserNameEdited) {

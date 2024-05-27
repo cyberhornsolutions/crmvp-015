@@ -51,6 +51,22 @@ const administratorsColumns = (
     sortable: true,
   },
   {
+    name: "Password",
+    selector: (row) =>
+      row.isEdit ? (
+        <Form.Control
+          type="text"
+          value={row.password}
+          name="password"
+          onChange={(e) =>
+            handleChangeManager(row.id, e.target.name, e.target.value)
+          }
+        />
+      ) : (
+        row.password
+      ),
+  },
+  {
     name: "Role",
     selector: (row) =>
       row.isEdit ? (

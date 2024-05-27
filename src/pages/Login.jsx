@@ -24,7 +24,7 @@ export default function Login() {
       toast.error("User is disabled");
       setLoading(false);
       // } else if (manager.password !== user.password) {
-    } else if (user.password !== role.toLowerCase()) {
+    } else if (user.password !== manager.password) {
       toast.error("Username or password is incorrect");
       setLoading(false);
     } else {

@@ -16,12 +16,12 @@ const NewOrder = ({ onClose, selectedOrder }) => {
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState({
     volume: 0,
-    sl: null,
-    tp: null,
+    sl: "",
+    tp: "",
   });
   const symbols = useSelector((state) => state?.symbols);
   const [selectedSymbol, setSelectedSymbol] = useState(
-    () => symbols.find((s) => s.id === selectedOrder.symbolId) || {}
+    () => symbols.find((s) => s.id === selectedOrder?.symbolId) || symbols[0]
   );
 
   const [enableOpenPrice, setEnableOpenPrice] = useState(false);
