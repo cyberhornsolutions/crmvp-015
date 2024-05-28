@@ -5,6 +5,7 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import DataTable from "react-data-table-component";
 import { toast } from "react-toastify";
 import administratorsColumns from "./columns/administratorsColumns";
+import ipMonitorsColumns from "./columns/ipMonitorColumns";
 import teamsColumns from "./columns/teamsColumns";
 import {
   addTeam,
@@ -20,7 +21,7 @@ import { setTeamsState } from "../redux/slicer/teamsSlice";
 
 export default function Users() {
   const dispatch = useDispatch();
-  const [tab, setTab] = useState("All");
+  const [tab, setTab] = useState("IP Monitor");
   const [searchText, setSearchText] = useState("");
   const [searchBy, setSearchBy] = useState("");
   const managers = useSelector((state) => state.managers);
@@ -80,10 +81,14 @@ export default function Users() {
   const handleChangeTeam = (e) =>
     setTeam((p) => ({ ...p, [e.target.name]: e.target.value }));
 
+  const handleChangeIp = (id, key, value) => {};
+
   const handleChangeManager = (id, key, value) =>
     setProcessedManagers((p) =>
       p.map((m) => (m.id === id ? { ...m, [key]: value } : m))
     );
+
+  const handleSaveIps = async () => {};
 
   const handleSaveManager = async (manager) => {
     const originalManager = managers.find(({ id }) => id === manager.id);
@@ -114,6 +119,8 @@ export default function Users() {
       toast.error("Error updating manager");
     }
   };
+
+  const toggleDisableIp = async (id, isActive) => {};
 
   const toggleActiveManager = async (id, isActive) => {
     try {
@@ -183,7 +190,8 @@ export default function Users() {
     ? filterSearchObjects(searchText, teams)
     : teams;
 
-  const searchOptions = tab === "All" ? administratorsColumns() : teamsColumns;
+  const searchOptions =
+    tab === "Managers" ? administratorsColumns() : teamsColumns;
 
   return (
     <div id="users" className="active">
@@ -194,13 +202,19 @@ export default function Users() {
         <Navbar className="nav nav-tabs p-0">
           <Nav className="me-auto" style={{ gap: "2px" }}>
             <Nav.Link
-              className={tab === "All" && "active"}
-              onClick={() => setTab("All")}
+              className={tab === "IP Monitor" ? "active" : ""}
+              onClick={() => setTab("IP Monitor")}
             >
-              All
+              IP Monitor
             </Nav.Link>
             <Nav.Link
-              className={tab === "Teams" && "active"}
+              className={tab === "Managers" ? "active" : ""}
+              onClick={() => setTab("Managers")}
+            >
+              Managers
+            </Nav.Link>
+            <Nav.Link
+              className={tab === "Teams" ? "active" : ""}
               onClick={() => setTab("Teams")}
             >
               Teams
@@ -215,9 +229,6 @@ export default function Users() {
           >
             <option className="d-none" disabled value="">
               Search By
-            </option>
-            <option className="dropdown-item" value="All">
-              All
             </option>
             {searchOptions.map(({ name }, i) => (
               <option key={i} className="dropdown-item">
@@ -235,7 +246,29 @@ export default function Users() {
           />
         </div>
         <div>
-          {tab === "All" && (
+          {tab === "IP Monitor" && (
+            <DataTable
+              columns={ipMonitorsColumns({
+                handleChangeIp,
+                handleSaveIps,
+                toggleDisableIp,
+              })}
+              data={fillArrayWithEmptyRows([], 10)}
+              pagination
+              paginationTotalRows={managers.length}
+              paginationPerPage={10}
+              paginationComponentOptions={{
+                noRowsPerPage: 1,
+              }}
+              // paginationRowsPerPageOptions={[5, 10, 20, 50]}
+              dense
+              customStyles={customStyles}
+              highlightOnHover
+              pointerOnHover
+              responsive
+            />
+          )}
+          {tab === "Managers" && (
             <DataTable
               columns={administratorsColumns({
                 handleChangeManager,
