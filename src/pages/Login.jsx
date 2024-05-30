@@ -3,9 +3,11 @@ import logo from "../logo.png";
 import { Form } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
 import {
+  getBlockedIPs,
   getManagerByUsernameAndRole,
   updateManager,
 } from "../utills/firebaseHelpers";
+import { getIPRange } from "../utills/helpers";
 
 export default function Login() {
   const [role, setRole] = useState("");
@@ -17,23 +19,41 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!role) return toast.error("Please select a role");
-    setLoading(true);
-    const manager = await getManagerByUsernameAndRole(user.username, role);
-    if (!manager) {
-      toast.error("User not found");
-      setLoading(false);
-    } else if (!manager.isActive) {
-      toast.error("User is disabled");
-      setLoading(false);
-      // } else if (manager.password !== user.password) {
-    } else if (user.password !== manager.password) {
-      toast.error("Username or password is incorrect");
-      setLoading(false);
-    } else {
-      await updateManager(manager.id, { onlineStatus: true });
-      localStorage.setItem("USER", JSON.stringify(manager));
-      location.href = "/";
+    try {
+      if (!role) return toast.error("Please select a role");
+      setLoading(true);
+      const manager = await getManagerByUsernameAndRole(user.username, role);
+      if (!manager) {
+        toast.error("User not found");
+        setLoading(false);
+      } else if (!manager.isActive) {
+        toast.error("User is disabled");
+        setLoading(false);
+        // } else if (manager.password !== user.password) {
+      } else if (user.password !== manager.password) {
+        toast.error("Username or password is incorrect");
+        setLoading(false);
+      } else {
+        if (role !== "Admin") {
+          const [ip, blockedIps] = await Promise.all([
+            fetch("https://api.ipify.org").then((res) => res.text()),
+            getBlockedIPs(),
+          ]);
+          console.log("ip ====> ", ip);
+          for (let { firstIp, secondIp } of blockedIps) {
+            if (ip === firstIp || ip === secondIp)
+              return toast.error("You are blocked to login");
+            const ipRange = getIPRange(firstIp, secondIp);
+            if (ipRange.includes(ip))
+              return toast.error("You are blocked to login");
+          }
+        }
+        await updateManager(manager.id, { onlineStatus: true });
+        localStorage.setItem("USER", JSON.stringify(manager));
+        location.href = "/";
+      }
+    } catch (error) {
+      console.log("Error while login", error);
     }
   };
 

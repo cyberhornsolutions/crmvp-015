@@ -121,8 +121,8 @@ export default function Users() {
       handleChangeIps(ip.id, "isEdit", false);
       return;
     }
-    for (let key in ip)
-      if (!ip[key]) return toast.error(key + " value cannot be empty");
+    if (!ip.firstIp || !ip.secondIp)
+      return toast.error(key + "First Ip & Second Ip value cannot be empty");
 
     try {
       delete ip.isEdit;
