@@ -10,14 +10,18 @@ import teamsColumns from "./columns/teamsColumns";
 import {
   addTeam,
   fetchManagers,
+  fetchBlockedIps,
   fetchTeams,
   getManagerByUsername,
   updateManager,
+  updateBlockedIp,
+  addBlockedIp,
 } from "../utills/firebaseHelpers";
 import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { setManagersState } from "../redux/slicer/managersSlice";
 import { setTeamsState } from "../redux/slicer/teamsSlice";
+import { setIpsState } from "../redux/slicer/ipsSlicer";
 
 export default function Users() {
   const dispatch = useDispatch();
@@ -26,7 +30,15 @@ export default function Users() {
   const [searchBy, setSearchBy] = useState("");
   const managers = useSelector((state) => state.managers);
   const teams = useSelector((state) => state.teams);
+  const players = useSelector((state) => state.players);
+  const ips = useSelector((state) => state.ips);
+
+  const playersOnlineCount = players.filter((el) => el.onlineStatus).length;
+  const managersOnlineCount = managers.filter((m) => m.onlineStatus).length;
+  const totalManagersActive = managers.filter((m) => m.isActive).length;
+
   const [processedManagers, setProcessedManagers] = useState([]);
+  const [processedIps, setProcessedIps] = useState([]);
 
   const [user, setUser] = useState({
     name: "",
@@ -48,9 +60,17 @@ export default function Users() {
     dispatch(setTeamsState(data));
   }, []);
 
+  const setIps = useCallback((data) => {
+    if (data.length < 10)
+      for (let i = data.length; i < 10; i++)
+        data.push({ id: i + 1, firstIp: "", secondIp: "" });
+    dispatch(setIpsState(data));
+  }, []);
+
   useEffect(() => {
     if (!managers.length) fetchManagers(setManagers);
     if (!teams.length) fetchTeams(setTeams);
+    if (!ips.length) fetchBlockedIps(setIps);
   }, []);
 
   const customStyles = {
@@ -81,14 +101,44 @@ export default function Users() {
   const handleChangeTeam = (e) =>
     setTeam((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  const handleChangeIp = (id, key, value) => {};
+  const handleChangeIps = (id, key, value) => {
+    setProcessedIps((p) =>
+      p.map((ip) => (ip.id === id ? { ...ip, [key]: value } : ip))
+    );
+  };
 
   const handleChangeManager = (id, key, value) =>
     setProcessedManagers((p) =>
       p.map((m) => (m.id === id ? { ...m, [key]: value } : m))
     );
 
-  const handleSaveIps = async () => {};
+  const handleSaveIps = async (ip) => {
+    const ipBefore = ips.find(({ id }) => id === ip.id);
+    const unChanged = Object.keys(ipBefore).every(
+      (key) => ipBefore[key] === ip[key]
+    );
+    if (unChanged) {
+      handleChangeIps(ip.id, "isEdit", false);
+      return;
+    }
+    for (let key in ip)
+      if (!ip[key]) return toast.error(key + " value cannot be empty");
+
+    try {
+      delete ip.isEdit;
+      if (ip.id < 10) {
+        delete ip.id;
+        await addBlockedIp(ip);
+        toast.success("Ip blocked successfully");
+      } else {
+        await updateBlockedIp(ip.id, ip);
+        toast.success("Ip updated successfully");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating ip");
+    }
+  };
 
   const handleSaveManager = async (manager) => {
     const originalManager = managers.find(({ id }) => id === manager.id);
@@ -120,7 +170,20 @@ export default function Users() {
     }
   };
 
-  const toggleDisableIp = async (id, isActive) => {};
+  const toggleDisableIp = async (id, isBlocked) => {
+    if (id < 10) return;
+    try {
+      await updateBlockedIp(id, {
+        isBlocked,
+      });
+      toast.success(
+        isBlocked ? "Ip blocked successfully" : "Ip unblocked successfully"
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating Ip");
+    }
+  };
 
   const toggleActiveManager = async (id, isActive) => {
     try {
@@ -182,6 +245,9 @@ export default function Users() {
   useEffect(() => {
     setProcessedManagers(managers);
   }, [managers]);
+  useEffect(() => {
+    setProcessedIps(ips);
+  }, [ips]);
 
   const filteredManagers = searchText
     ? filterSearchObjects(searchText, processedManagers)
@@ -221,42 +287,62 @@ export default function Users() {
             </Nav.Link>
           </Nav>
         </Navbar>
-        <div className="input-group input-group-sm gap-1 my-2">
-          <select
-            className="input-group-text"
-            value={searchBy}
-            onChange={(e) => setSearchBy(e.target.value)}
-          >
-            <option className="d-none" disabled value="">
-              Search By
-            </option>
-            {searchOptions.map(({ name }, i) => (
-              <option key={i} className="dropdown-item">
-                {name}
+        {tab === "IP Monitor" ? (
+          <div className="d-flex justify-content-between font-bold px-3 my-2">
+            <span className="text-bold-500">
+              Players online: {playersOnlineCount}
+            </span>
+            <span className="text-bold-500">
+              Managers online: {managersOnlineCount}
+            </span>
+            <span className="text-bold-500">
+              Total players registered: {players.length}
+            </span>
+            <span className="text-bold-500">
+              Total managers active: {totalManagersActive}
+            </span>
+            <span className="text-bold-500">
+              Total users: {players.length + totalManagersActive}
+            </span>
+          </div>
+        ) : (
+          <div className="input-group input-group-sm gap-1 my-2">
+            <select
+              className="input-group-text"
+              value={searchBy}
+              onChange={(e) => setSearchBy(e.target.value)}
+            >
+              <option className="d-none" disabled value="">
+                Search By
               </option>
-            ))}
-          </select>
-          <input
-            className="form-control-sm"
-            type="search"
-            autoComplete="off"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search.."
-          />
-        </div>
+              {searchOptions.map(({ name }, i) => (
+                <option key={i} className="dropdown-item">
+                  {name}
+                </option>
+              ))}
+            </select>
+            <input
+              className="form-control-sm"
+              type="search"
+              autoComplete="off"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Search.."
+            />
+          </div>
+        )}
         <div>
           {tab === "IP Monitor" && (
             <DataTable
               columns={ipMonitorsColumns({
-                handleChangeIp,
+                handleChangeIps,
                 handleSaveIps,
                 toggleDisableIp,
               })}
-              data={fillArrayWithEmptyRows([], 10)}
-              pagination
-              paginationTotalRows={managers.length}
-              paginationPerPage={10}
+              data={fillArrayWithEmptyRows(processedIps, 10)}
+              // pagination
+              paginationTotalRows={ips.length}
+              // paginationPerPage={10}
               paginationComponentOptions={{
                 noRowsPerPage: 1,
               }}

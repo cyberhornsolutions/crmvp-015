@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import logo from "../logo.png";
 import { Form } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
-import { getManagerByUsernameAndRole } from "../utills/firebaseHelpers";
+import {
+  getManagerByUsernameAndRole,
+  updateManager,
+} from "../utills/firebaseHelpers";
 
 export default function Login() {
   const [role, setRole] = useState("");
@@ -28,6 +31,7 @@ export default function Login() {
       toast.error("Username or password is incorrect");
       setLoading(false);
     } else {
+      await updateManager(manager.id, { onlineStatus: true });
       localStorage.setItem("USER", JSON.stringify(manager));
       location.href = "/";
     }

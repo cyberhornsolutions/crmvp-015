@@ -958,3 +958,7 @@ th {
 .stopClik {
   cursor: not-allowed;
 }
+
+.text-bold-500 {
+  font-weight: 500;
+}

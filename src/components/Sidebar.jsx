@@ -2,6 +2,7 @@ import React from "react";
 import accImg from "../acc-img-placeholder.png";
 import logo from "../logo.png";
 import { useSelector } from "react-redux";
+import { updateManager } from "../utills/firebaseHelpers";
 
 export default function Sidebar({ setTab, tab }) {
   const { user } = useSelector((state) => state.user);
@@ -101,7 +102,8 @@ export default function Sidebar({ setTab, tab }) {
         <button
           id="logout-button"
           className="transparent-background"
-          onClick={() => {
+          onClick={async () => {
+            await updateManager(user.id, { onlineStatus: false });
             localStorage.clear();
             location.href = "/";
           }}

@@ -1,17 +1,16 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
 import { Form } from "react-bootstrap";
-import { convertTimestamptToDate } from "../../utills/helpers";
 
 const ipMonitorsColumns = (
-  { handleChangeIp, handleSaveIps, toggleDisableIp } = {
-    handleChangeIp: () => {},
+  { handleChangeIps, handleSaveIps, toggleDisableIp } = {
+    handleChangeIps: () => {},
     handleSaveIps: () => {},
     toggleDisableIp: () => {},
   }
 ) => [
   {
-    name: "First IP", // Translate the header using your t function
+    name: "First IP",
     selector: (row) =>
       row.isEdit ? (
         <Form.Control
@@ -19,16 +18,16 @@ const ipMonitorsColumns = (
           value={row.firstIp}
           name="firstIp"
           onChange={(e) =>
-            handleChangeIp(row.id, e.target.name, e.target.value)
+            handleChangeIps(row.id, e.target.name, e.target.value)
           }
         />
       ) : (
-        row.name
+        row.firstIp
       ),
     sortable: true,
   },
   {
-    name: "Second IP", // Translate the header using your t function
+    name: "Second IP",
     selector: (row) =>
       row.isEdit ? (
         <Form.Control
@@ -36,11 +35,11 @@ const ipMonitorsColumns = (
           value={row.secondIp}
           name="secondIp"
           onChange={(e) =>
-            handleChangeIp(row.id, e.target.name, e.target.value)
+            handleChangeIps(row.id, e.target.name, e.target.value)
           }
         />
       ) : (
-        row.name
+        row.secondIp
       ),
     sortable: true,
   },
@@ -52,19 +51,22 @@ const ipMonitorsColumns = (
         {row.isEdit ? (
           <FontAwesomeIcon
             icon={faSave}
+            title="Save"
             className="btn btn-secondary btn-sm"
             onClick={() => handleSaveIps(row)}
           />
         ) : (
           <FontAwesomeIcon
             icon={faEdit}
+            title="Edit"
             className="btn btn-outline-secondary btn-sm"
-            onClick={() => handleChangeIp(row.id, "isEdit", true)}
+            onClick={() => handleChangeIps(row.id, "isEdit", true)}
           />
         )}
         <Form.Check
           type="switch"
-          checked={row.isActive}
+          checked={row.isBlocked}
+          title="Blocked"
           onChange={(e) => toggleDisableIp(row.id, e.target.checked)}
         />
       </div>

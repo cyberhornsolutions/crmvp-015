@@ -114,6 +114,24 @@ export const fetchManagers = (setState) => {
   }
 };
 
+export const fetchBlockedIps = (setState) => {
+  try {
+    const q = query(collection(db, "blockedIps"));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const ipsData = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        ipsData.push({ ...data, id: doc.id, date: { ...data.date } });
+      });
+      setState(ipsData);
+    });
+    return unsubscribe;
+  } catch (error) {
+    console.error("Error fetching blocked ips:", error);
+  }
+};
+
 export const fetchTeams = (setState) => {
   try {
     const q = query(collection(db, "teams"));
@@ -130,6 +148,13 @@ export const fetchTeams = (setState) => {
   } catch (error) {
     console.error("Error fetching teams:", error);
   }
+};
+
+export const addBlockedIp = async (ip) => {
+  return await addDoc(collection(db, "blockedIps"), {
+    ...ip,
+    date: serverTimestamp(),
+  });
 };
 
 export const addTeam = async (team) => {
@@ -175,6 +200,11 @@ export const getManagerByUsernameAndRole = async (username, role) => {
 
 export const updateManager = async (id, payload) => {
   const docRef = doc(db, "managers", id);
+  return await updateDoc(docRef, payload);
+};
+
+export const updateBlockedIp = async (id, payload) => {
+  const docRef = doc(db, "blockedIps", id);
   return await updateDoc(docRef, payload);
 };
 
