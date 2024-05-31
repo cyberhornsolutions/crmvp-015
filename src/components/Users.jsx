@@ -124,6 +124,16 @@ export default function Users() {
     if (!ip.firstIp || !ip.secondIp)
       return toast.error("First Ip & Second Ip value cannot be empty");
 
+    const { firstIp, secondIp } = ip;
+    const firstIpParts = firstIp.split(".").filter((i) => i);
+    const secondIpParts = secondIp.split(".").filter((i) => i);
+    if (firstIpParts.length < 4 || secondIpParts.length < 4)
+      return toast.error("Invalid ip length");
+
+    for (let part of firstIpParts)
+      if (Number.isNaN(+part) || +part < 0 || +part > 255)
+        return toast.error("Invalid ip");
+
     try {
       delete ip.isEdit;
       if (ip.id < 10) {

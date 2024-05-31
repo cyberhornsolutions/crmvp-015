@@ -24,7 +24,6 @@ const ipMonitorsColumns = (
       ) : (
         row.firstIp
       ),
-    sortable: true,
   },
   {
     name: "Second IP",
@@ -41,7 +40,6 @@ const ipMonitorsColumns = (
       ) : (
         row.secondIp
       ),
-    sortable: true,
   },
   {
     name: "Action",
@@ -71,7 +69,6 @@ const ipMonitorsColumns = (
         />
       </div>
     ),
-    sortable: false,
   },
 ];
 
