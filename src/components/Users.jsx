@@ -122,7 +122,7 @@ export default function Users() {
       return;
     }
     if (!ip.firstIp || !ip.secondIp)
-      return toast.error(key + "First Ip & Second Ip value cannot be empty");
+      return toast.error("First Ip & Second Ip value cannot be empty");
 
     try {
       delete ip.isEdit;
