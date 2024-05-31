@@ -3,10 +3,17 @@ import { faClose, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
 import { Form } from "react-bootstrap";
 
 const ipMonitorsColumns = (
-  { handleChangeIps, handleSaveIps, toggleDisableIp } = {
+  {
+    handleChangeIps,
+    handleSaveIps,
+    toggleDisableIp,
+    selectedRowRef,
+    setSelectedRow,
+  } = {
     handleChangeIps: () => {},
     handleSaveIps: () => {},
     toggleDisableIp: () => {},
+    setSelectedRow: () => {},
   }
 ) => [
   {
@@ -47,19 +54,37 @@ const ipMonitorsColumns = (
     cell: (row) => (
       <div className="d-flex align-items-center gap-1">
         {row.isEdit ? (
-          <FontAwesomeIcon
-            icon={faSave}
+          <button
             title="Save"
             className="btn btn-secondary btn-sm"
             onClick={() => handleSaveIps(row)}
-          />
+          >
+            <FontAwesomeIcon
+              icon={faSave}
+              style={{
+                pointerEvents: "none",
+              }}
+            />
+          </button>
         ) : (
-          <FontAwesomeIcon
-            icon={faEdit}
+          <button
             title="Edit"
             className="btn btn-outline-secondary btn-sm"
-            onClick={() => handleChangeIps(row.id, "isEdit", true)}
-          />
+            onClick={(e) => {
+              selectedRowRef.current =
+                e.target.parentElement.parentElement.parentElement;
+              setSelectedRow(row);
+              handleChangeIps(row.id, "isEdit", true);
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faEdit}
+              style={{
+                pointerEvents: "none",
+              }}
+              onclick
+            />
+          </button>
         )}
         <Form.Check
           type="switch"

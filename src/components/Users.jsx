@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Nav, Navbar, Form } from "react-bootstrap";
 import { auth, db } from "../firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
@@ -22,12 +22,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { setManagersState } from "../redux/slicer/managersSlice";
 import { setTeamsState } from "../redux/slicer/teamsSlice";
 import { setIpsState } from "../redux/slicer/ipsSlicer";
+import SaveOrderModal from "./SaveOrderModal";
 
 export default function Users() {
   const dispatch = useDispatch();
   const [tab, setTab] = useState("IP Monitor");
   const [searchText, setSearchText] = useState("");
   const [searchBy, setSearchBy] = useState("");
+  const [isSaveIpModalOpen, setIsSaveIpModalOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState();
+  const selectedRowRef = useRef(null);
   const managers = useSelector((state) => state.managers);
   const teams = useSelector((state) => state.teams);
   const players = useSelector((state) => state.players);
@@ -103,7 +107,10 @@ export default function Users() {
 
   const handleChangeIps = (id, key, value) => {
     setProcessedIps((p) =>
-      p.map((ip) => (ip.id === id ? { ...ip, [key]: value } : ip))
+      p.map((ip) => {
+        if (key === "isEdit" && value) delete ip.isEdit;
+        return ip.id === id ? { ...ip, [key]: value } : ip;
+      })
     );
   };
 
@@ -113,6 +120,8 @@ export default function Users() {
     );
 
   const handleSaveIps = async (ip) => {
+    if (!ip && selectedRow)
+      ip = processedIps.find(({ id }) => id === selectedRow.id);
     const ipBefore = ips.find(({ id }) => id === ip.id);
     const unChanged = Object.keys(ipBefore).every(
       (key) => ipBefore[key] === ip[key]
@@ -144,6 +153,7 @@ export default function Users() {
         await updateBlockedIp(ip.id, ip);
         toast.success("Ip updated successfully");
       }
+      handleCloseSaveModal();
     } catch (error) {
       console.error(error);
       toast.error("Error updating ip");
@@ -252,12 +262,33 @@ export default function Users() {
     }
   };
 
+  const handleCloseSaveModal = (reset) => {
+    if (reset) setProcessedIps(ips);
+    setIsSaveIpModalOpen(false);
+    setSelectedRow();
+  };
+
   useEffect(() => {
     setProcessedManagers(managers);
   }, [managers, tab]);
   useEffect(() => {
     setProcessedIps(ips);
+    selectedRowRef.current = null;
   }, [ips, tab]);
+
+  useEffect(() => {
+    if (!selectedRowRef.current || tab !== "IP Monitor") return;
+    const handleOutsideClick = (e) => {
+      if (selectedRowRef.current.contains(e.target)) return;
+      selectedRowRef.current = null;
+      setIsSaveIpModalOpen(true);
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+      selectedRowRef.current = null;
+    };
+  }, [selectedRowRef.current, selectedRow]);
 
   const filteredManagers = searchText
     ? filterSearchObjects(searchText, processedManagers)
@@ -270,197 +301,244 @@ export default function Users() {
     tab === "Managers" ? administratorsColumns() : teamsColumns;
 
   return (
-    <div id="users" className="active">
-      <div
-        id="users-div"
-        // className="hidden"
-      >
-        <Navbar className="nav nav-tabs p-0">
-          <Nav className="me-auto" style={{ gap: "2px" }}>
-            <Nav.Link
-              className={tab === "IP Monitor" ? "active" : ""}
-              onClick={() => setTab("IP Monitor")}
-            >
-              IP Monitor
-            </Nav.Link>
-            <Nav.Link
-              className={tab === "Managers" ? "active" : ""}
-              onClick={() => setTab("Managers")}
-            >
-              Managers
-            </Nav.Link>
-            <Nav.Link
-              className={tab === "Teams" ? "active" : ""}
-              onClick={() => setTab("Teams")}
-            >
-              Teams
-            </Nav.Link>
-          </Nav>
-        </Navbar>
-        {tab === "IP Monitor" ? (
-          <div className="d-flex justify-content-between font-bold px-3 my-2">
-            <span className="text-bold-500">
-              Players online: {playersOnlineCount}
-            </span>
-            <span className="text-bold-500">
-              Managers online: {managersOnlineCount}
-            </span>
-            <span className="text-bold-500">
-              Total players registered: {players.length}
-            </span>
-            <span className="text-bold-500">
-              Total managers active: {totalManagersActive}
-            </span>
-            <span className="text-bold-500">
-              Total users: {players.length + totalManagersActive}
-            </span>
-          </div>
-        ) : (
-          <div className="input-group input-group-sm gap-1 my-2">
-            <select
-              className="input-group-text"
-              value={searchBy}
-              onChange={(e) => setSearchBy(e.target.value)}
-            >
-              <option className="d-none" disabled value="">
-                Search By
-              </option>
-              {searchOptions.map(({ name }, i) => (
-                <option key={i} className="dropdown-item">
-                  {name}
-                </option>
-              ))}
-            </select>
-            <input
-              className="form-control-sm"
-              type="search"
-              autoComplete="off"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Search.."
-            />
-          </div>
-        )}
-        <div>
-          {tab === "IP Monitor" && (
-            <DataTable
-              columns={ipMonitorsColumns({
-                handleChangeIps,
-                handleSaveIps,
-                toggleDisableIp,
-              })}
-              data={fillArrayWithEmptyRows(processedIps, 10)}
-              // pagination
-              paginationTotalRows={ips.length}
-              // paginationPerPage={10}
-              paginationComponentOptions={{
-                noRowsPerPage: 1,
-              }}
-              // paginationRowsPerPageOptions={[5, 10, 20, 50]}
-              dense
-              customStyles={customStyles}
-              highlightOnHover
-              pointerOnHover
-              responsive
-            />
-          )}
-          {tab === "Managers" && (
-            <DataTable
-              columns={administratorsColumns({
-                handleChangeManager,
-                handleSaveManager,
-                toggleActiveManager,
-                teams,
-              })}
-              data={fillArrayWithEmptyRows(filteredManagers, 10)}
-              pagination
-              paginationTotalRows={managers.length}
-              paginationPerPage={10}
-              paginationComponentOptions={{
-                noRowsPerPage: 1,
-              }}
-              // paginationRowsPerPageOptions={[5, 10, 20, 50]}
-              dense
-              customStyles={customStyles}
-              highlightOnHover
-              pointerOnHover
-              responsive
-            />
-          )}
-          {tab === "Teams" && (
-            <DataTable
-              columns={teamsColumns}
-              data={fillArrayWithEmptyRows(filteredTeams, 10)}
-              pagination
-              paginationTotalRows={teams.length}
-              paginationPerPage={10}
-              // paginationRowsPerPageOptions={[10, 20, 50]}
-              paginationComponentOptions={{
-                noRowsPerPage: 1,
-              }}
-              dense
-              customStyles={customStyles}
-              highlightOnHover
-              pointerOnHover
-              responsive
-            />
-          )}
-        </div>
-      </div>
-      <div
-        id="newUser-form"
-        className="d-flex flex-column gap-3 mx-3 py-2 rounded"
-      >
-        <div className="w-75 mx-auto">
-          <h5 className="d-inline-block">Manager</h5>
-          <form>
-            <div className="d-flex gap-1">
-              <Form.Control
-                type="text"
-                name="name"
-                value={user.name}
-                onChange={handleChangeUser}
-                placeholder="Name"
-              />
-              <Form.Control
-                type="text"
-                name="username"
-                value={user.username}
-                onChange={handleChangeUser}
-                placeholder="Username"
-              />
-
-              <Form.Select
-                type="text"
-                name="role"
-                value={user.role}
-                placeholder="Role"
-                onChange={handleChangeUser}
+    <>
+      <div id="users" className="active">
+        <div
+          id="users-div"
+          // className="hidden"
+        >
+          <Navbar className="nav nav-tabs p-0">
+            <Nav className="me-auto" style={{ gap: "2px" }}>
+              <Nav.Link
+                className={tab === "IP Monitor" ? "active" : ""}
+                onClick={() => setTab("IP Monitor")}
               >
-                <option value="" disabled>
-                  Role
-                </option>
-                <option value="Admin">Admin</option>
-                <option value="Sale">Sale</option>
-                <option value="Reten">Reten</option>
-              </Form.Select>
-              <Form.Select
-                type="text"
-                name="team"
-                value={user.team}
-                placeholder="Team"
-                onChange={handleChangeUser}
+                IP Monitor
+              </Nav.Link>
+              <Nav.Link
+                className={tab === "Managers" ? "active" : ""}
+                onClick={() => setTab("Managers")}
               >
-                <option value="" disabled>
-                  Team
+                Managers
+              </Nav.Link>
+              <Nav.Link
+                className={tab === "Teams" ? "active" : ""}
+                onClick={() => setTab("Teams")}
+              >
+                Teams
+              </Nav.Link>
+            </Nav>
+          </Navbar>
+          {tab === "IP Monitor" ? (
+            <div className="d-flex justify-content-between font-bold px-3 my-2">
+              <span className="text-bold-500">
+                Players online: {playersOnlineCount}
+              </span>
+              <span className="text-bold-500">
+                Managers online: {managersOnlineCount}
+              </span>
+              <span className="text-bold-500">
+                Total players registered: {players.length}
+              </span>
+              <span className="text-bold-500">
+                Total managers active: {totalManagersActive}
+              </span>
+              <span className="text-bold-500">
+                Total users: {players.length + totalManagersActive}
+              </span>
+            </div>
+          ) : (
+            <div className="input-group input-group-sm gap-1 my-2">
+              <select
+                className="input-group-text"
+                value={searchBy}
+                onChange={(e) => setSearchBy(e.target.value)}
+              >
+                <option className="d-none" disabled value="">
+                  Search By
                 </option>
-                {teams.map((team, i) => (
-                  <option key={i} value={team.name}>
-                    {team.name}
+                {searchOptions.map(({ name }, i) => (
+                  <option key={i} className="dropdown-item">
+                    {name}
                   </option>
                 ))}
-              </Form.Select>
+              </select>
+              <input
+                className="form-control-sm"
+                type="search"
+                autoComplete="off"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                placeholder="Search.."
+              />
             </div>
+          )}
+          <div>
+            {tab === "IP Monitor" && (
+              <DataTable
+                columns={ipMonitorsColumns({
+                  handleChangeIps,
+                  handleSaveIps,
+                  toggleDisableIp,
+                  selectedRowRef,
+                  setSelectedRow,
+                })}
+                data={fillArrayWithEmptyRows(processedIps, 10)}
+                // pagination
+                paginationTotalRows={ips.length}
+                // paginationPerPage={10}
+                paginationComponentOptions={{
+                  noRowsPerPage: 1,
+                }}
+                // paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                dense
+                customStyles={customStyles}
+                highlightOnHover
+                pointerOnHover
+                responsive
+              />
+            )}
+            {tab === "Managers" && (
+              <DataTable
+                columns={administratorsColumns({
+                  handleChangeManager,
+                  handleSaveManager,
+                  toggleActiveManager,
+                  teams,
+                })}
+                data={fillArrayWithEmptyRows(filteredManagers, 10)}
+                pagination
+                paginationTotalRows={managers.length}
+                paginationPerPage={10}
+                paginationComponentOptions={{
+                  noRowsPerPage: 1,
+                }}
+                // paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                dense
+                customStyles={customStyles}
+                highlightOnHover
+                pointerOnHover
+                responsive
+              />
+            )}
+            {tab === "Teams" && (
+              <DataTable
+                columns={teamsColumns}
+                data={fillArrayWithEmptyRows(filteredTeams, 10)}
+                pagination
+                paginationTotalRows={teams.length}
+                paginationPerPage={10}
+                // paginationRowsPerPageOptions={[10, 20, 50]}
+                paginationComponentOptions={{
+                  noRowsPerPage: 1,
+                }}
+                dense
+                customStyles={customStyles}
+                highlightOnHover
+                pointerOnHover
+                responsive
+              />
+            )}
+          </div>
+        </div>
+        <div
+          id="newUser-form"
+          className="d-flex flex-column gap-3 mx-3 py-2 rounded"
+        >
+          <div className="w-75 mx-auto">
+            <h5 className="d-inline-block">Manager</h5>
+            <form>
+              <div className="d-flex gap-1">
+                <Form.Control
+                  type="text"
+                  name="name"
+                  value={user.name}
+                  onChange={handleChangeUser}
+                  placeholder="Name"
+                />
+                <Form.Control
+                  type="text"
+                  name="username"
+                  value={user.username}
+                  onChange={handleChangeUser}
+                  placeholder="Username"
+                />
+
+                <Form.Select
+                  type="text"
+                  name="role"
+                  value={user.role}
+                  placeholder="Role"
+                  onChange={handleChangeUser}
+                >
+                  <option value="" disabled>
+                    Role
+                  </option>
+                  <option value="Admin">Admin</option>
+                  <option value="Sale">Sale</option>
+                  <option value="Reten">Reten</option>
+                </Form.Select>
+                <Form.Select
+                  type="text"
+                  name="team"
+                  value={user.team}
+                  placeholder="Team"
+                  onChange={handleChangeUser}
+                >
+                  <option value="" disabled>
+                    Team
+                  </option>
+                  {teams.map((team, i) => (
+                    <option key={i} value={team.name}>
+                      {team.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </div>
+              <div className="mt-2 d-flex justify-content-center gap-1">
+                <button
+                  className="btn btn-outline-secondary"
+                  type="button"
+                  // onClick={deleteUser}
+                >
+                  Delete
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  type="button"
+                  onClick={addUser}
+                >
+                  Add
+                </button>
+              </div>
+            </form>
+          </div>
+          <div className="w-50 mx-auto">
+            <h5 className="d-inline-block">Team</h5>
+            <form>
+              <div className="d-flex gap-1">
+                <Form.Control
+                  type="text"
+                  name="name"
+                  value={team.name}
+                  onChange={handleChangeTeam}
+                  placeholder="Name"
+                />
+                <Form.Select
+                  type="text"
+                  name="desk"
+                  value={team.desk}
+                  placeholder="Desk"
+                  onChange={handleChangeTeam}
+                >
+                  <option value="" disabled>
+                    Desk
+                  </option>
+                  <option value="Main">Main</option>
+                  <option value="Demo">Demo</option>
+                </Form.Select>
+              </div>
+            </form>
             <div className="mt-2 d-flex justify-content-center gap-1">
               <button
                 className="btn btn-outline-secondary"
@@ -472,57 +550,20 @@ export default function Users() {
               <button
                 className="btn btn-secondary"
                 type="button"
-                onClick={addUser}
+                onClick={handleAddNewTeam}
               >
                 Add
               </button>
             </div>
-          </form>
-        </div>
-        <div className="w-50 mx-auto">
-          <h5 className="d-inline-block">Team</h5>
-          <form>
-            <div className="d-flex gap-1">
-              <Form.Control
-                type="text"
-                name="name"
-                value={team.name}
-                onChange={handleChangeTeam}
-                placeholder="Name"
-              />
-              <Form.Select
-                type="text"
-                name="desk"
-                value={team.desk}
-                placeholder="Desk"
-                onChange={handleChangeTeam}
-              >
-                <option value="" disabled>
-                  Desk
-                </option>
-                <option value="Main">Main</option>
-                <option value="Demo">Demo</option>
-              </Form.Select>
-            </div>
-          </form>
-          <div className="mt-2 d-flex justify-content-center gap-1">
-            <button
-              className="btn btn-outline-secondary"
-              type="button"
-              // onClick={deleteUser}
-            >
-              Delete
-            </button>
-            <button
-              className="btn btn-secondary"
-              type="button"
-              onClick={handleAddNewTeam}
-            >
-              Add
-            </button>
           </div>
         </div>
       </div>
-    </div>
+      {isSaveIpModalOpen && (
+        <SaveOrderModal
+          handleSaveOrder={() => handleSaveIps()}
+          closeModal={handleCloseSaveModal}
+        />
+      )}
+    </>
   );
 }
