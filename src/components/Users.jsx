@@ -244,10 +244,10 @@ export default function Users() {
 
   useEffect(() => {
     setProcessedManagers(managers);
-  }, [managers]);
+  }, [managers, tab]);
   useEffect(() => {
     setProcessedIps(ips);
-  }, [ips]);
+  }, [ips, tab]);
 
   const filteredManagers = searchText
     ? filterSearchObjects(searchText, processedManagers)
