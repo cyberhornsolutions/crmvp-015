@@ -57,7 +57,10 @@ const ipMonitorsColumns = (
           <button
             title="Save"
             className="btn btn-secondary btn-sm"
-            onClick={() => handleSaveIps(row)}
+            onClick={() => {
+              selectedRowRef.current = null;
+              handleSaveIps(row);
+            }}
           >
             <FontAwesomeIcon
               icon={faSave}
