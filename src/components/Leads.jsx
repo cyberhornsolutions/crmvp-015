@@ -85,6 +85,8 @@ export default function Leads({ setTab }) {
     dispatch(setManagersState(data));
   }, []);
 
+
+
   let filteredUsers = isOnline
     ? players.filter((el) => el.onlineStatus == true)
     : players;
@@ -164,7 +166,7 @@ export default function Leads({ setTab }) {
 
   let userColumns = [
     {
-      name: "ID",
+      name: "Active Account",
       selector: (row, i) =>
         row ? (
           <div className="d-flex align-items-center gap-1">
@@ -173,7 +175,7 @@ export default function Leads({ setTab }) {
             ) : (
               <CircleIcon className="onlineRed" />
             )}
-            {i + 1}
+            {row.accounts ? getActiveAccountNo(row.accounts) : "N/A"}
           </div>
         ) : (
           ""
@@ -367,6 +369,10 @@ export default function Leads({ setTab }) {
       event.preventDefault();
     }
   };
+  const getActiveAccountNo = (accounts) => {
+    const activeAccount = Object.values(accounts).find(account => account.active);
+    return activeAccount ? activeAccount.account_no : 'N/A';
+  };
 
   return (
     <>
@@ -454,9 +460,9 @@ export default function Leads({ setTab }) {
             }}
             // responsive
             dense
-            // style={{
-            //   fontSize: 18
-            // }}
+          // style={{
+          //   fontSize: 18
+          // }}
           />
         </div>
         <div id="lead-transactions">
