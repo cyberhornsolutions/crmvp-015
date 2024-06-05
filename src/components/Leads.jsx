@@ -85,13 +85,21 @@ export default function Leads({ setTab }) {
     dispatch(setManagersState(data));
   }, []);
 
-
-
   let filteredUsers = isOnline
     ? players.filter((el) => el.onlineStatus == true)
     : players;
   if (searchText)
     filteredUsers = filterSearchObjects(searchText, filteredUsers);
+  filteredUsers = filteredUsers
+    .map((player) =>
+      player?.accounts?.length
+        ? player?.accounts?.map((account) => ({
+            ...player,
+            account,
+          }))
+        : player
+    )
+    .flat();
 
   useEffect(() => {
     if (!symbols.length) getAllSymbols(setSymbols);
@@ -166,7 +174,7 @@ export default function Leads({ setTab }) {
 
   let userColumns = [
     {
-      name: "Active Account",
+      name: "Account",
       selector: (row, i) =>
         row ? (
           <div className="d-flex align-items-center gap-1">
@@ -175,7 +183,7 @@ export default function Leads({ setTab }) {
             ) : (
               <CircleIcon className="onlineRed" />
             )}
-            {row.accounts ? getActiveAccountNo(row.accounts) : "N/A"}
+            {row?.account?.account_no || "N/A"}
           </div>
         ) : (
           ""
@@ -183,7 +191,7 @@ export default function Leads({ setTab }) {
       sortable: false,
       compact: true,
       width: "50px",
-      omit: !showPlayersColumns.ID,
+      omit: !showPlayersColumns.Account,
     },
     {
       name: "Registered",
@@ -369,10 +377,6 @@ export default function Leads({ setTab }) {
       event.preventDefault();
     }
   };
-  const getActiveAccountNo = (accounts) => {
-    const activeAccount = Object.values(accounts).find(account => account.active);
-    return activeAccount ? activeAccount.account_no : 'N/A';
-  };
 
   return (
     <>
@@ -460,9 +464,9 @@ export default function Leads({ setTab }) {
             }}
             // responsive
             dense
-          // style={{
-          //   fontSize: 18
-          // }}
+            // style={{
+            //   fontSize: 18
+            // }}
           />
         </div>
         <div id="lead-transactions">
