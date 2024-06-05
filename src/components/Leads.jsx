@@ -194,15 +194,10 @@ export default function Leads({ setTab }) {
       omit: !showPlayersColumns.Account,
     },
     {
-      name: "Account Type",
+      name: "Type",
       selector: (row, i) =>
         row ? (
           <div className="d-flex align-items-center gap-1">
-            {row.onlineStatus ? (
-              <CircleIcon className="onlineGreen" />
-            ) : (
-              <CircleIcon className="onlineRed" />
-            )}
             {row?.account?.account_type || "N/A"}
           </div>
         ) : (
