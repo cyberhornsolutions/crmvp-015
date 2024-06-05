@@ -94,9 +94,9 @@ export default function Leads({ setTab }) {
     .map((player) =>
       player?.accounts?.length
         ? player?.accounts?.map((account) => ({
-            ...player,
-            account,
-          }))
+          ...player,
+          account,
+        }))
         : player
     )
     .flat();
@@ -190,7 +190,27 @@ export default function Leads({ setTab }) {
         ),
       sortable: false,
       compact: true,
-      width: "50px",
+      width: "60px",
+      omit: !showPlayersColumns.Account,
+    },
+    {
+      name: "Account Type",
+      selector: (row, i) =>
+        row ? (
+          <div className="d-flex align-items-center gap-1">
+            {row.onlineStatus ? (
+              <CircleIcon className="onlineGreen" />
+            ) : (
+              <CircleIcon className="onlineRed" />
+            )}
+            {row?.account?.account_type || "N/A"}
+          </div>
+        ) : (
+          ""
+        ),
+      sortable: false,
+      compact: true,
+      width: "80px",
       omit: !showPlayersColumns.Account,
     },
     {
@@ -464,9 +484,9 @@ export default function Leads({ setTab }) {
             }}
             // responsive
             dense
-            // style={{
-            //   fontSize: 18
-            // }}
+          // style={{
+          //   fontSize: 18
+          // }}
           />
         </div>
         <div id="lead-transactions">
