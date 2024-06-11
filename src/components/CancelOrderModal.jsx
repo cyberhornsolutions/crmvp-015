@@ -10,10 +10,16 @@ const CancelOrderModal = ({ setShow, selectedOrder, userProfile }) => {
   const handleCancelOrder = async () => {
     setIsLoading(true);
     try {
-      await deleteDocument("orders", selectedOrder.id);
-      await updateUserById(userProfile.id, {
-        totalMargin: +(userProfile?.totalMargin - selectedOrder.sum).toFixed(2),
+      const accounts = userProfile.accounts?.map((ac) => {
+        if (!ac.isDefault) return ac;
+        return {
+          ...ac,
+          totalMargin: +(+ac?.totalMargin - selectedOrder.sum).toFixed(2),
+        };
       });
+
+      await deleteDocument("orders", selectedOrder.id);
+      await updateUserById(userProfile.id, { accounts });
       toast.success("Order cancelled");
       closeModal();
     } catch (error) {

@@ -31,7 +31,8 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
     const userSnapshot = await getDoc(userRef);
     if (!userSnapshot.exists()) return toast.error("User doesn't exist");
     const userProfile = userSnapshot.data();
-    const account = userProfile?.accounts?.find((ac) => ac.isDefault);
+
+    let defaultAccount = userProfile?.accounts?.find((ac) => ac.isDefault);
 
     const newData = {
       status: newStatus,
@@ -44,47 +45,52 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
       newData.sum = newVolume * closedPrice;
     }
 
-    let totalMargin = parseFloat(account?.totalMargin);
+    let totalMargin = parseFloat(defaultAccount?.totalMargin);
     if (newVolume) {
-      totalMargin = +(account?.totalMargin - newData.sum).toFixed(2);
+      totalMargin = +(defaultAccount?.totalMargin - newData.sum).toFixed(2);
     } else {
-      totalMargin = +(account?.totalMargin - selectedOrder.sum).toFixed(2);
+      totalMargin = +(defaultAccount?.totalMargin - selectedOrder.sum).toFixed(
+        2
+      );
     }
-
-    const userPayload = {
+    defaultAccount = {
+      ...defaultAccount,
       totalBalance:
-        account?.totalBalance + selectedOrder.profit - selectedOrder.swap,
+        defaultAccount.totalBalance + selectedOrder.profit - selectedOrder.swap,
       totalMargin,
       activeOrdersProfit: +parseFloat(
-        account?.activeOrdersProfit - selectedOrder.profit
+        defaultAccount?.activeOrdersProfit - selectedOrder.profit
       ).toFixed(2),
       activeOrdersSwap: +parseFloat(
-        account?.activeOrdersSwap - selectedOrder.swap
+        defaultAccount?.activeOrdersSwap - selectedOrder.swap
       )?.toFixed(2),
     };
 
     if (
       userProfile?.settings?.allowBonus &&
-      userPayload.totalBalance < 0 &&
-      account.bonus - Math.abs(userPayload.totalBalance) >= 0
+      defaultAccount.totalBalance < 0 &&
+      defaultAccount.bonus - Math.abs(defaultAccount.totalBalance) >= 0
     ) {
-      const spentBonus = Math.abs(userPayload.totalBalance);
-      if (account.bonus < spentBonus)
+      const spentBonus = Math.abs(defaultAccount.totalBalance);
+      if (defaultAccount.bonus < spentBonus)
         return toast.error("Not enough bonus to cover the loss");
-      userPayload.totalBalance = userPayload.totalBalance + spentBonus;
-      userPayload.bonus = +parseFloat(userProfile.bonus - spentBonus)?.toFixed(
-        2
-      );
-      userPayload.bonusSpent = +parseFloat(
-        userProfile.bonusSpent + spentBonus
+      defaultAccount.totalBalance = defaultAccount.totalBalance + spentBonus;
+      defaultAccount.bonus = +parseFloat(
+        defaultAccount.bonus - spentBonus
+      )?.toFixed(2);
+      defaultAccount.bonusSpent = +parseFloat(
+        defaultAccount.bonusSpent + spentBonus
       )?.toFixed(2);
     }
 
-    newData.balance = +parseFloat(userPayload.totalBalance)?.toFixed(2);
+    const accounts = userProfile.accounts.map((ac) =>
+      ac.account_no !== defaultAccount.account_no ? ac : defaultAccount
+    );
 
+    newData.balance = +parseFloat(defaultAccount.totalBalance)?.toFixed(2);
     if (docSnapshot.exists()) {
       await updateDoc(orderRef, newData);
-      await updateUserById(userProfile.id, userPayload);
+      await updateUserById(userProfile.id, { accounts });
       toast.success("Order status updated successfully");
     } else {
       toast.error("Order does not exist");
