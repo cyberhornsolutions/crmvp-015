@@ -213,7 +213,7 @@ export default function MainBoard() {
       (userDocSnapshot) => {
         if (userDocSnapshot.exists()) {
           const data = userDocSnapshot.data();
-          const account = data.find((ac) => ac.isDefault);
+          const account = data?.accounts?.find((ac) => ac.isDefault);
           const userData = {
             id: account?.account_no || userDocSnapshot.id,
             ...data,

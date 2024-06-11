@@ -31,6 +31,7 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
     const userSnapshot = await getDoc(userRef);
     if (!userSnapshot.exists()) return toast.error("User doesn't exist");
     const userProfile = userSnapshot.data();
+    const account = userProfile?.accounts?.find((ac) => ac.isDefault);
 
     const newData = {
       status: newStatus,
@@ -43,31 +44,33 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
       newData.sum = newVolume * closedPrice;
     }
 
-    let totalMargin = parseFloat(userProfile?.totalMargin);
+    let totalMargin = parseFloat(account?.totalMargin);
     if (newVolume) {
-      totalMargin = +(userProfile?.totalMargin - newData.sum).toFixed(2);
+      totalMargin = +(account?.totalMargin - newData.sum).toFixed(2);
     } else {
-      totalMargin = +(userProfile?.totalMargin - selectedOrder.sum).toFixed(2);
+      totalMargin = +(account?.totalMargin - selectedOrder.sum).toFixed(2);
     }
 
     const userPayload = {
       totalBalance:
-        userProfile?.totalBalance + selectedOrder.profit - selectedOrder.swap,
+        account?.totalBalance + selectedOrder.profit - selectedOrder.swap,
       totalMargin,
       activeOrdersProfit: +parseFloat(
-        userProfile?.activeOrdersProfit - selectedOrder.profit
+        account?.activeOrdersProfit - selectedOrder.profit
       ).toFixed(2),
       activeOrdersSwap: +parseFloat(
-        userProfile?.activeOrdersSwap - selectedOrder.swap
+        account?.activeOrdersSwap - selectedOrder.swap
       )?.toFixed(2),
     };
 
     if (
       userProfile?.settings?.allowBonus &&
       userPayload.totalBalance < 0 &&
-      userProfile.bonus - Math.abs(userPayload.totalBalance) >= 0
+      account.bonus - Math.abs(userPayload.totalBalance) >= 0
     ) {
       const spentBonus = Math.abs(userPayload.totalBalance);
+      if (account.bonus < spentBonus)
+        return toast.error("Not enough bonus to cover the loss");
       userPayload.totalBalance = userPayload.totalBalance + spentBonus;
       userPayload.bonus = +parseFloat(userProfile.bonus - spentBonus)?.toFixed(
         2

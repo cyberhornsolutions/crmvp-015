@@ -27,21 +27,23 @@ const NewOrder = ({ onClose, selectedOrder }) => {
   const [enableOpenPrice, setEnableOpenPrice] = useState(false);
   const [openPriceValue, setOpenPriceValue] = useState(null);
 
-  const activeOrdersProfit = parseFloat(selectedUser?.activeOrdersProfit) || 0;
-  const activeOrdersSwap = parseFloat(selectedUser?.activeOrdersSwap) || 0;
-  const totalMargin = parseFloat(selectedUser?.totalMargin) || 0;
+  const account = selectedUser?.account;
+  const activeOrdersProfit = parseFloat(account?.activeOrdersProfit) || 0;
+  const activeOrdersSwap = parseFloat(account?.activeOrdersSwap) || 0;
+  const totalMargin = parseFloat(account?.totalMargin) || 0;
+  const bonus = parseFloat(account?.bonus);
   const allowBonus = selectedUser?.settings?.allowBonus;
-  const bonus = parseFloat(selectedUser?.bonus);
 
   const pendingOrders = orders.filter(
-    (o) => o.userId === selectedUser?.id && o.status === "Pending"
+    (o) =>
+      o.userId === selectedUser?.id &&
+      o.status === "Pending" &&
+      o.account_no === account.account_no
   );
 
   const calculateEquity = () => {
     let equity =
-      parseFloat(selectedUser?.totalBalance) +
-      activeOrdersProfit -
-      activeOrdersSwap;
+      parseFloat(account?.totalBalance) + activeOrdersProfit - activeOrdersSwap;
     if (allowBonus) equity += bonus;
     return equity;
   };
@@ -96,6 +98,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
 
   const placeOrder = async (e, type) => {
     e.preventDefault();
+    if (!account) return toast.error("Need an account number to start trading");
 
     const minDealSum = selectedUser?.settings?.minDealSum;
     const maxDeals = selectedUser?.settings?.maxDeals;
@@ -206,7 +209,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
     const formattedDate = new Date().toLocaleDateString("en-US");
     const dealPayload = {
       ...order,
-      userId: selectedUser.id,
+      userId: selectedUser.userId,
       type,
       status: "Pending",
       profit:
@@ -222,6 +225,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
       sum: calculatedSum,
       fee: feeValue,
       swap: 0,
+      account_no: account?.account_no,
       spread,
       enableOpenPrice,
       createdAt: formattedDate,
@@ -233,30 +237,38 @@ const NewOrder = ({ onClose, selectedOrder }) => {
       dealPayload.profit = 0;
     }
 
-    const userPayload = {
-      totalBalance: parseFloat(selectedUser?.totalBalance - feeValue - spread),
-      totalMargin: +totalMargin + +calculatedSum,
-      activeOrdersProfit: +activeOrdersProfit + +dealPayload.profit,
-    };
-
     if (
       allowBonus &&
       calculatedSum > freeMargin - bonus &&
-      userPayload.totalBalance < 0
+      account.totalBalance < 0
     ) {
-      const spentBonus = Math.abs(userPayload.totalBalance);
+      const spentBonus = Math.abs(account.totalBalance);
       if (bonus < spentBonus)
         return toast.error("Not enough bonus to cover the deal fee");
 
-      userPayload.totalBalance = userPayload.totalBalance + spentBonus;
-      userPayload.bonus = +parseFloat(bonus - spentBonus)?.toFixed(2);
-      userPayload.bonusSpent = +parseFloat(bonusSpent + spentBonus)?.toFixed(2);
+      account.totalBalance = account.totalBalance + spentBonus;
+      account.bonus = +parseFloat(bonus - spentBonus)?.toFixed(2);
+      account.bonusSpent = +parseFloat(bonusSpent + spentBonus)?.toFixed(2);
     }
+
+    const userPayload = {
+      accounts: selectedUser.accounts?.map((ac) => {
+        if (ac.account_no !== account?.account_no) return ac;
+        ac = { ...ac, ...account };
+        return {
+          ...ac,
+          totalBalance: parseFloat(ac?.totalBalance - feeValue - spread),
+          totalMargin: +totalMargin + +calculatedSum,
+          activeOrdersProfit: +activeOrdersProfit + +dealPayload.profit,
+        };
+      }),
+    };
+
     try {
       console.log("dealPayload", dealPayload);
       setLoading(true);
       await addDoc(ordersCollectionRef, dealPayload);
-      await updateUserById(selectedUser.id, userPayload);
+      await updateUserById(selectedUser.userId, userPayload);
       toast.success("Order created successfully", "success");
       onClose();
     } catch (error) {
