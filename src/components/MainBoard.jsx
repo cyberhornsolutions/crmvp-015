@@ -52,7 +52,7 @@ export default function MainBoard() {
     );
   });
   const deposits = useSelector((state) =>
-    state.deposits.filter(({ userId }) => userId === selectedUser.id)
+    state.deposits.filter(({ userId }) => userId === selectedUser.userId)
   );
   const [tab, setTab] = useState(
     () => localStorage.getItem("PLAYER_TAB") || "info"
@@ -85,7 +85,7 @@ export default function MainBoard() {
   const [showColumns, setShowColumns] = useState({});
 
   useEffect(() => {
-    const _orders = orders.filter((o) => o.userId === selectedUser?.id);
+    const _orders = orders.filter((o) => o.userId === selectedUser?.userId);
     const closed = _orders.filter(({ status }) => status !== "Pending");
     setUserOrders(_orders);
     // if (closed.length !== closedOrders.length)
@@ -207,16 +207,19 @@ export default function MainBoard() {
   };
 
   const getSelectedUserData = () => {
-    const userDocRef = doc(db, "users", selectedUser.id);
+    const userDocRef = doc(db, "users", selectedUser.userId);
     const unsubscribe = onSnapshot(
       userDocRef,
       (userDocSnapshot) => {
         if (userDocSnapshot.exists()) {
           const data = userDocSnapshot.data();
+          const account = data.find((ac) => ac.isDefault);
           const userData = {
-            id: userDocSnapshot.id,
+            id: account?.account_no || userDocSnapshot.id,
             ...data,
             createdAt: { ...data.createdAt },
+            account,
+            userId: userDocSnapshot.id,
           };
           dispatch(setSelectedUser(userData));
           setNewUserData(userData);
