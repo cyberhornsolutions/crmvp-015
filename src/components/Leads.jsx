@@ -94,10 +94,12 @@ export default function Leads({ setTab }) {
     .map((player) =>
       player?.accounts?.length
         ? player?.accounts?.map((account) => ({
-          ...player,
-          account,
-        }))
-        : player
+            ...player,
+            account,
+            id: account?.account_no,
+            userId: player.id,
+          }))
+        : { ...player, userId: player.id }
     )
     .flat();
 
@@ -167,8 +169,9 @@ export default function Leads({ setTab }) {
 
   const deals = orders.filter(
     (o) =>
-      o.userId === selectedUser?.id &&
+      o.userId === selectedUser?.userId &&
       o.status === "Pending" &&
+      o.account_no === selectedUser?.account?.account_no &&
       !o.enableOpenPrice
   );
 
@@ -291,18 +294,24 @@ export default function Leads({ setTab }) {
     {
       name: "Balance",
       selector: (row) => {
-        if (!row) return;
+        if (!row || !row?.account) return;
+        const ac = row.account;
         let equity =
-          parseFloat(row.totalBalance) +
-          parseFloat(row.activeOrdersProfit) -
-          parseFloat(row.activeOrdersSwap);
-        if (row?.settings?.allowBonus) equity += parseFloat(row.bonus);
+          parseFloat(ac?.totalBalance) +
+          parseFloat(ac?.activeOrdersProfit) -
+          parseFloat(ac?.activeOrdersSwap);
+        if (row?.settings?.allowBonus) equity += parseFloat(ac.bonus);
         const dealSum = orders
-          .filter((o) => o.userId === row.id && o.status === "Pending")
+          .filter(
+            (o) =>
+              o.userId === row.userId &&
+              o.status === "Pending" &&
+              o.account_no === ac.account_no
+          )
           .reduce((p, v) => p + +v.sum, 0);
         const freeMargin = equity - dealSum;
         const balance =
-          freeMargin + parseFloat(row.totalMargin) + parseFloat(row.bonus);
+          freeMargin + parseFloat(ac.totalMargin) + parseFloat(ac.bonus);
         return +parseFloat(balance)?.toFixed(2);
       },
       omit: !showPlayersColumns.Balance,
@@ -479,9 +488,9 @@ export default function Leads({ setTab }) {
             }}
             // responsive
             dense
-          // style={{
-          //   fontSize: 18
-          // }}
+            // style={{
+            //   fontSize: 18
+            // }}
           />
         </div>
         <div id="lead-transactions">
