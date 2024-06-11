@@ -14,7 +14,7 @@ function AddBalanceModal({ setShowModal }) {
   const handleAddNewBalance = async (amount) => {
     const newDeposit = {
       player: selectedUser.name,
-      userId: selectedUser.id,
+      userId: selectedUser.userId,
       type: balanceType,
       sum: amount,
       method: "VISA",
@@ -28,14 +28,17 @@ function AddBalanceModal({ setShowModal }) {
     if (balanceType === "Bonus") {
       userPayload.bonus = parseFloat(selectedUser.bonus) + newBalance;
     } else if (balanceType === "Withdraw") {
-      userPayload.totalBalance = +parseFloat(selectedUser.totalBalance - newBalance)?.toFixed(2);
+      userPayload.totalBalance = +parseFloat(
+        selectedUser.totalBalance - newBalance
+      )?.toFixed(2);
     } else {
-      userPayload.totalBalance = parseFloat(selectedUser.totalBalance) + newBalance;
+      userPayload.totalBalance =
+        parseFloat(selectedUser.totalBalance) + newBalance;
     }
     setLoading(true);
     try {
       await addNewDepsit(newDeposit);
-      await updateUserById(selectedUser.id, userPayload);
+      await updateUserById(selectedUser.userId, userPayload);
       toast.success("Balance added successfully");
       setShowModal(false);
     } catch (error) {

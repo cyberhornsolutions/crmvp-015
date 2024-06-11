@@ -32,7 +32,7 @@ const TradingSettings = ({ setShowModal }) => {
     //   userPayload.totalBalance = selectedUser.totalBalance + selectedUser.bonus;
     // }
     try {
-      await updateUserById(selectedUser.id, userPayload);
+      await updateUserById(selectedUser.userId, userPayload);
       toast.success("Trading settings saved successfully");
       closeModal();
     } catch (error) {
