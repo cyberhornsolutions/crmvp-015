@@ -19,7 +19,7 @@ const CancelOrderModal = ({ setShow, selectedOrder, userProfile }) => {
       });
 
       await deleteDocument("orders", selectedOrder.id);
-      await updateUserById(userProfile.id, { accounts });
+      await updateUserById(userProfile.userId, { accounts });
       toast.success("Order cancelled");
       closeModal();
     } catch (error) {

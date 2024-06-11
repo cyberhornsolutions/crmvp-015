@@ -84,6 +84,11 @@ export default function MainBoard() {
   const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [showColumns, setShowColumns] = useState({});
 
+  const account_no = selectedUser?.account?.account_no;
+  const account = newUserData?.accounts?.find(
+    (ac) => ac.account_no === account_no
+  );
+
   useEffect(() => {
     const _orders = orders.filter((o) => o.userId === selectedUser?.userId);
     const closed = _orders.filter(({ status }) => status !== "Pending");
@@ -213,10 +218,12 @@ export default function MainBoard() {
       (userDocSnapshot) => {
         if (userDocSnapshot.exists()) {
           const data = userDocSnapshot.data();
-          const account = data?.accounts?.find((ac) => ac.isDefault);
+          const account = data?.accounts?.find(
+            (ac) => ac.account_no === account_no
+          );
           const userData = {
-            id: account?.account_no || userDocSnapshot.id,
             ...data,
+            id: account_no || userDocSnapshot.id,
             createdAt: { ...data.createdAt },
             account,
             userId: userDocSnapshot.id,
@@ -263,7 +270,7 @@ export default function MainBoard() {
           )?.toFixed(2),
           activeOrdersSwap: +(activeOrdersSwap - dealPayload.swap)?.toFixed(2),
         };
-        await updateUserById(newUserData?.id, userPayload);
+        await updateUserById(newUserData?.userId, userPayload);
       }
 
       const docRef = doc(db, "orders", dealPayload.id);
@@ -281,7 +288,7 @@ export default function MainBoard() {
 
   const updateUser = async () => {
     try {
-      const userDocRef = doc(db, "users", newUserData.id);
+      const userDocRef = doc(db, "users", newUserData.userId);
       await updateDoc(userDocRef, newUserData);
       toast.success("Saved successfully");
     } catch (error) {
@@ -399,27 +406,26 @@ export default function MainBoard() {
   ];
 
   const pendingOrders = userOrders?.filter(
-    ({ status }) => status === "Pending"
+    (order) =>
+      order.status === "Pending" && order.account_no === account?.account_no
   );
 
-  const bonus = parseFloat(newUserData?.bonus);
+  const bonus = parseFloat(account?.bonus);
 
   const activeOrders = pendingOrders.filter((order) => !order.enableOpenPrice);
   const delayedOrders = pendingOrders.filter((order) => order.enableOpenPrice);
 
-  const activeOrdersProfit = parseFloat(newUserData?.activeOrdersProfit) || 0;
-  const activeOrdersSwap = parseFloat(newUserData?.activeOrdersSwap) || 0;
+  const activeOrdersProfit = parseFloat(account?.activeOrdersProfit) || 0;
+  const activeOrdersSwap = parseFloat(account?.activeOrdersSwap) || 0;
 
   const calculateEquity = () => {
     let equity =
-      parseFloat(newUserData?.totalBalance) +
-      activeOrdersProfit -
-      activeOrdersSwap;
+      parseFloat(account?.totalBalance) + activeOrdersProfit - activeOrdersSwap;
     if (newUserData?.settings?.allowBonus) equity += bonus;
     return equity;
   };
   const equity = calculateEquity();
-  const totalMargin = parseFloat(newUserData.totalMargin);
+  const totalMargin = parseFloat(account?.totalMargin);
 
   const calculateFreeMargin = () => {
     const dealSum = pendingOrders.reduce((p, v) => p + +v.sum, 0);
