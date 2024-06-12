@@ -1,16 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { db } from "../firebase";
-import { collection, serverTimestamp, addDoc } from "firebase/firestore";
+import {
+  collection,
+  serverTimestamp,
+  addDoc,
+  doc,
+  onSnapshot,
+} from "firebase/firestore";
 import moment from "moment";
 import { calculateProfit, getAskValue, getBidValue } from "../utills/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateUserById } from "../utills/firebaseHelpers";
+import { setSelectedUser } from "../redux/slicer/userSlice";
 
 const NewOrder = ({ onClose, selectedOrder }) => {
+  const dispatch = useDispatch();
   const selectedUser = useSelector((state) => state.user.selectedUser);
   const orders = useSelector((state) => state.orders);
   const [loading, setLoading] = useState(false);
@@ -19,6 +27,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
     sl: "",
     tp: "",
   });
+
   const symbols = useSelector((state) => state?.symbols);
   const [selectedSymbol, setSelectedSymbol] = useState(
     () => symbols.find((s) => s.id === selectedOrder?.symbolId) || symbols[0]
@@ -28,6 +37,39 @@ const NewOrder = ({ onClose, selectedOrder }) => {
   const [openPriceValue, setOpenPriceValue] = useState(null);
 
   const account = selectedUser?.account;
+
+  useEffect(() => getSelectedUserData(), []);
+
+  const getSelectedUserData = () => {
+    if (!account?.account_no) return;
+    const userDocRef = doc(db, "users", selectedUser.userId);
+    const unsubscribe = onSnapshot(
+      userDocRef,
+      (userDocSnapshot) => {
+        if (userDocSnapshot.exists()) {
+          const data = userDocSnapshot.data();
+          const ac = data?.accounts?.find(
+            (ac) => ac.account_no === account?.account_no
+          );
+          const userData = {
+            ...data,
+            id: ac.account_no || userDocSnapshot.id,
+            createdAt: { ...data.createdAt },
+            account: ac,
+            userId: userDocSnapshot.id,
+          };
+          dispatch(setSelectedUser(userData));
+        } else {
+          console.error("User ID does not exist in the database.");
+        }
+      },
+      (error) => {
+        console.error("Error fetching user:", error);
+      }
+    );
+    return unsubscribe;
+  };
+
   const activeOrdersProfit = parseFloat(account?.activeOrdersProfit) || 0;
   const activeOrdersSwap = parseFloat(account?.activeOrdersSwap) || 0;
   const totalMargin = parseFloat(account?.totalMargin) || 0;
@@ -38,7 +80,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
     (o) =>
       o.userId === selectedUser?.id &&
       o.status === "Pending" &&
-      o.account_no === account.account_no
+      o.account_no === account?.account_no
   );
 
   const calculateEquity = () => {

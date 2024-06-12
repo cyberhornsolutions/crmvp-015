@@ -45,14 +45,11 @@ export default function MainBoard() {
   const orders = useSelector((state) => state.orders);
   const [userOrders, setUserOrders] = useState([]);
   const columns = useSelector((state) => state?.columns);
-  const selectedUser = useSelector((state) => {
-    return (
-      state?.user.selectedUser ||
-      JSON.parse(localStorage.getItem("SELECTED_USER"))
-    );
-  });
-  const deposits = useSelector((state) =>
-    state.deposits.filter(({ userId }) => userId === selectedUser.userId)
+  const selectedUser =
+    useSelector((state) => state?.user.selectedUser) ||
+    JSON.parse(localStorage.getItem("SELECTED_USER"));
+  const deposits = useSelector((state) => state.deposits).filter(
+    ({ userId }) => userId === selectedUser.userId
   );
   const [tab, setTab] = useState(
     () => localStorage.getItem("PLAYER_TAB") || "info"
@@ -84,18 +81,22 @@ export default function MainBoard() {
   const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [showColumns, setShowColumns] = useState({});
 
-  const account_no = selectedUser?.account?.account_no;
   const account = newUserData?.accounts?.find(
-    (ac) => ac.account_no === account_no
+    (ac) => ac.account_no === selectedUser?.account?.account_no
   );
 
+  const accounts = newUserData?.accounts || [];
+
   useEffect(() => {
-    const _orders = orders.filter((o) => o.userId === selectedUser?.userId);
+    const _orders = orders.filter(
+      (o) =>
+        o.userId === selectedUser?.userId && o.account_no === account.account_no
+    );
     const closed = _orders.filter(({ status }) => status !== "Pending");
     setUserOrders(_orders);
     // if (closed.length !== closedOrders.length)
     setClosedOrders(closed);
-  }, [orders]);
+  }, [orders, account]);
 
   useEffect(() => getSelectedUserData(), []);
 
@@ -188,6 +189,26 @@ export default function MainBoard() {
   //   }
   // };
 
+  const handleAccountChange = async (e) => {
+    const updatedAccounts = newUserData?.accounts?.map((ac) => ({
+      ...ac,
+      isDefault: +e.target.value === ac.account_no,
+    }));
+    try {
+      const ans = await updateUserById(newUserData.userId, {
+        accounts: updatedAccounts,
+      });
+      dispatch(
+        setSelectedUser({
+          ...selectedUser,
+          account: updatedAccounts.find((ac) => ac.isDefault),
+        })
+      );
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+    }
+  };
+
   const handleImageClick = (image) => {
     console.log("Image", image);
     setSelectedImage(URL.createObjectURL(image));
@@ -212,20 +233,21 @@ export default function MainBoard() {
   };
 
   const getSelectedUserData = () => {
+    if (!selectedUser?.userId) return;
     const userDocRef = doc(db, "users", selectedUser.userId);
     const unsubscribe = onSnapshot(
       userDocRef,
       (userDocSnapshot) => {
         if (userDocSnapshot.exists()) {
           const data = userDocSnapshot.data();
-          const account = data?.accounts?.find(
-            (ac) => ac.account_no === account_no
+          const ac = data?.accounts?.find(
+            (ac) => ac.account_no === account.account_no
           );
           const userData = {
             ...data,
-            id: account_no || userDocSnapshot.id,
+            id: ac.account_no || userDocSnapshot.id,
             createdAt: { ...data.createdAt },
-            account,
+            account: ac,
             userId: userDocSnapshot.id,
           };
           dispatch(setSelectedUser(userData));
@@ -455,19 +477,20 @@ export default function MainBoard() {
             {userOrders?.name}
           </h4>
         </div> */}
-        <button
+        {/* <button
           className="btn btn-primary"
           onClick={() => {
             setIsUserEdit(true);
           }}
         >
           Edit
-        </button>
+        </button> */}
+        <select value={account?.account_no} onChange={handleAccountChange}>
+          {accounts.map((ac) => (
+            <option value={ac.account_no}>{ac.account_no}</option>
+          ))}
+        </select>
         <div id="profile-deals">
-          <h4 style={{ lineHeight: 1.1 }}>
-            {/* Сделки */}
-            Transactions
-          </h4>
           <div id="sdelki-numbers">
             <div>
               <h5

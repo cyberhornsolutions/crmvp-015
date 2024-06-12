@@ -411,7 +411,7 @@ export const updateShowColumnsById = async (id, payload) => {
 
 export const updateUserById = async (id, payload) => {
   const userDocRef = doc(db, "users", id);
-  await updateDoc(userDocRef, payload);
+  return await updateDoc(userDocRef, payload);
 };
 
 export const getAllSymbols = (setState) => {
