@@ -631,7 +631,7 @@ export default function MainBoard() {
         </div>
         <div id="profile-referral-code">
           <h5>Referral code</h5>
-          <input type="text" disabled="true" value={userOrders?.refCode} />
+          <input type="text" disabled="true" value={newUserData?.refCode} />
         </div>
       </div>
       <div id="board">
@@ -1299,13 +1299,13 @@ export default function MainBoard() {
                   <div id="" className="">
                     <input
                       type="text"
-                      value={userOrders?.name}
+                      value={newUserData?.name}
                       placeholder="John Doe"
                       className="refInput"
                     />
                     <input
                       type="text"
-                      value={userOrders?.refCode}
+                      value={newUserData?.refCode}
                       placeholder="Qc1iOSzP"
                       className="refInput"
                     />
