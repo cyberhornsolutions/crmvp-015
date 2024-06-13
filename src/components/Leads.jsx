@@ -1,15 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { db } from "../firebase";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  onSnapshot,
-  doc,
-  updateDoc,
-  orderBy,
-} from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { Dropdown, ProgressBar } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,11 +10,7 @@ import DelOrderModal from "./DelOrderModal";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditOrder from "./EditOrder";
 import NewOrder from "./NewOrder";
-import {
-  getUserById,
-  getAllSymbols,
-  fetchManagers,
-} from "../utills/firebaseHelpers";
+import { getAllSymbols } from "../utills/firebaseHelpers";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import AddBalanceModal from "./AddBalanceModal";
@@ -35,10 +22,7 @@ import {
 } from "../utills/helpers";
 import dealsColumns from "./columns/dealsColumns";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
-import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
-import { setPlayersState } from "../redux/slicer/playersSlicer";
-import { setManagersState } from "../redux/slicer/managersSlice";
 
 export default function Leads({ setTab }) {
   const user = useSelector((state) => state.user.user);
@@ -81,10 +65,6 @@ export default function Leads({ setTab }) {
     dispatch(setSymbolsState(symbolsData));
   }, []);
 
-  const setManagers = useCallback((data) => {
-    dispatch(setManagersState(data));
-  }, []);
-
   let filteredUsers = isOnline
     ? players.filter((el) => el.onlineStatus == true)
     : players;
@@ -105,7 +85,6 @@ export default function Leads({ setTab }) {
 
   useEffect(() => {
     if (!symbols.length) getAllSymbols(setSymbols);
-    if (!managers.length && user.role === "Admin") fetchManagers(setManagers);
 
     const headers = document.querySelectorAll(".rdt_TableHead");
     if (!headers.length) return;

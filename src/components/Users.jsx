@@ -19,7 +19,6 @@ import {
 } from "../utills/firebaseHelpers";
 import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
 import { useDispatch, useSelector } from "react-redux";
-import { setManagersState } from "../redux/slicer/managersSlice";
 import { setTeamsState } from "../redux/slicer/teamsSlice";
 import { setIpsState } from "../redux/slicer/ipsSlicer";
 import SaveOrderModal from "./SaveOrderModal";
@@ -56,10 +55,6 @@ export default function Users() {
     desk: "",
   });
 
-  const setManagers = useCallback((data) => {
-    dispatch(setManagersState(data));
-  }, []);
-
   const setTeams = useCallback((data) => {
     dispatch(setTeamsState(data));
   }, []);
@@ -72,7 +67,6 @@ export default function Users() {
   }, []);
 
   useEffect(() => {
-    if (!managers.length) fetchManagers(setManagers);
     if (!teams.length) fetchTeams(setTeams);
     if (!ips.length) fetchBlockedIps(setIps);
   }, []);

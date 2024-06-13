@@ -10,6 +10,7 @@ import MainBoard from "../components/MainBoard";
 import Symbols from "../components/Symbols";
 import { ToastContainer } from "react-toastify";
 import {
+  fetchManagers,
   fetchOrders,
   fetchPlayers,
   getAllDeposits,
@@ -20,6 +21,7 @@ import { setDepositsState } from "../redux/slicer/transactionSlicer";
 import { setColumnsState } from "../redux/slicer/columnsSlicer";
 import { useSelector, useDispatch } from "react-redux";
 import { setPlayersState } from "../redux/slicer/playersSlicer";
+import { setManagersState } from "../redux/slicer/managersSlice";
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -50,16 +52,21 @@ export default function Home() {
       players.map((p) => p.id)
     );
   }, []);
+  const setManagers = useCallback((data) => {
+    dispatch(setManagersState(data));
+  }, []);
 
   useEffect(() => {
     const unsubDeposits = getAllDeposits(setDeposits);
     const unsubColumns = getColumnsById(user.id, setColumns);
     const unsubPlayers = fetchPlayers(setPlayers);
+    const unsubMangers = fetchManagers(setManagers);
 
     return () => {
       unsubDeposits();
       unsubColumns();
       unsubPlayers();
+      unsubMangers();
     };
   }, []);
 

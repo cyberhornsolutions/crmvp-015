@@ -350,30 +350,24 @@ export default function MainBoard() {
       });
       if (unChanged) return;
 
-      const {
-        name,
-        surname,
-        email,
-        phone,
-        password,
-        country,
-        city,
-        createdAt,
-        comment,
-      } = newUserData;
+      const userPayload = {
+        name: newUserData.name,
+        surname: newUserData.surname,
+        email: newUserData.email,
+        phone: newUserData.phone,
+        password: newUserData.password,
+        country: newUserData.country,
+        city: newUserData.city,
+        createdAt: newUserData.createdAt,
+        comment: newUserData.comment,
+      };
+
+      Object.keys(userPayload).forEach((key) => {
+        if (!userPayload[key]) userPayload[key] = "";
+      });
 
       const userDocRef = doc(db, "users", newUserData.userId);
-      await updateDoc(userDocRef, {
-        name,
-        surname,
-        email,
-        phone,
-        password,
-        country,
-        city,
-        createdAt,
-        comment,
-      });
+      await updateDoc(userDocRef, userPayload);
       await addDocument("recentChanges", {
         userId: newUserData.userId,
         date: serverTimestamp(),
