@@ -2,7 +2,11 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import placeholder from "../acc-img-placeholder.png";
 import { Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
-import { addDocument, updateUserById } from "../utills/firebaseHelpers";
+import {
+  addDocument,
+  getRecentChangesById,
+  updateUserById,
+} from "../utills/firebaseHelpers";
 import {
   onSnapshot,
   doc,
@@ -50,6 +54,7 @@ export default function MainBoard() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.user?.user);
   const orders = useSelector((state) => state.orders);
+  const managers = useSelector((state) => state.managers);
   const [userOrders, setUserOrders] = useState([]);
   const columns = useSelector((state) => state?.columns);
   const selectedUser =
@@ -87,6 +92,7 @@ export default function MainBoard() {
   const [isUserEdit, setIsUserEdit] = useState(false);
   const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [showColumns, setShowColumns] = useState({});
+  const [recentChanges, setRecentChanges] = useState([]);
 
   const accounts = newUserData?.accounts || [];
   const account = accounts.find(
@@ -106,7 +112,17 @@ export default function MainBoard() {
     setClosedOrders(closed);
   }, [orders, account]);
 
-  useEffect(() => getSelectedUserData(), []);
+  useEffect(() => {
+    const unsubUserData = getSelectedUserData();
+    const unsubChanges = getRecentChangesById(
+      selectedUser.userId,
+      setRecentChanges
+    );
+    return () => {
+      unsubUserData();
+      unsubChanges();
+    };
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("PLAYER_TAB", tab);
@@ -334,13 +350,35 @@ export default function MainBoard() {
       });
       if (unChanged) return;
 
+      const {
+        name,
+        surname,
+        email,
+        phone,
+        password,
+        country,
+        city,
+        createdAt,
+        comment,
+      } = newUserData;
+
       const userDocRef = doc(db, "users", newUserData.userId);
-      await updateDoc(userDocRef, newUserData);
+      await updateDoc(userDocRef, {
+        name,
+        surname,
+        email,
+        phone,
+        password,
+        country,
+        city,
+        createdAt,
+        comment,
+      });
       await addDocument("recentChanges", {
         userId: newUserData.userId,
         date: serverTimestamp(),
         manager: user.id,
-        info: [changedKey],
+        info: changedKey,
         update: newUserData[changedKey],
       });
       toast.success("Saved successfully");
@@ -897,14 +935,22 @@ export default function MainBoard() {
                 </section>
               </div>
               <div>
+                <h4 className="f-s-inherit my-2">Recent Changes</h4>
                 <DataTable
                   columns={recentChangesColumns}
-                  data={fillArrayWithEmptyRows([], 5)}
+                  data={fillArrayWithEmptyRows(
+                    recentChanges.map((c) => ({
+                      ...c,
+                      manager: managers.find((m) => m.id === c.manager)
+                        ?.username,
+                    })),
+                    5
+                  )}
                   highlightOnHover
                   pointerOnHover
                   pagination
                   paginationPerPage={5}
-                  paginationTotalRows={0}
+                  paginationTotalRows={recentChanges.length}
                   paginationComponentOptions={{
                     noRowsPerPage: 1,
                   }}

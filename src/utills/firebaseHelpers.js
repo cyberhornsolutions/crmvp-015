@@ -91,10 +91,7 @@ export const fetchOrders = (setState, playersList) => {
 
 export const fetchManagers = (setState) => {
   try {
-    const q = query(
-      collection(db, "managers"),
-      where("username", "!=", "admin")
-    );
+    const q = query(collection(db, "managers"));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const managerData = [];
@@ -399,6 +396,24 @@ export const getColumnsById = (id, setState) => {
     },
     (error) => {
       console.error("Error fetching users:", error);
+    }
+  );
+  return unsubscribe;
+};
+
+export const getRecentChangesById = (id, setState) => {
+  const q = query(collection(db, "recentChanges"), where("userId", "==", id));
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const recentChanges = [];
+      snapshot.forEach((snap) => {
+        recentChanges.push({ id: snap.id, ...snap.data() });
+      });
+      setState(recentChanges);
+    },
+    (error) => {
+      console.error("Error fetching recent changes:", error);
     }
   );
   return unsubscribe;

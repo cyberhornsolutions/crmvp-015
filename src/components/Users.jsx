@@ -128,7 +128,7 @@ export default function Users() {
     );
     if (unChanged) {
       handleChangeIps(ip.id, "isEdit", false);
-      setIsSaveIpModalOpen(false)
+      setIsSaveIpModalOpen(false);
       return;
     }
     if (!ip.firstIp || !ip.secondIp)
@@ -270,7 +270,9 @@ export default function Users() {
   };
 
   useEffect(() => {
-    setProcessedManagers(managers);
+    setProcessedManagers(
+      managers.filter(({ username }) => username !== "admin")
+    );
   }, [managers, tab]);
   useEffect(() => {
     setProcessedIps(ips);
@@ -306,7 +308,7 @@ export default function Users() {
       <div id="users" className="active">
         <div
           id="users-div"
-        // className="hidden"
+          // className="hidden"
         >
           <Navbar className="nav nav-tabs p-0">
             <Nav className="me-auto" style={{ gap: "2px" }}>
@@ -500,7 +502,7 @@ export default function Users() {
                 <button
                   className="btn btn-outline-secondary"
                   type="button"
-                // onClick={deleteUser}
+                  // onClick={deleteUser}
                 >
                   Delete
                 </button>
@@ -544,7 +546,7 @@ export default function Users() {
               <button
                 className="btn btn-outline-secondary"
                 type="button"
-              // onClick={deleteUser}
+                // onClick={deleteUser}
               >
                 Delete
               </button>
