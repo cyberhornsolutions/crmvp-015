@@ -2,8 +2,13 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import placeholder from "../acc-img-placeholder.png";
 import { Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
-import { updateUserById } from "../utills/firebaseHelpers";
-import { onSnapshot, doc, updateDoc } from "firebase/firestore";
+import { addDocument, updateUserById } from "../utills/firebaseHelpers";
+import {
+  onSnapshot,
+  doc,
+  updateDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import ImageModal from "./ImageModal";
 import DataTable from "react-data-table-component";
 import { toast } from "react-toastify";
@@ -21,6 +26,7 @@ import dealsColumns from "./columns/dealsColumns";
 import delayedColumns from "./columns/delayedColumns";
 import overviewColumns from "./columns/overviewColumns";
 import depositsColumns from "./columns/depositsColumns";
+import recentChangesColumns from "./columns/recentChangesColumns";
 import { fillArrayWithEmptyRows } from "../utills/helpers";
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
@@ -42,6 +48,7 @@ const delayedColumnsNames = delayedColumns().reduce(
 
 export default function MainBoard() {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state?.user?.user);
   const orders = useSelector((state) => state.orders);
   const [userOrders, setUserOrders] = useState([]);
   const columns = useSelector((state) => state?.columns);
@@ -81,16 +88,17 @@ export default function MainBoard() {
   const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [showColumns, setShowColumns] = useState({});
 
-  const account = newUserData?.accounts?.find(
+  const accounts = newUserData?.accounts || [];
+  const account = accounts.find(
     (ac) => ac.account_no === selectedUser?.account?.account_no
   );
 
-  const accounts = newUserData?.accounts || [];
-
   useEffect(() => {
+    if (!account) return;
     const _orders = orders.filter(
       (o) =>
-        o.userId === selectedUser?.userId && o.account_no === account.account_no
+        o.userId === selectedUser?.userId &&
+        o.account_no === account?.account_no
     );
     const closed = _orders.filter(({ status }) => status !== "Pending");
     setUserOrders(_orders);
@@ -245,7 +253,7 @@ export default function MainBoard() {
           );
           const userData = {
             ...data,
-            id: ac.account_no || userDocSnapshot.id,
+            id: ac?.account_no || userDocSnapshot.id,
             createdAt: { ...data.createdAt },
             account: ac,
             userId: userDocSnapshot.id,
@@ -310,8 +318,31 @@ export default function MainBoard() {
 
   const updateUser = async () => {
     try {
+      let changedKey;
+      const unChanged = [
+        "name",
+        "surname",
+        "email",
+        "phone",
+        "password",
+        "country",
+        "city",
+      ].every((key) => {
+        const isChanged = selectedUser[key] === newUserData[key];
+        if (!isChanged) changedKey = key;
+        return isChanged;
+      });
+      if (unChanged) return;
+
       const userDocRef = doc(db, "users", newUserData.userId);
       await updateDoc(userDocRef, newUserData);
+      await addDocument("recentChanges", {
+        userId: newUserData.userId,
+        date: serverTimestamp(),
+        manager: user.id,
+        info: [changedKey],
+        update: newUserData[changedKey],
+      });
       toast.success("Saved successfully");
     } catch (error) {
       console.log("error in updating user =", error);
@@ -427,18 +458,29 @@ export default function MainBoard() {
     },
   ];
 
-  const pendingOrders = userOrders?.filter(
-    (order) =>
-      order.status === "Pending" && order.account_no === account?.account_no
-  );
+  let pendingOrders = [],
+    activeOrders = [],
+    delayedOrders = [],
+    bonus = 0,
+    activeOrdersProfit = 0,
+    activeOrdersSwap = 0;
 
-  const bonus = parseFloat(account?.bonus);
+  if (account) {
+    userOrders?.forEach((order) => {
+      if (
+        order.status === "Pending" &&
+        order.account_no === account?.account_no
+      ) {
+        pendingOrders.push(order);
+        if (!order.enableOpenPrice) activeOrders.push(order);
+        else delayedOrders.push(order);
+      }
+    });
 
-  const activeOrders = pendingOrders.filter((order) => !order.enableOpenPrice);
-  const delayedOrders = pendingOrders.filter((order) => order.enableOpenPrice);
-
-  const activeOrdersProfit = parseFloat(account?.activeOrdersProfit) || 0;
-  const activeOrdersSwap = parseFloat(account?.activeOrdersSwap) || 0;
+    bonus = parseFloat(account?.bonus) || 0;
+    activeOrdersProfit = parseFloat(account?.activeOrdersProfit) || 0;
+    activeOrdersSwap = parseFloat(account?.activeOrdersSwap) || 0;
+  }
 
   const calculateEquity = () => {
     let equity =
@@ -486,8 +528,10 @@ export default function MainBoard() {
           Edit
         </button> */}
         <select value={account?.account_no} onChange={handleAccountChange}>
-          {accounts.map((ac) => (
-            <option value={ac.account_no}>{ac.account_no}</option>
+          {accounts.map((ac, i) => (
+            <option key={i} value={ac.account_no}>
+              {ac.account_no}
+            </option>
           ))}
         </select>
         <div id="profile-deals">
@@ -852,45 +896,23 @@ export default function MainBoard() {
                   </button>
                 </section>
               </div>
-              <div id="menu0-extra">
-                <table className="table table-hover table-striped">
-                  <thead>
-                    <tr>
-                      <th className="text-center" scope="col">
-                        Дата
-                      </th>
-                      <th className="text-center" scope="col">
-                        Админ
-                      </th>
-                      <th className="text-center" scope="col">
-                        Данные
-                      </th>
-                      <th className="text-center" scope="col">
-                        Изменение
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>03-08-2022 9:01</td>
-                      <td>Супер Админ</td>
-                      <td>Пароль</td>
-                      <td>12345678</td>
-                    </tr>
-                    <tr>
-                      <td>01-01-2024 12:11</td>
-                      <td>Тест Админ</td>
-                      <td>Комментарий</td>
-                      <td>Тест</td>
-                    </tr>
-                    <tr>
-                      <td>03-08-2022 16:45</td>
-                      <td>Супер Админ</td>
-                      <td>Ретен статус</td>
-                      <td>Новый</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div>
+                <DataTable
+                  columns={recentChangesColumns}
+                  data={fillArrayWithEmptyRows([], 5)}
+                  highlightOnHover
+                  pointerOnHover
+                  pagination
+                  paginationPerPage={5}
+                  paginationTotalRows={0}
+                  paginationComponentOptions={{
+                    noRowsPerPage: 1,
+                  }}
+                  // dense
+                  // paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                  // responsive
+                  // customStyles={customStyles}
+                />
               </div>
             </div>
           )}
