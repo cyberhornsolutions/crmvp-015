@@ -1,5 +1,9 @@
 import { Modal, Form } from "react-bootstrap";
-import { addNewDepsit, updateUserById } from "../utills/firebaseHelpers";
+import {
+  addNewDepsit,
+  getUserById,
+  updateUserById,
+} from "../utills/firebaseHelpers";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -10,35 +14,43 @@ function AddBalanceModal({ setShowModal }) {
   const [balanceType, setBalanceType] = useState("Bonus");
   const [loading, setLoading] = useState(false);
   const { selectedUser, user } = useSelector((state) => state.user);
+  const [account] = useState(selectedUser?.account);
 
   const handleAddNewBalance = async (amount) => {
-    const newDeposit = {
-      player: selectedUser.name,
-      userId: selectedUser.userId,
-      type: balanceType,
-      sum: amount,
-      method: "VISA",
-      manager: user.username,
-      team: user.team || "",
-      desk: user.desk || "",
-      comment,
-    };
-
-    const userPayload = {};
-    if (balanceType === "Bonus") {
-      userPayload.bonus = parseFloat(selectedUser.bonus) + newBalance;
-    } else if (balanceType === "Withdraw") {
-      userPayload.totalBalance = +parseFloat(
-        selectedUser.totalBalance - newBalance
-      )?.toFixed(2);
-    } else {
-      userPayload.totalBalance =
-        parseFloat(selectedUser.totalBalance) + newBalance;
-    }
-    setLoading(true);
     try {
+      const newDeposit = {
+        player: selectedUser.name,
+        userId: selectedUser.userId,
+        type: balanceType,
+        sum: amount,
+        method: "VISA",
+        manager: user.username,
+        team: user.team || "",
+        desk: user.desk || "",
+        comment,
+      };
+
+      setLoading(true);
+      const player = await getUserById(selectedUser.userId);
+      const defaultAccount = player?.accounts?.find(
+        (acc) => acc.account_no == account.account_no
+      );
+      if (!defaultAccount) return;
+      if (balanceType === "Bonus") {
+        defaultAccount.bonus = parseFloat(defaultAccount.bonus) + newBalance;
+      } else if (balanceType === "Withdraw") {
+        defaultAccount.totalBalance = +parseFloat(
+          defaultAccount.totalBalance - newBalance
+        )?.toFixed(2);
+      } else {
+        defaultAccount.totalBalance =
+          parseFloat(defaultAccount.totalBalance) + newBalance;
+      }
+      const accounts = player.accounts.map((ac) =>
+        ac.account_no === account.account_no ? defaultAccount : ac
+      );
       await addNewDepsit(newDeposit);
-      await updateUserById(selectedUser.userId, userPayload);
+      await updateUserById(selectedUser.userId, { accounts });
       toast.success("Balance added successfully");
       setShowModal(false);
     } catch (error) {
@@ -51,15 +63,13 @@ function AddBalanceModal({ setShowModal }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     // const minDeposit = selectedUser?.settings?.minDeposit;
-    if (!newBalance || newBalance <= 0) {
-      toast.error("Balance should be greater than 0");
-    }
+    if (!account) return toast.error("Need an account to start trading");
+    if (!newBalance || newBalance <= 0)
+      return toast.error("Balance should be greater than 0");
     // else if (newBalance < +minDeposit) {
     //   toast.error(`Minimum Deposit amount for this player is ${minDeposit}`);
     // }
-    else {
-      handleAddNewBalance(newBalance);
-    }
+    handleAddNewBalance(newBalance);
   };
 
   return (
