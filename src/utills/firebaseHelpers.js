@@ -402,7 +402,7 @@ export const getColumnsById = (id, setState) => {
 };
 
 export const getRecentChangesById = (id, setState) => {
-  const q = query(collection(db, "recentChanges"), where("userId", "==", id));
+  const q = query(collection(db, "recentChanges"), where("userId", "==", id),  orderBy("date", "desc"));
   const unsubscribe = onSnapshot(
     q,
     (snapshot) => {
