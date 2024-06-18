@@ -99,6 +99,10 @@ export default function MainBoard() {
     (ac) => ac.account_no === selectedUser?.account?.account_no
   );
 
+  const accountDeposits = deposits.filter(
+    ({ account_no }) => account_no === account?.account_no
+  );
+
   useEffect(() => {
     if (!account) return;
     const _orders = orders.filter(
@@ -649,7 +653,7 @@ export default function MainBoard() {
                 Deposited
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {deposits
+                {accountDeposits
                   .filter(({ type }) => type === "Deposit")
                   .reduce((p, { sum }) => p + +sum, 0)}
               </h4>
@@ -698,7 +702,7 @@ export default function MainBoard() {
                 Withdrawn
               </h5>
               <h4 className="text-left f-w-inherit" style={{ lineHeight: 1.1 }}>
-                {deposits
+                {accountDeposits
                   .filter(({ type }) => type === "Withdraw")
                   .reduce((p, { sum }) => p + +sum, 0)}
               </h4>
@@ -1337,12 +1341,12 @@ export default function MainBoard() {
             <div id="menu">
               <DataTable
                 columns={depositsColumns}
-                data={fillArrayWithEmptyRows(deposits, 10)}
+                data={fillArrayWithEmptyRows(accountDeposits, 10)}
                 highlightOnHover
                 pointerOnHover
                 pagination
                 paginationPerPage={10}
-                paginationTotalRows={deposits.length}
+                paginationTotalRows={accountDeposits.length}
                 paginationComponentOptions={{
                   noRowsPerPage: 1,
                 }}
