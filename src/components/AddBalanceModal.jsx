@@ -18,6 +18,13 @@ function AddBalanceModal({ setShowModal }) {
 
   const handleAddNewBalance = async (amount) => {
     try {
+      setLoading(true);
+      const player = await getUserById(selectedUser.userId);
+      const defaultAccount = player?.accounts?.find(
+        (acc) => acc.account_no == account.account_no
+      );
+      if (!defaultAccount) return;
+
       const newDeposit = {
         player: selectedUser.name,
         userId: selectedUser.userId,
@@ -28,14 +35,9 @@ function AddBalanceModal({ setShowModal }) {
         team: user.team || "",
         desk: user.desk || "",
         comment,
+        account_no: defaultAccount.account_no,
       };
 
-      setLoading(true);
-      const player = await getUserById(selectedUser.userId);
-      const defaultAccount = player?.accounts?.find(
-        (acc) => acc.account_no == account.account_no
-      );
-      if (!defaultAccount) return;
       if (balanceType === "Bonus") {
         defaultAccount.bonus = parseFloat(defaultAccount.bonus) + newBalance;
       } else if (balanceType === "Withdraw") {
