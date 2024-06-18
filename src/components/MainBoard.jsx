@@ -563,13 +563,24 @@ export default function MainBoard() {
         >
           Edit
         </button> */}
-        <select value={account?.account_no} onChange={handleAccountChange}>
-          {accounts.map((ac, i) => (
-            <option key={i} value={ac.account_no}>
-              {ac.account_no}
-            </option>
-          ))}
-        </select>
+        {accounts.length ? (
+          <>
+            <select value={account?.account_no} onChange={handleAccountChange}>
+              {accounts.map((ac, i) => (
+                <option key={i} value={ac.account_no}>
+                  {ac.account_no}
+                </option>
+              ))}
+            </select>
+
+            <div className="d-flex align-items-center justify-content-center mt-2 gap-3">
+              <h6>Type: </h6>
+              <h6>{account?.account_type} </h6>
+            </div>
+          </>
+        ) : (
+          ""
+        )}
         <div id="profile-deals">
           <div id="sdelki-numbers">
             <div>
