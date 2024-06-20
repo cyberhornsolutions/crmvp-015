@@ -3,7 +3,7 @@ import { faClose, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
 import { Form } from "react-bootstrap";
 import { convertTimestamptToDate } from "../../utills/helpers";
 
-const administratorsColumns = (
+const managerColumns = (
   { handleChangeManager, handleSaveManager, toggleActiveManager, teams } = {
     handleChangeManager: () => {},
     handleSaveManager: () => {},
@@ -14,7 +14,25 @@ const administratorsColumns = (
   {
     name: "ID",
     selector: (row, i) => row && i + 1,
-    grow: 0.5,
+    width: "4%",
+  },
+  {
+    name: "Login",
+    selector: (row) =>
+      row.isEdit ? (
+        <Form.Control
+          type="text"
+          value={row.username}
+          name="username"
+          onChange={(e) =>
+            handleChangeManager(row.id, e.target.name, e.target.value)
+          }
+        />
+      ) : (
+        row.username
+      ),
+    sortable: true,
+    width: "8%",
   },
   {
     name: "Name", // Translate the header using your t function
@@ -34,26 +52,54 @@ const administratorsColumns = (
     sortable: true,
   },
   {
-    name: "Username",
+    name: "Surname",
     selector: (row) =>
       row.isEdit ? (
         <Form.Control
           type="text"
-          value={row.username}
-          name="username"
+          value={row.surname}
+          name="surname"
           onChange={(e) =>
             handleChangeManager(row.id, e.target.name, e.target.value)
           }
         />
       ) : (
-        row.username
+        row.surname
       ),
     sortable: true,
   },
   {
-    name: "Password",
+    name: "Email",
     selector: (row) =>
       row.isEdit ? (
+        <Form.Control
+          type="text"
+          value={row.surname}
+          name="email"
+          onChange={(e) =>
+            handleChangeManager(row.id, e.target.name, e.target.value)
+          }
+        />
+      ) : (
+        row.email
+      ),
+    width: "10%",
+    wrap: true,
+  },
+  {
+    name: "Last active",
+    selector: (row) =>
+      row.lastActive && convertTimestamptToDate(row.lastActive),
+  },
+  {
+    name: "IP",
+    selector: (row) => row && row.ip,
+  },
+  {
+    name: "Password",
+    selector: (row) =>
+      row &&
+      (row.isEdit ? (
         <Form.Control
           type="text"
           value={row.password}
@@ -63,8 +109,14 @@ const administratorsColumns = (
           }
         />
       ) : (
-        row.password
-      ),
+        "****" // row.password
+      )),
+  },
+  {
+    name: "Last modified",
+    selector: (row) => row.updatedAt && convertTimestamptToDate(row.updatedAt),
+    width: "10%",
+    compact: true,
   },
   {
     name: "Role",
@@ -108,16 +160,15 @@ const administratorsColumns = (
           ))}
         </Form.Select>
       ) : (
-        row.team
+        teams.find((t) => t.id === row.team)?.name
       ),
     sortable: true,
   },
   {
-    name: "Date",
+    name: "Date created",
     selector: (row) => row.date && convertTimestamptToDate(row.date),
-    sortable: true,
-    grow: 1.5,
     compact: true,
+    width: "10%",
   },
   {
     name: "Action",
@@ -145,8 +196,7 @@ const administratorsColumns = (
           />
         </div>
       ),
-    sortable: false,
   },
 ];
 
-export default administratorsColumns;
+export default managerColumns;

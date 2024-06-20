@@ -4,7 +4,7 @@ import { auth, db } from "../firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import DataTable from "react-data-table-component";
 import { toast } from "react-toastify";
-import administratorsColumns from "./columns/administratorsColumns";
+import managerColumns from "./columns/managerColumns";
 import ipMonitorsColumns from "./columns/ipMonitorColumns";
 import teamsColumns from "./columns/teamsColumns";
 import {
@@ -22,6 +22,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { setTeamsState } from "../redux/slicer/teamsSlice";
 import { setIpsState } from "../redux/slicer/ipsSlicer";
 import SaveOrderModal from "./SaveOrderModal";
+import CreateManagerModal from "./CreateManagerModal";
+import CreateTeamModal from "./CreateTeamModal";
 
 export default function Users() {
   const dispatch = useDispatch();
@@ -29,6 +31,8 @@ export default function Users() {
   const [searchText, setSearchText] = useState("");
   const [searchBy, setSearchBy] = useState("");
   const [isSaveIpModalOpen, setIsSaveIpModalOpen] = useState(false);
+  const [showCreateManagerModal, setShowCreateManagerModal] = useState(false);
+  const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState();
   const selectedRowRef = useRef(null);
   const managers = useSelector((state) => state.managers);
@@ -204,37 +208,12 @@ export default function Users() {
     try {
       await updateManager(id, {
         isActive,
+        updatedAt: serverTimestamp(),
       });
       toast.success(isActive ? "Manager is active" : "Manager is disabled");
     } catch (error) {
       console.error(error);
       toast.error("Error updating manager");
-    }
-  };
-
-  const addUser = async () => {
-    if (!(user.name && user.username && user.role && user.team)) {
-      toast.error("Please fill all field");
-      return;
-    }
-    try {
-      // const formattedDate = new Date().toLocaleDateString("en-US");
-      await addDoc(collection(db, "managers"), {
-        ...user,
-        password: "manager",
-        isActive: true,
-        date: serverTimestamp(),
-      });
-      toast.success("Manager Record Added Successfully.");
-      setUser({
-        name: "",
-        username: "",
-        role: "",
-        team: "",
-      });
-    } catch (error) {
-      toast.success(error.message);
-      console.log("Error While Adding The Manager Record : ", error);
     }
   };
 
@@ -294,8 +273,7 @@ export default function Users() {
     ? filterSearchObjects(searchText, teams)
     : teams;
 
-  const searchOptions =
-    tab === "Managers" ? administratorsColumns() : teamsColumns;
+  const searchOptions = tab === "Managers" ? managerColumns() : teamsColumns;
 
   return (
     <>
@@ -397,7 +375,7 @@ export default function Users() {
             )}
             {tab === "Managers" && (
               <DataTable
-                columns={administratorsColumns({
+                columns={managerColumns({
                   handleChangeManager,
                   handleSaveManager,
                   toggleActiveManager,
@@ -438,121 +416,25 @@ export default function Users() {
             )}
           </div>
         </div>
-        <div
-          id="newUser-form"
-          className="d-flex flex-column gap-3 mx-3 py-2 rounded"
-        >
-          <div className="w-75 mx-auto">
-            <h5 className="d-inline-block">Manager</h5>
-            <form>
-              <div className="d-flex gap-1">
-                <Form.Control
-                  type="text"
-                  name="name"
-                  value={user.name}
-                  onChange={handleChangeUser}
-                  placeholder="Name"
-                />
-                <Form.Control
-                  type="text"
-                  name="username"
-                  value={user.username}
-                  onChange={handleChangeUser}
-                  placeholder="Username"
-                />
-
-                <Form.Select
-                  type="text"
-                  name="role"
-                  value={user.role}
-                  placeholder="Role"
-                  onChange={handleChangeUser}
-                >
-                  <option value="" disabled>
-                    Role
-                  </option>
-                  <option value="Admin">Admin</option>
-                  <option value="Sale">Sale</option>
-                  <option value="Reten">Reten</option>
-                </Form.Select>
-                <Form.Select
-                  type="text"
-                  name="team"
-                  value={user.team}
-                  placeholder="Team"
-                  onChange={handleChangeUser}
-                >
-                  <option value="" disabled>
-                    Team
-                  </option>
-                  {teams.map((team, i) => (
-                    <option key={i} value={team.name}>
-                      {team.name}
-                    </option>
-                  ))}
-                </Form.Select>
-              </div>
-              <div className="mt-2 d-flex justify-content-center gap-1">
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  // onClick={deleteUser}
-                >
-                  Delete
-                </button>
-                <button
-                  className="btn btn-secondary"
-                  type="button"
-                  onClick={addUser}
-                >
-                  Add
-                </button>
-              </div>
-            </form>
-          </div>
-          <div className="w-50 mx-auto">
-            <h5 className="d-inline-block">Team</h5>
-            <form>
-              <div className="d-flex gap-1">
-                <Form.Control
-                  type="text"
-                  name="name"
-                  value={team.name}
-                  onChange={handleChangeTeam}
-                  placeholder="Name"
-                />
-                <Form.Select
-                  type="text"
-                  name="desk"
-                  value={team.desk}
-                  placeholder="Desk"
-                  onChange={handleChangeTeam}
-                >
-                  <option value="" disabled>
-                    Desk
-                  </option>
-                  <option value="Main">Main</option>
-                  <option value="Demo">Demo</option>
-                </Form.Select>
-              </div>
-            </form>
-            <div className="mt-2 d-flex justify-content-center gap-1">
-              <button
-                className="btn btn-outline-secondary"
-                type="button"
-                // onClick={deleteUser}
-              >
-                Delete
-              </button>
-              <button
-                className="btn btn-secondary"
-                type="button"
-                onClick={handleAddNewTeam}
-              >
-                Add
-              </button>
-            </div>
-          </div>
+        <div className="d-flex justify-content-around align-items-center mt-3">
+          <button
+            className="btn btn-secondary"
+            onClick={() => setShowCreateManagerModal(true)}
+          >
+            Create Manager
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setShowCreateTeamModal(true)}
+          >
+            Create Team
+          </button>
+          <button
+            className="btn btn-secondary"
+            // onClick={() => setShowCreateManagerModal(true)}
+          >
+            Create Player
+          </button>
         </div>
       </div>
       {isSaveIpModalOpen && (
@@ -560,6 +442,12 @@ export default function Users() {
           handleSaveOrder={() => handleSaveIps()}
           closeModal={handleCloseSaveModal}
         />
+      )}
+      {showCreateManagerModal && (
+        <CreateManagerModal setShowModal={setShowCreateManagerModal} />
+      )}
+      {showCreateTeamModal && (
+        <CreateTeamModal setShowModal={setShowCreateTeamModal} />
       )}
     </>
   );
