@@ -233,7 +233,7 @@ export default function Leads({ setTab }) {
               {Object.keys(progressBarConfig).map((status) => (
                 <Dropdown.Item
                   key={status}
-                  onClick={() => handleDropdownItemClick(status, row.id)}
+                  onClick={() => handleDropdownItemClick(status, row.userId)}
                   className={row.status === status ? "active-status" : ""}
                 >
                   {row.status === status ? <span>&#10004;</span> : " "} {status}
@@ -320,7 +320,7 @@ export default function Leads({ setTab }) {
                 .map((m, i) => (
                   <Dropdown.Item
                     key={i}
-                    onClick={() => handleChangeManager(row.id, m.id)}
+                    onClick={() => handleChangeManager(row.userId, m.id)}
                   >
                     {row.manager === m.id ? <span>&#10004;</span> : " "}{" "}
                     {m.username}

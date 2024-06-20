@@ -184,7 +184,10 @@ export default function Users() {
         }
       }
       delete manager.isEdit;
-      await updateManager(manager.id, manager);
+      await updateManager(manager.id, {
+        manager,
+        updatedAt: serverTimestamp(),
+      });
       toast.success("Manager updated successfully");
     } catch (error) {
       console.error(error);
