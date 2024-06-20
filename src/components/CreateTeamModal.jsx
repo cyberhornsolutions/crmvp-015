@@ -52,7 +52,7 @@ const CreateTeamModal = ({ setShowModal }) => {
           <Form onSubmit={handleSubmit}>
             <Form.Group className="row align-items-center mb-3">
               <div className="col-5 text-left">
-                <Form.Label htmlFor="login">Name</Form.Label>
+                <Form.Label htmlFor="name">Name</Form.Label>
               </div>
               <div className="col">
                 <Form.Control

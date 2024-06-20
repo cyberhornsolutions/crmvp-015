@@ -1,54 +1,68 @@
 import React, { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { addDocument } from "../utills/firebaseHelpers";
 import { useSelector } from "react-redux";
-import { serverTimestamp } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../firebase";
 
-const CreateManagerModal = ({ setShowModal }) => {
-  const teams = useSelector((state) => state.teams);
-  console.log("teams = ", teams);
-  const [manager, setManager] = useState({
-    login: "",
+const CreatePlayerModal = ({ setShowModal }) => {
+  const user = useSelector((state) => state.user?.user);
+  const [player, setPlayer] = useState({
     name: "",
     surname: "",
+    email: "",
     password: "",
     repeatPassword: "",
-    email: "",
-    role: "Sale",
-    team: teams[0]?.id || "",
+    phone: "",
+    country: "",
+    city: "",
+    useRefCode: "",
   });
   const [loading, setLoading] = useState(false);
 
   const closeModal = () => setShowModal(false);
 
   const handleChange = (e) =>
-    setManager((p) => ({ ...p, [e.target.name]: e.target.value }));
+    setPlayer((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    for (let k in manager)
-      if (!manager[k]) return toast.error("Please fill all field");
-    if (manager.password !== manager.repeatPassword)
+    for (let k in player)
+      if (!player[k] && k !== "useRefCode")
+        return toast.error("Please fill all field");
+    if (player.password.length < 6)
+      return toast.error("Password should be at least 6 characters long");
+    if (player.password !== player.repeatPassword)
       return toast.error("Password not matched");
-
     try {
       setLoading(true);
       const date = serverTimestamp();
       const payload = {
-        ...manager,
-        username: manager.login,
-        isActive: true,
-        date,
+        ...player,
+        manager: user.id,
+        createdAt: date,
         updatedAt: date,
+        allowTrading: true,
+        status: "New",
+        refCode: "",
+        onlineStatus: false,
+        role: "user",
+        isUserEdited: false,
+        // quotes
       };
-      ["login", "repeatPassword"].forEach((k) => delete payload[k]);
-      await addDocument("managers", payload);
-      toast.success("Manager created successfully");
+      ["repeatPassword"].forEach((k) => delete payload[k]);
+      const credentials = await createUserWithEmailAndPassword(
+        auth,
+        payload.email,
+        payload.password
+      );
+      await setDoc(doc(db, "users", credentials.user.uid), payload);
+      toast.success("Player created successfully");
       closeModal();
     } catch (error) {
-      toast.error("Failed to create manager");
+      toast.error("Failed to create player" + error.message);
       console.log(error.message);
       setLoading(false);
     }
@@ -58,28 +72,10 @@ const CreateManagerModal = ({ setShowModal }) => {
     <>
       <Modal size="md" show onHide={closeModal} centered>
         <Modal.Header closeButton>
-          <h5 className="m-0">Create Manager</h5>
+          <h5 className="m-0">Create Player</h5>
         </Modal.Header>
         <Modal.Body className="px-4">
           <Form onSubmit={handleSubmit}>
-            <Form.Group className="row align-items-center mb-3">
-              <div className="col-5 text-left">
-                <Form.Label htmlFor="login">Login</Form.Label>
-              </div>
-              <div className="col">
-                <Form.Control
-                  id="login"
-                  name="login"
-                  // type="number"
-                  // min={1}
-                  // max={100}
-                  placeholder="Login"
-                  required
-                  value={manager.login}
-                  onChange={handleChange}
-                />
-              </div>
-            </Form.Group>
             <Form.Group className="row align-items-center mb-3">
               <div className="col-5 text-left">
                 <Form.Label htmlFor="name">Name</Form.Label>
@@ -90,7 +86,7 @@ const CreateManagerModal = ({ setShowModal }) => {
                   name="name"
                   placeholder="Name"
                   required
-                  value={manager.name}
+                  value={player.name}
                   onChange={handleChange}
                 />
               </div>
@@ -105,7 +101,23 @@ const CreateManagerModal = ({ setShowModal }) => {
                   name="surname"
                   placeholder="Surname"
                   required
-                  value={manager.surname}
+                  value={player.surname}
+                  onChange={handleChange}
+                />
+              </div>
+            </Form.Group>
+            <Form.Group className="row align-items-center mb-3">
+              <div className="col-5 text-left">
+                <Form.Label htmlFor="email">Email</Form.Label>
+              </div>
+              <div className="col">
+                <Form.Control
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Email"
+                  required
+                  value={player.email}
                   onChange={handleChange}
                 />
               </div>
@@ -121,7 +133,7 @@ const CreateManagerModal = ({ setShowModal }) => {
                   type="password"
                   placeholder="Password"
                   required
-                  value={manager.password}
+                  value={player.password}
                   onChange={handleChange}
                 />
               </div>
@@ -139,63 +151,72 @@ const CreateManagerModal = ({ setShowModal }) => {
                   type="password"
                   placeholder="Repeat Password"
                   required
-                  value={manager.repeatPassword}
+                  value={player.repeatPassword}
                   onChange={handleChange}
                 />
               </div>
             </Form.Group>
             <Form.Group className="row align-items-center mb-3">
               <div className="col-5 text-left">
-                <Form.Label htmlFor="email">Email</Form.Label>
+                <Form.Label htmlFor="phone">Phone</Form.Label>
               </div>
               <div className="col">
                 <Form.Control
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Email"
+                  id="phone"
+                  name="phone"
+                  type="text"
+                  placeholder="Phone"
                   required
-                  value={manager.email}
+                  value={player.phone}
                   onChange={handleChange}
                 />
               </div>
             </Form.Group>
             <Form.Group className="row align-items-center mb-3">
               <div className="col-5 text-left">
-                <Form.Label htmlFor="role">Role</Form.Label>
+                <Form.Label htmlFor="country">Country</Form.Label>
               </div>
               <div className="col">
-                <Form.Select
-                  id="role"
-                  name="role"
+                <Form.Control
+                  id="country"
+                  name="country"
+                  type="text"
+                  placeholder="Country"
                   required
-                  value={manager.role}
+                  value={player.country}
                   onChange={handleChange}
-                >
-                  <option value="Sale">Sale</option>
-                  <option value="Reten">Reten</option>
-                  <option value="Admin">Admin</option>
-                </Form.Select>
+                />
               </div>
             </Form.Group>
             <Form.Group className="row align-items-center mb-3">
               <div className="col-5 text-left">
-                <Form.Label htmlFor="team">Team</Form.Label>
+                <Form.Label htmlFor="city">City</Form.Label>
               </div>
               <div className="col">
-                <Form.Select
-                  id="team"
-                  name="team"
+                <Form.Control
+                  id="city"
+                  name="city"
+                  type="text"
+                  placeholder="City"
                   required
-                  value={manager.team}
+                  value={player.city}
                   onChange={handleChange}
-                >
-                  {teams.map((team, i) => (
-                    <option key={i} value={team.id}>
-                      {team.name}
-                    </option>
-                  ))}
-                </Form.Select>
+                />
+              </div>
+            </Form.Group>
+            <Form.Group className="row align-items-center mb-3">
+              <div className="col-5 text-left">
+                <Form.Label htmlFor="refCode">Referral code</Form.Label>
+              </div>
+              <div className="col">
+                <Form.Control
+                  id="refCode"
+                  name="refCode"
+                  type="text"
+                  placeholder="Referral Code"
+                  value={player.useRefCode}
+                  onChange={handleChange}
+                />
               </div>
             </Form.Group>
             <Button type="submit" className="w-100" disabled={loading}>
@@ -208,4 +229,4 @@ const CreateManagerModal = ({ setShowModal }) => {
   );
 };
 
-export default CreateManagerModal;
+export default CreatePlayerModal;

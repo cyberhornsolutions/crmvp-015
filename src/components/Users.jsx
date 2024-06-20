@@ -24,6 +24,7 @@ import { setIpsState } from "../redux/slicer/ipsSlicer";
 import SaveOrderModal from "./SaveOrderModal";
 import CreateManagerModal from "./CreateManagerModal";
 import CreateTeamModal from "./CreateTeamModal";
+import CreatePlayerModal from "./CreatePlayerModal";
 
 export default function Users() {
   const dispatch = useDispatch();
@@ -33,6 +34,7 @@ export default function Users() {
   const [isSaveIpModalOpen, setIsSaveIpModalOpen] = useState(false);
   const [showCreateManagerModal, setShowCreateManagerModal] = useState(false);
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
+  const [showCreatePlayerModal, setShowCreatePlayerModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState();
   const selectedRowRef = useRef(null);
   const managers = useSelector((state) => state.managers);
@@ -432,7 +434,7 @@ export default function Users() {
           </button>
           <button
             className="btn btn-secondary"
-            // onClick={() => setShowCreateManagerModal(true)}
+            onClick={() => setShowCreatePlayerModal(true)}
           >
             Create Player
           </button>
@@ -449,6 +451,9 @@ export default function Users() {
       )}
       {showCreateTeamModal && (
         <CreateTeamModal setShowModal={setShowCreateTeamModal} />
+      )}
+      {showCreatePlayerModal && (
+        <CreatePlayerModal setShowModal={setShowCreatePlayerModal} />
       )}
     </>
   );
