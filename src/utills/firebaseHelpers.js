@@ -131,7 +131,7 @@ export const fetchBlockedIps = (setState) => {
 
 export const fetchTeams = (setState) => {
   try {
-    const q = query(collection(db, "teams"));
+    const q = query(collection(db, "teams"),  orderBy("createdAt", "asc"));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const teamsData = [];

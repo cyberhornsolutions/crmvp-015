@@ -169,7 +169,8 @@ export default function Users() {
       return;
     }
     for (let key in manager)
-      if (!manager[key]) return toast.error(key + " value cannot be empty");
+      if (!manager[key] && manager[key] !== false)
+        return toast.error(key + " value cannot be empty");
 
     const isUserNameEdited = originalManager.username !== manager.username;
     try {

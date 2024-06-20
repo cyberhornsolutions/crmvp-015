@@ -1,34 +1,45 @@
 import React, { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { updateUserById } from "../utills/firebaseHelpers";
+import { addDocument } from "../utills/firebaseHelpers";
+import { serverTimestamp } from "firebase/firestore";
 import { useSelector } from "react-redux";
-
 const CreateTeamModal = ({ setShowModal }) => {
+  const user = useSelector((state) => state.user?.user);
   const [team, setTeam] = useState({
     name: "",
-    desk: "main",
+    desk: "Main",
   });
   const [loading, setLoading] = useState(false);
 
   const closeModal = () => setShowModal(false);
 
   const handleChange = (e) =>
-    setManager((p) => ({ ...p, [e.target.name]: e.target.value }));
+    setTeam((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // setLoading(true);
-    // const userPayload = { settings };
-    // try {
-    //   await updateUserById(selectedUser.userId, userPayload);
-    //   toast.success("Trading settings saved successfully");
-    //   closeModal();
-    // } catch (error) {
-    //   toast.error("Failed to save trading settings!");
-    //   console.log(error.message);
-    //   setLoading(false);
-    // }
+
+    for (let k in team)
+      if (!team[k]) return toast.error("Please fill all field");
+
+    try {
+      setLoading(true);
+      const date = serverTimestamp();
+      const payload = {
+        ...team,
+        createdAt: date,
+        updatedAt: date,
+        createdBy: user.id,
+      };
+      await addDocument("teams", payload);
+      toast.success("Team created successfully");
+      closeModal();
+    } catch (error) {
+      toast.error("Failed to create team");
+      console.log(error.message);
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,8 +77,8 @@ const CreateTeamModal = ({ setShowModal }) => {
                   value={team.desk}
                   onChange={handleChange}
                 >
-                  <option value="main">Main</option>
-                  <option value="demo">Demo</option>
+                  <option value="Main">Main</option>
+                  <option value="Demo">Demo</option>
                 </Form.Select>
               </div>
             </Form.Group>

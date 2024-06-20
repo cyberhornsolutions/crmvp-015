@@ -73,8 +73,8 @@ const managerColumns = (
     selector: (row) =>
       row.isEdit ? (
         <Form.Control
-          type="text"
-          value={row.surname}
+          type="email"
+          value={row.email}
           name="email"
           onChange={(e) =>
             handleChangeManager(row.id, e.target.name, e.target.value)
@@ -101,7 +101,7 @@ const managerColumns = (
       row &&
       (row.isEdit ? (
         <Form.Control
-          type="text"
+          type="password"
           value={row.password}
           name="password"
           onChange={(e) =>
@@ -154,7 +154,7 @@ const managerColumns = (
           }
         >
           {teams.map((team, i) => (
-            <option key={i} value={team.name}>
+            <option key={i} value={team.id}>
               {team.name}
             </option>
           ))}
