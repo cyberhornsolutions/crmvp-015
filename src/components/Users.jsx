@@ -217,25 +217,6 @@ export default function Users() {
     }
   };
 
-  const handleAddNewTeam = async () => {
-    if (!(team.name && team.desk)) {
-      toast.error("Please fill all field");
-      return;
-    }
-    try {
-      const res = await addTeam(team);
-      console.log("new team res = ", res);
-      toast.success("Team added successfully");
-      setTeam({
-        name: "",
-        desk: "",
-      });
-    } catch (error) {
-      toast.error("Error while adding the team");
-      console.error("Error while adding the team:", error);
-    }
-  };
-
   const handleCloseSaveModal = (reset) => {
     if (reset) setProcessedIps(ips);
     setIsSaveIpModalOpen(false);
