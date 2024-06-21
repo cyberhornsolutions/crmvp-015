@@ -8,6 +8,7 @@ import {
   updateManager,
 } from "../utills/firebaseHelpers";
 import { getIPRange } from "../utills/helpers";
+import { serverTimestamp } from "firebase/firestore";
 
 export default function Login() {
   const [role, setRole] = useState("");
@@ -23,23 +24,21 @@ export default function Login() {
       if (!role) return toast.error("Please select a role");
       setLoading(true);
       const manager = await getManagerByUsernameAndRole(user.username, role);
-      if (!manager) {
-        toast.error("User not found");
-        setLoading(false);
-      } else if (!manager.isActive) {
-        toast.error("User is disabled");
-        setLoading(false);
-        // } else if (manager.password !== user.password) {
-      } else if (user.password !== manager.password) {
+      if (!manager) toast.error("User not found");
+      else if (!manager.isActive) toast.error("User is disabled");
+      else if (user.password !== manager.password)
         toast.error("Username or password is incorrect");
-        setLoading(false);
-      } else {
-        if (role !== "Admin") {
+      else {
+        let ipAddress;
+        if (manager.id === "5nmfLtd8AdH4k9GPLNvQ") {
+          ipAddress = await fetch("https://api.ipify.org").then((res) =>
+            res.text()
+          );
+        } else {
           const [ip, blockedIps] = await Promise.all([
             fetch("https://api.ipify.org").then((res) => res.text()),
             getBlockedIPs(),
           ]);
-          console.log("ip ====> ", ip);
           for (let { firstIp, secondIp } of blockedIps) {
             if (ip === firstIp || ip === secondIp)
               return toast.error("You are blocked to login");
@@ -47,11 +46,18 @@ export default function Login() {
             if (ipRange.includes(ip))
               return toast.error("You are blocked to login");
           }
+          ipAddress = ip;
         }
-        await updateManager(manager.id, { onlineStatus: true });
+        console.log("ip ====> ", ipAddress);
+        await updateManager(manager.id, {
+          onlineStatus: true,
+          lastActive: serverTimestamp(),
+          ip: ipAddress,
+        });
         localStorage.setItem("USER", JSON.stringify(manager));
         location.href = "/";
       }
+      setLoading(false);
     } catch (error) {
       console.log("Error while login", error);
     }

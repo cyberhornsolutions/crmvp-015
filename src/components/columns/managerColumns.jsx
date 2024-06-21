@@ -85,15 +85,20 @@ const managerColumns = (
       ),
     width: "10%",
     wrap: true,
+    compact: true,
   },
   {
     name: "Last active",
     selector: (row) =>
       row.lastActive && convertTimestamptToDate(row.lastActive),
+    width: "10%",
+    wrap: true,
   },
   {
     name: "IP",
     selector: (row) => row && row.ip,
+    width: "10%",
+    compact: true,
   },
   {
     name: "Password",
