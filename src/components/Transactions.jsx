@@ -1,24 +1,19 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState } from "react";
 import transactionsColumns from "./columns/transactionsColumns";
 import DataTable from "react-data-table-component";
 import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
-import { getAllDeposits } from "../utills/firebaseHelpers";
-import { setDepositsState } from "../redux/slicer/transactionSlicer";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 export default function Transactions() {
-  const dispatch = useDispatch();
   const [searchText, setSearchText] = useState("");
   const [searchBy, setSearchBy] = useState("");
-  const deposits = useSelector((state) => state.deposits);
-
-  const setDeposits = useCallback((data) => {
-    dispatch(setDepositsState(data));
-  }, []);
-
-  useEffect(() => {
-    if (!deposits.length) getAllDeposits(setDeposits);
-  }, []);
+  const managers = useSelector((state) => state.managers);
+  const teams = useSelector((state) => state.teams);
+  const deposits = useSelector((state) => state.deposits).map((d) => ({
+    ...d,
+    manager: managers.find((m) => m.id === d.manager)?.username,
+    team: teams.find((t) => t.id === d.team)?.name,
+  }));
 
   const filteredTransactions = searchText
     ? filterSearchObjects(searchText, deposits)

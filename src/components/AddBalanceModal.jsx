@@ -31,7 +31,7 @@ function AddBalanceModal({ setShowModal }) {
         type: balanceType,
         sum: amount,
         method: "VISA",
-        manager: user.username,
+        manager: user.id,
         team: user.team || "",
         desk: user.desk || "",
         comment,

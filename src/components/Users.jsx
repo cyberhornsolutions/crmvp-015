@@ -9,9 +9,7 @@ import ipMonitorsColumns from "./columns/ipMonitorColumns";
 import teamsColumns from "./columns/teamsColumns";
 import {
   addTeam,
-  fetchManagers,
   fetchBlockedIps,
-  fetchTeams,
   getManagerByUsername,
   updateManager,
   updateBlockedIp,
@@ -19,7 +17,6 @@ import {
 } from "../utills/firebaseHelpers";
 import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
 import { useDispatch, useSelector } from "react-redux";
-import { setTeamsState } from "../redux/slicer/teamsSlice";
 import { setIpsState } from "../redux/slicer/ipsSlicer";
 import SaveOrderModal from "./SaveOrderModal";
 import CreateManagerModal from "./CreateManagerModal";
@@ -61,10 +58,6 @@ export default function Users() {
     desk: "",
   });
 
-  const setTeams = useCallback((data) => {
-    dispatch(setTeamsState(data));
-  }, []);
-
   const setIps = useCallback((data) => {
     if (data.length < 10)
       for (let i = data.length; i < 10; i++)
@@ -73,7 +66,6 @@ export default function Users() {
   }, []);
 
   useEffect(() => {
-    if (!teams.length) fetchTeams(setTeams);
     if (!ips.length) fetchBlockedIps(setIps);
   }, []);
 
@@ -164,9 +156,10 @@ export default function Users() {
   const handleSaveManager = async (manager) => {
     ["date", "updatedAt"].forEach((k) => delete manager[k]);
     const originalManager = managers.find(({ id }) => id === manager.id);
-    const unChanged = Object.keys(manager).every(
-      (key) => originalManager[key] === manager[key]
-    );
+    const unChanged = Object.keys(manager).every((key) => {
+      if (originalManager[key] === undefined) return true;
+      return originalManager[key] === manager[key];
+    });
     if (unChanged) {
       handleChangeManager(manager.id, "isEdit", false);
       return;
