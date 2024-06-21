@@ -385,6 +385,23 @@ export default function MainBoard() {
     }
   };
 
+  const updateVerificationSettings = async (e) => {
+    const unChanged = ["allowTrading"].every(
+      (key) => selectedUser[key] === newUserData[key]
+    );
+    if (unChanged) return;
+
+    try {
+      const ans = await updateUserById(newUserData.userId, {
+        allowTrading: newUserData.allowTrading,
+      });
+      toast.success("Saved successfully");
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      toast.error("Failed to update user");
+    }
+  };
+
   const handleUserInfoChange = (e) =>
     setNewUserData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -1211,7 +1228,7 @@ export default function MainBoard() {
                   <h4 className="f-s-inherit" style={{ lineHeight: 1.1 }}>
                     Rights
                   </h4>
-                  <button onClick={updateUser}>Save</button>
+                  <button onClick={updateVerificationSettings}>Save</button>
                 </div>
                 <div className="form-check form-switch">
                   <label className="form-check-label f-s-inherit f-w-700">
