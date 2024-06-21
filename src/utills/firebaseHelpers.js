@@ -131,7 +131,7 @@ export const fetchBlockedIps = (setState) => {
 
 export const fetchTeams = (setState) => {
   try {
-    const q = query(collection(db, "teams"),  orderBy("createdAt", "asc"));
+    const q = query(collection(db, "teams"), orderBy("createdAt", "asc"));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const teamsData = [];
@@ -198,6 +198,15 @@ export const getManagerByUsernameAndRole = async (username, role) => {
 export const updateManager = async (id, payload) => {
   const docRef = doc(db, "managers", id);
   return await updateDoc(docRef, payload);
+};
+
+export const saveManagerIpAddress = async (id, ip) => {
+  const managerRef = doc(db, "managers", id);
+  const ipCollectionRef = collection(managerRef, "ipAddress");
+  return await addDoc(ipCollectionRef, {
+    ip,
+    date: serverTimestamp(),
+  });
 };
 
 export const updateBlockedIp = async (id, payload) => {
@@ -402,7 +411,11 @@ export const getColumnsById = (id, setState) => {
 };
 
 export const getRecentChangesById = (id, setState) => {
-  const q = query(collection(db, "recentChanges"), where("userId", "==", id),  orderBy("date", "desc"));
+  const q = query(
+    collection(db, "recentChanges"),
+    where("userId", "==", id),
+    orderBy("date", "desc")
+  );
   const unsubscribe = onSnapshot(
     q,
     (snapshot) => {

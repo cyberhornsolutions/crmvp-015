@@ -6,6 +6,7 @@ import {
   getBlockedIPs,
   getManagerByUsernameAndRole,
   updateManager,
+  saveManagerIpAddress,
 } from "../utills/firebaseHelpers";
 import { getIPRange } from "../utills/helpers";
 import { serverTimestamp } from "firebase/firestore";
@@ -49,11 +50,14 @@ export default function Login() {
           ipAddress = ip;
         }
         console.log("ip ====> ", ipAddress);
-        await updateManager(manager.id, {
-          onlineStatus: true,
-          lastActive: serverTimestamp(),
-          ip: ipAddress,
-        });
+        await Promise.all([
+          saveManagerIpAddress(manager.id, ipAddress),
+          updateManager(manager.id, {
+            onlineStatus: true,
+            lastActive: serverTimestamp(),
+            ip: ipAddress,
+          }),
+        ]);
         localStorage.setItem("USER", JSON.stringify(manager));
         location.href = "/";
       }
