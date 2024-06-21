@@ -162,8 +162,9 @@ export default function Users() {
   };
 
   const handleSaveManager = async (manager) => {
+    ["date", "updatedAt"].forEach((k) => delete manager[k]);
     const originalManager = managers.find(({ id }) => id === manager.id);
-    const unChanged = Object.keys(originalManager).every(
+    const unChanged = Object.keys(manager).every(
       (key) => originalManager[key] === manager[key]
     );
     if (unChanged) {
@@ -185,7 +186,7 @@ export default function Users() {
       }
       delete manager.isEdit;
       await updateManager(manager.id, {
-        manager,
+        ...manager,
         updatedAt: serverTimestamp(),
       });
       toast.success("Manager updated successfully");
