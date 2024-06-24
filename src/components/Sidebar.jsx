@@ -105,7 +105,7 @@ export default function Sidebar({ setTab, tab }) {
           className="transparent-background"
           onClick={async () => {
             try {
-              await updateManager(user.id + "2", {
+              await updateManager(user.id, {
                 onlineStatus: false,
                 lastActive: serverTimestamp(),
               });
