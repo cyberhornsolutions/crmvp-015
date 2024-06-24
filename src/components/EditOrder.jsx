@@ -80,8 +80,18 @@ const EditOrder = ({ onClose, selectedOrder }) => {
   let potentialSL = 0,
     potentialTP = 0;
   if (selectedOrder.symbolValue) {
-    if (sl) potentialSL = selectedOrder.volume * sl - selectedOrder.fee;
-    if (tp) potentialTP = selectedOrder.volume * tp - selectedOrder.fee;
+    if (sl) {
+      potentialSL =
+        selectedOrder.volume * (sl - selectedOrder.symbolValue) -
+        selectedOrder.fee;
+      if (selectedOrder.type === "Sell") potentialSL = -potentialSL;
+    }
+    if (tp) {
+      potentialTP =
+        selectedOrder.volume * (tp - selectedOrder.symbolValue) -
+        selectedOrder.fee;
+      if (selectedOrder.type === "Sell") potentialTP = -potentialTP;
+    }
   }
 
   return (
