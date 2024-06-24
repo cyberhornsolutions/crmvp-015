@@ -104,10 +104,14 @@ export default function Sidebar({ setTab, tab }) {
           id="logout-button"
           className="transparent-background"
           onClick={async () => {
-            await updateManager(user.id, {
-              onlineStatus: false,
-              lastActive: serverTimestamp(),
-            });
+            try {
+              await updateManager(user.id + "2", {
+                onlineStatus: false,
+                lastActive: serverTimestamp(),
+              });
+            } catch (error) {
+              console.log(error);
+            }
             localStorage.clear();
             location.href = "/";
           }}
