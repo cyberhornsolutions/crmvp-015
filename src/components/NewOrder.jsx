@@ -340,6 +340,20 @@ const NewOrder = ({ onClose, selectedOrder }) => {
               <div className="col-1"></div>
             </div>
             <div className="form-group row align-items-center">
+              <label className="col-4" htmlFor="sl">
+                Description
+              </label>
+              <div className="col">
+                <input
+                  className="form-control"
+                  disabled
+                  readOnly
+                  value={selectedSymbol.settings.description}
+                ></input>
+              </div>
+              <div className="col-1"></div>
+            </div>
+            <div className="form-group row align-items-center">
               <label className="col-4" htmlFor="price">
                 Price
               </label>
@@ -389,7 +403,7 @@ const NewOrder = ({ onClose, selectedOrder }) => {
                   onChange={handleOrderChange}
                 />
                 <label className="mt-1">
-                  Total: {+calculatedSum?.toFixed(2)} USDT
+                  Margin: {+calculatedSum?.toFixed(2)} USDT
                 </label>
               </div>
               <div className="col-1"></div>
