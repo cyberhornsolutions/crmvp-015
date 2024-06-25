@@ -4,17 +4,25 @@ import { Form } from "react-bootstrap";
 import { convertTimestamptToDate } from "../../utills/helpers";
 
 const managerColumns = (
-  { handleChangeManager, handleSaveManager, toggleActiveManager, teams } = {
+  {
+    handleChangeManager,
+    handleSaveManager,
+    toggleActiveManager,
+    teams,
+    showColumns,
+  } = {
     handleChangeManager: () => {},
     handleSaveManager: () => {},
     toggleActiveManager: () => {},
     teams: [],
+    showColumns: {},
   }
 ) => [
   {
     name: "ID",
     selector: (row, i) => row && i + 1,
     width: "4%",
+    omit: !showColumns.ID,
   },
   {
     name: "Login",
@@ -33,6 +41,7 @@ const managerColumns = (
       ),
     sortable: true,
     width: "8%",
+    omit: !showColumns.Login,
   },
   {
     name: "Name", // Translate the header using your t function
@@ -50,6 +59,7 @@ const managerColumns = (
         row.name
       ),
     sortable: true,
+    omit: !showColumns.Name,
   },
   {
     name: "Surname",
@@ -67,6 +77,7 @@ const managerColumns = (
         row.surname
       ),
     sortable: true,
+    omit: !showColumns.Surname,
   },
   {
     name: "Email",
@@ -86,6 +97,7 @@ const managerColumns = (
     width: "10%",
     wrap: true,
     compact: true,
+    omit: !showColumns.Email,
   },
   {
     name: "Last active",
@@ -93,12 +105,14 @@ const managerColumns = (
       row.lastActive && convertTimestamptToDate(row.lastActive),
     width: "10%",
     wrap: true,
+    omit: !showColumns["Last active"],
   },
   {
     name: "IP",
     selector: (row) => row && row.ip,
     width: "10%",
     compact: true,
+    omit: !showColumns.IP,
   },
   {
     name: "Password",
@@ -116,12 +130,14 @@ const managerColumns = (
       ) : (
         "****" // row.password
       )),
+    omit: !showColumns.Password,
   },
   {
     name: "Last modified",
     selector: (row) => row.updatedAt && convertTimestamptToDate(row.updatedAt),
     width: "10%",
     compact: true,
+    omit: !showColumns["Last modified"],
   },
   {
     name: "Role",
@@ -144,6 +160,7 @@ const managerColumns = (
         row.role
       ),
     sortable: true,
+    omit: !showColumns.Role,
   },
   {
     name: "Team",
@@ -168,12 +185,14 @@ const managerColumns = (
         teams.find((t) => t.id === row.team)?.name
       ),
     sortable: true,
+    omit: !showColumns.Team,
   },
   {
     name: "Date created",
     selector: (row) => row.date && convertTimestamptToDate(row.date),
     compact: true,
     width: "10%",
+    omit: !showColumns["Date created"],
   },
   {
     name: "Action",
@@ -201,6 +220,7 @@ const managerColumns = (
           />
         </div>
       ),
+    omit: !showColumns.Action,
   },
 ];
 

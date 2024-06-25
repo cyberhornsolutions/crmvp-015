@@ -22,6 +22,7 @@ import SaveOrderModal from "./SaveOrderModal";
 import CreateManagerModal from "./CreateManagerModal";
 import CreateTeamModal from "./CreateTeamModal";
 import CreatePlayerModal from "./CreatePlayerModal";
+import SelectColumnsModal from "./SelectColumnsModal";
 
 export default function Users() {
   const dispatch = useDispatch();
@@ -38,6 +39,7 @@ export default function Users() {
   const teams = useSelector((state) => state.teams);
   const players = useSelector((state) => state.players);
   const ips = useSelector((state) => state.ips);
+  const columns = useSelector((state) => state.columns);
 
   const playersOnlineCount = players.filter((el) => el.onlineStatus).length;
   const managersOnlineCount = managers.filter((m) => m.onlineStatus).length;
@@ -45,6 +47,8 @@ export default function Users() {
 
   const [processedManagers, setProcessedManagers] = useState([]);
   const [processedIps, setProcessedIps] = useState([]);
+  const [showManagerColumns, setShowManagerColumns] = useState({});
+  const [showManagerColumnsModal, setShowManagerColumnsModal] = useState(false);
 
   const [user, setUser] = useState({
     name: "",
@@ -256,6 +260,30 @@ export default function Users() {
 
   const searchOptions = tab === "Managers" ? managerColumns() : teamsColumns;
 
+  useEffect(() => {
+    if (tab === "Managers") {
+      const header = document.querySelector(".rdt_TableHead");
+      if (!header) return;
+      if (columns.managerColumns) {
+        setShowManagerColumns(columns.managerColumns);
+      } else {
+        const managerCols = managerColumns().reduce(
+          (p, { name }) => ({ ...p, [name]: true }),
+          {}
+        );
+        setShowManagerColumns(managerCols);
+      }
+      const handleManagerRightClick = (e) => {
+        e.preventDefault();
+        setShowManagerColumnsModal(true);
+      };
+      header.addEventListener("contextmenu", handleManagerRightClick);
+      return () => {
+        header.removeEventListener("contextmenu", handleManagerRightClick);
+      };
+    }
+  }, [tab]);
+
   return (
     <>
       <div id="users" className="active">
@@ -361,6 +389,7 @@ export default function Users() {
                   handleSaveManager,
                   toggleActiveManager,
                   teams,
+                  showColumns: showManagerColumns,
                 })}
                 data={fillArrayWithEmptyRows(filteredManagers, 10)}
                 pagination
@@ -432,6 +461,14 @@ export default function Users() {
       )}
       {showCreatePlayerModal && (
         <CreatePlayerModal setShowModal={setShowCreatePlayerModal} />
+      )}
+      {showManagerColumnsModal && (
+        <SelectColumnsModal
+          columnKey={"managerColumns"}
+          setModal={setShowManagerColumnsModal}
+          columns={showManagerColumns}
+          setColumns={setShowManagerColumns}
+        />
       )}
     </>
   );
