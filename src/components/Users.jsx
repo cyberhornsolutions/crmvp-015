@@ -50,8 +50,7 @@ export default function Users() {
   const [processedIps, setProcessedIps] = useState([]);
   const [showManagerColumns, setShowManagerColumns] = useState({});
   const [showManagerColumnsModal, setShowManagerColumnsModal] = useState(false);
-  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] =
-    useState(false);
+  const [showRepeatPasswordModal, setShowRepeatPasswordModal] = useState(false);
   const [managerInfo, setManagerInfo] = useState({});
   const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
 
@@ -162,9 +161,7 @@ export default function Users() {
     }
   };
 
-  const handleSaveManager = async (manager) => {
-    console.log("🚀 -> handleSaveManager -> manager:", manager);
-
+  const handleSaveManager = async (manager, checkPassword) => {
     ["date", "updatedAt"].forEach((k) => delete manager[k]);
     const originalManager = managers.find(({ id }) => id === manager.id);
     const unChanged = Object.keys(manager).every((key) => {
@@ -172,13 +169,9 @@ export default function Users() {
       return originalManager[key] === manager[key];
     });
 
-    if (originalManager.password !== manager.password && !isPasswordConfirmed) {
-      console.log(
-        "🚀 -> handleSaveManager -> isPasswordConfirmed:",
-        isPasswordConfirmed
-      );
+    if (originalManager.password !== manager.password && !checkPassword) {
       setManagerInfo(manager);
-      setIsChangePasswordModalOpen(true);
+      setShowRepeatPasswordModal(true);
     } else {
       if (unChanged) {
         handleChangeManager(manager.id, "isEdit", false);
@@ -241,10 +234,6 @@ export default function Users() {
     if (reset) setProcessedIps(ips);
     setIsSaveIpModalOpen(false);
     setSelectedRow();
-  };
-
-  const handleClosePasswordModal = () => {
-    setIsChangePasswordModalOpen(false);
   };
 
   const handleIsPasswordConfirmed = () => {
@@ -477,16 +466,15 @@ export default function Users() {
           closeModal={handleCloseSaveModal}
         />
       )}
-      {isChangePasswordModalOpen && (
-        <ChangeManagerPasswordModal
-          closeModal={handleClosePasswordModal}
-          handleIsPasswordConfirmed={handleIsPasswordConfirmed}
-          handleSaveManager={handleSaveManager}
-          managerInfo={managerInfo}
-        />
-      )}
       {showCreateManagerModal && (
         <CreateManagerModal setShowModal={setShowCreateManagerModal} />
+      )}
+      {showRepeatPasswordModal && (
+        <ChangeManagerPasswordModal
+          setShowModal={setShowRepeatPasswordModal}
+          handleSaveManager={handleSaveManager}
+          manager={managerInfo}
+        />
       )}
       {showCreateTeamModal && (
         <CreateTeamModal setShowModal={setShowCreateTeamModal} />
