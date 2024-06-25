@@ -23,6 +23,7 @@ import CreateManagerModal from "./CreateManagerModal";
 import CreateTeamModal from "./CreateTeamModal";
 import CreatePlayerModal from "./CreatePlayerModal";
 import SelectColumnsModal from "./SelectColumnsModal";
+import ChangeManagerPasswordModal from "./ChangeManagerPasswordModal";
 
 export default function Users() {
   const dispatch = useDispatch();
@@ -49,6 +50,10 @@ export default function Users() {
   const [processedIps, setProcessedIps] = useState([]);
   const [showManagerColumns, setShowManagerColumns] = useState({});
   const [showManagerColumnsModal, setShowManagerColumnsModal] = useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] =
+    useState(false);
+  const [managerInfo, setManagerInfo] = useState({});
+  const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
 
   const [user, setUser] = useState({
     name: "",
@@ -158,38 +163,49 @@ export default function Users() {
   };
 
   const handleSaveManager = async (manager) => {
+    console.log("🚀 -> handleSaveManager -> manager:", manager);
+
     ["date", "updatedAt"].forEach((k) => delete manager[k]);
     const originalManager = managers.find(({ id }) => id === manager.id);
     const unChanged = Object.keys(manager).every((key) => {
       if (originalManager[key] === undefined) return true;
       return originalManager[key] === manager[key];
     });
-    if (unChanged) {
-      handleChangeManager(manager.id, "isEdit", false);
-      return;
-    }
-    for (let key in manager)
-      if (!manager[key] && manager[key] !== false)
-        return toast.error(key + " value cannot be empty");
 
-    const isUserNameEdited = originalManager.username !== manager.username;
-    try {
-      if (isUserNameEdited) {
-        const alreadyExist = await getManagerByUsername(manager.username);
-        if (alreadyExist) {
-          toast.error("Username already exist");
-          return;
-        }
+    if (originalManager.password !== manager.password && !isPasswordConfirmed) {
+      console.log(
+        "🚀 -> handleSaveManager -> isPasswordConfirmed:",
+        isPasswordConfirmed
+      );
+      setManagerInfo(manager);
+      setIsChangePasswordModalOpen(true);
+    } else {
+      if (unChanged) {
+        handleChangeManager(manager.id, "isEdit", false);
+        return;
       }
-      delete manager.isEdit;
-      await updateManager(manager.id, {
-        ...manager,
-        updatedAt: serverTimestamp(),
-      });
-      toast.success("Manager updated successfully");
-    } catch (error) {
-      console.error(error);
-      toast.error("Error updating manager");
+      for (let key in manager)
+        if (!manager[key] && manager[key] !== false)
+          return toast.error(key + " value cannot be empty");
+      const isUserNameEdited = originalManager.username !== manager.username;
+      try {
+        if (isUserNameEdited) {
+          const alreadyExist = await getManagerByUsername(manager.username);
+          if (alreadyExist) {
+            toast.error("Username already exist");
+            return;
+          }
+        }
+        delete manager.isEdit;
+        await updateManager(manager.id, {
+          ...manager,
+          updatedAt: serverTimestamp(),
+        });
+        toast.success("Manager updated successfully");
+      } catch (error) {
+        console.error(error);
+        toast.error("Error updating manager");
+      }
     }
   };
 
@@ -225,6 +241,14 @@ export default function Users() {
     if (reset) setProcessedIps(ips);
     setIsSaveIpModalOpen(false);
     setSelectedRow();
+  };
+
+  const handleClosePasswordModal = () => {
+    setIsChangePasswordModalOpen(false);
+  };
+
+  const handleIsPasswordConfirmed = () => {
+    setIsPasswordConfirmed(true);
   };
 
   useEffect(() => {
@@ -451,6 +475,14 @@ export default function Users() {
         <SaveOrderModal
           handleSaveOrder={() => handleSaveIps()}
           closeModal={handleCloseSaveModal}
+        />
+      )}
+      {isChangePasswordModalOpen && (
+        <ChangeManagerPasswordModal
+          closeModal={handleClosePasswordModal}
+          handleIsPasswordConfirmed={handleIsPasswordConfirmed}
+          handleSaveManager={handleSaveManager}
+          managerInfo={managerInfo}
         />
       )}
       {showCreateManagerModal && (
