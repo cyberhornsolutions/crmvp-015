@@ -340,11 +340,13 @@ const NewOrder = ({ onClose, selectedOrder }) => {
               <div className="col-1"></div>
             </div>
             <div className="form-group row align-items-center">
-              <label className="col-4" htmlFor="sl">
+              <label className="col-4" htmlFor="description">
                 Description
               </label>
               <div className="col">
                 <input
+                  name="description"
+                  id="description"
                   className="form-control"
                   disabled
                   readOnly
