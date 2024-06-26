@@ -124,6 +124,24 @@ const NewOrder = ({ onClose, selectedOrder }) => {
   };
   const calculatedSum = calculateTotalSum();
 
+  let potentialSL = 0,
+    potentialTP = 0;
+  if (selectedSymbol.symbol) {
+    const settings = selectedSymbol?.settings || {};
+    const lot = settings.group === "commodities" ? +settings.lot || 1 : 1;
+
+    const { fee = 0, feeUnit } = settings;
+    const symbolFee =
+      feeUnit === "$" ? fee : (selectedSymbol?.price / 100) * fee;
+
+    if (order.sl)
+      potentialSL =
+        +order.volume * lot * (order.sl - selectedSymbol.price) - symbolFee;
+    if (order.tp)
+      potentialTP =
+        +order.volume * lot * (order.tp - selectedSymbol.price) - symbolFee;
+  }
+
   const placeOrder = async (e, type) => {
     e.preventDefault();
     if (!account) return toast.error("Need an account number to start trading");
@@ -459,6 +477,9 @@ const NewOrder = ({ onClose, selectedOrder }) => {
                   value={order.sl}
                   onChange={handleOrderChange}
                 />
+                <label className="text-muted">
+                  Potential: {+parseFloat(potentialSL)?.toFixed(2)}
+                </label>
               </div>
               <div className="col-1"></div>
             </div>
@@ -477,6 +498,9 @@ const NewOrder = ({ onClose, selectedOrder }) => {
                   value={order.tp}
                   onChange={handleOrderChange}
                 />
+                <label className="text-muted">
+                  Potential: {+parseFloat(potentialTP)?.toFixed(2)}
+                </label>
               </div>
               <div className="col-1"></div>
             </div>
