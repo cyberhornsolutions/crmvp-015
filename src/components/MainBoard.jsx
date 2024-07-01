@@ -34,6 +34,7 @@ import recentChangesColumns from "./columns/recentChangesColumns";
 import { fillArrayWithEmptyRows } from "../utills/helpers";
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
+import SaveUserInfoModal from "./SaveUserInfoModal";
 
 const overviewColumnsNames = overviewColumns().reduce(
   (p, { name }) => ({ ...p, [name]: true }),
@@ -184,6 +185,56 @@ export default function MainBoard() {
     };
   }, [selectedRowRef.current, tab]);
 
+  useEffect(() => {
+    if (tab === "info") {
+      [
+        "city",
+        "comment",
+        "country",
+        "email",
+        "name",
+        "password",
+        "phone",
+        "surname",
+      ].forEach((name) => {
+        const inputField = document.querySelector(`input[name="${name}"]`);
+        inputField.addEventListener("dblclick", () => {
+          setIsEdit(true);
+          inputField.readOnly = false;
+        });
+      });
+    }
+  }, [tab]);
+
+  useEffect(() => {
+    const handleOutsideClick = () => {
+      setIsInfoEdit(true);
+    };
+    if (isEdit) {
+      document.addEventListener("click", handleOutsideClick);
+    }
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, [isEdit]);
+
+  const closeSaveInfoModal = () => {
+    [
+      "city",
+      "comment",
+      "country",
+      "email",
+      "name",
+      "password",
+      "phone",
+      "surname",
+    ].forEach((name) => {
+      const inputField = document.querySelector(`input[name="${name}"]`);
+      inputField.readOnly = true;
+    });
+    getSelectedUserData();
+    setIsEdit(false);
+    setIsInfoEdit(false);
+  };
+
   const customStyles = {
     pagination: {
       style: {
@@ -203,6 +254,14 @@ export default function MainBoard() {
         userSelect: "none",
         // minHeight: 36,
         // height: 36,
+      },
+    },
+  };
+
+  const customInfoStyles = {
+    rows: {
+      style: {
+        minHeight: 30,
       },
     },
   };
@@ -352,24 +411,17 @@ export default function MainBoard() {
         if (!isChanged) changedKey = key;
         return isChanged;
       });
-      if (unChanged) return;
-
+      if (unChanged) {
+        setIsEdit(false);
+        setIsInfoEdit(false);
+        return;
+      }
       const userPayload = {
-        name: newUserData.name,
-        surname: newUserData.surname,
-        email: newUserData.email,
-        phone: newUserData.phone,
-        password: newUserData.password,
-        country: newUserData.country,
-        city: newUserData.city,
-        createdAt: newUserData.createdAt,
-        comment: newUserData.comment,
+        [changedKey]: newUserData[changedKey],
       };
-
       Object.keys(userPayload).forEach((key) => {
         if (!userPayload[key]) userPayload[key] = "";
       });
-
       const userDocRef = doc(db, "users", newUserData.userId);
       await updateDoc(userDocRef, userPayload);
       await addDocument("recentChanges", {
@@ -379,6 +431,8 @@ export default function MainBoard() {
         info: changedKey,
         update: newUserData[changedKey],
       });
+      setIsEdit(false);
+      setIsInfoEdit(false);
       toast.success("Saved successfully");
     } catch (error) {
       console.log("error in updating user =", error);
@@ -829,7 +883,7 @@ export default function MainBoard() {
         <div className="tab-content">
           {tab === "info" && (
             <div id="menu0" className="h-100">
-              <div className="h-50 b-bottom">
+              <div className="b-bottom">
                 <div className="d-flex justify-content-evenly py-4">
                   <div className="d-flex flex-column align-items-start gap-4">
                     <span className="b-bottom">Name</span>
@@ -837,13 +891,16 @@ export default function MainBoard() {
                     <span className="b-bottom">Email</span>
                     <span className="b-bottom">Phone</span>
                     <span className="b-bottom">Password</span>
+                    <span className="b-bottom">Country</span>
+                    <span className="b-bottom">City</span>
+                    <span className="b-bottom">Date registered</span>
                   </div>
                   <div className="d-flex flex-column gap-4">
                     <input
                       name="name"
                       type="text"
                       placeholder="Name"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.name}
                       onChange={handleUserInfoChange}
                     />
@@ -851,7 +908,7 @@ export default function MainBoard() {
                       name="surname"
                       type="text"
                       placeholder="Surname"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.surname}
                       onChange={handleUserInfoChange}
                     />
@@ -859,7 +916,7 @@ export default function MainBoard() {
                       name="email"
                       type="email"
                       placeholder="Email"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.email}
                       onChange={handleUserInfoChange}
                     />
@@ -867,7 +924,7 @@ export default function MainBoard() {
                       name="phone"
                       type="tel"
                       placeholder="Phone"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.phone}
                       onChange={handleUserInfoChange}
                     />
@@ -876,7 +933,7 @@ export default function MainBoard() {
                         name="password"
                         type={passwordShown ? "text" : "password"}
                         placeholder="Password"
-                        disabled={!isInfoEdit}
+                        readOnly
                         value={newUserData.password}
                         onChange={handleUserInfoChange}
                       />
@@ -888,19 +945,11 @@ export default function MainBoard() {
                         onClick={() => setPasswordShown(!passwordShown)}
                       />
                     </div>
-                  </div>
-                  <div className="d-flex flex-column align-items-start gap-4">
-                    <span className="b-bottom">Country</span>
-                    <span className="b-bottom">City</span>
-                    <span className="b-bottom">Date registered</span>
-                    <span className="b-bottom">Comment</span>
-                  </div>
-                  <div className="d-flex flex-column gap-4">
                     <input
                       name="country"
                       type="text"
                       placeholder="Country"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.country}
                       onChange={handleUserInfoChange}
                     />
@@ -908,57 +957,33 @@ export default function MainBoard() {
                       name="city"
                       type="text"
                       placeholder="City"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.city}
                       onChange={handleUserInfoChange}
                     />
                     <input
                       type="text"
                       placeholder="Date Registered"
-                      disabled
+                      readOnly
                       value={moment(
                         newUserData?.createdAt?.seconds * 1000
                       )?.format("DD/MM/YYYY")}
                     />
+                  </div>
+                  <div className="d-flex flex-column align-items-start gap-4">
+                    <span className="b-bottom">Comment</span>
+                  </div>
+                  <div className="d-flex flex-column gap-4">
                     <input
                       name="comment"
                       type="text"
                       placeholder="Comment"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.comment}
                       onChange={handleUserInfoChange}
                     />
                   </div>
                 </div>
-                <section className="d-flex justify-content-around">
-                  <button
-                    id="editButton"
-                    className="w-25 rounded"
-                    onClick={(e) => {
-                      if (isInfoEdit) {
-                        setNewUserData(selectedUser);
-                        setIsInfoEdit(false);
-                      } else {
-                        setIsInfoEdit(true);
-                      }
-                    }}
-                  >
-                    {isInfoEdit ? "Cancel" : "Edit"}
-                  </button>
-                  <button
-                    id="saveButton"
-                    disabled={!isInfoEdit}
-                    className={`w-25 rounded ${!isInfoEdit && "stopClik"}`}
-                    onClick={(e) => {
-                      if (isInfoEdit) {
-                        updateUser();
-                        setIsInfoEdit(false);
-                      }
-                    }}
-                  >
-                    Save
-                  </button>
-                </section>
               </div>
               <div>
                 <h4 className="f-s-inherit my-2">Recent Changes</h4>
@@ -983,7 +1008,7 @@ export default function MainBoard() {
                   // dense
                   // paginationRowsPerPageOptions={[5, 10, 20, 50]}
                   // responsive
-                  // customStyles={customStyles}
+                  customStyles={customInfoStyles}
                 />
               </div>
             </div>
@@ -1453,7 +1478,12 @@ export default function MainBoard() {
           selectedOrder={selectedOrder}
         />
       )}
-
+      {isInfoEdit && (
+        <SaveUserInfoModal
+          closeModal={closeSaveInfoModal}
+          handleSaveInfo={updateUser}
+        />
+      )}
       {isUserEdit && <EditUserModal onClose={handleClose} show={isUserEdit} />}
       {showColumnsModal && (
         <SelectColumnsModal
