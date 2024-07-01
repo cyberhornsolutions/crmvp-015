@@ -24,7 +24,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
 import delayedColumns from "./columns/delayedColumns";
@@ -90,7 +89,6 @@ export default function MainBoard() {
   const [selectedRow, setSelectedRow] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
   const [closedOrders, setClosedOrders] = useState([]);
-  const [isUserEdit, setIsUserEdit] = useState(false);
   const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [showColumns, setShowColumns] = useState({});
   const [recentChanges, setRecentChanges] = useState([]);
@@ -479,7 +477,6 @@ export default function MainBoard() {
     setIsBalOpen(false);
     setIsDelModalOpen(false);
     setIsDealEdit(false);
-    setIsUserEdit(false);
   };
 
   const referralUserColumns = [
@@ -614,26 +611,6 @@ export default function MainBoard() {
     <div id="mainboard">
       <div id="profile">
         <img id="profile-pic" src={placeholder} alt="" />
-        {/* <div id="profile-i">
-          <h5 className="f-w-inherit f-s-inherit" style={{ lineHeight: 1.1 }}>
-            {userOrders?.id}
-          </h5>
-          <h4
-            id="lead-name"
-            className="f-w-inherit f-s-inherit"
-            style={{ lineHeight: 1.1 }}
-          >
-            {userOrders?.name}
-          </h4>
-        </div> */}
-        {/* <button
-          className="btn btn-primary"
-          onClick={() => {
-            setIsUserEdit(true);
-          }}
-        >
-          Edit
-        </button> */}
         {accounts.length ? (
           <>
             <select value={account?.account_no} onChange={handleAccountChange}>
@@ -797,43 +774,6 @@ export default function MainBoard() {
         </div>
       </div>
       <div id="board">
-        {/* <ul className="nav nav-tabs">
-          <li className="active">
-            <a data-toggle="tab" href="#menu0" onclick="showTab('menu0')">
-              Info
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu1" onclick="showTab('menu1')">
-              Verification
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu2" onclick="showTab('menu2')">
-              Overview
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu3" onclick="showTab('menu3')">
-              Deals
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu4" onclick="showTab('menu4')">
-              History
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu5" onclick="showTab('menu5')">
-              News
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu6" onclick="showTab('menu6')">
-              Referrals
-            </a>
-          </li>
-        </ul> */}
         <Navbar className="nav nav-tabs p-0">
           <Nav className="me-auto" style={{ gap: "2px" }}>
             <Nav.Link
@@ -1484,7 +1424,6 @@ export default function MainBoard() {
           handleSaveInfo={updateUser}
         />
       )}
-      {isUserEdit && <EditUserModal onClose={handleClose} show={isUserEdit} />}
       {showColumnsModal && (
         <SelectColumnsModal
           columnKey={
