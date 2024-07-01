@@ -67,6 +67,7 @@ export default function MainBoard() {
     () => localStorage.getItem("PLAYER_TAB") || "info"
   );
   const idInputRef = useRef(null);
+  const editInputInfoRef = useRef(null);
   const selectedRowRef = useRef(null);
   const locationInputRef = useRef(null);
   const mapInputRef = useRef(null);
@@ -80,7 +81,7 @@ export default function MainBoard() {
   const [modalShow, setModalShow] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
-  const [isInfoEdit, setIsInfoEdit] = useState(false);
+  const [showSaveInfoModal, setShowSaveInfoModal] = useState(false);
   const [newUserData, setNewUserData] = useState(selectedUser);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [isSaveOrderModalOpen, setIsSaveOrderModalOpen] = useState(false);
@@ -198,6 +199,7 @@ export default function MainBoard() {
         const inputField = document.querySelector(`input[name="${name}"]`);
         inputField.addEventListener("dblclick", () => {
           setIsEdit(true);
+          editInputInfoRef.current = inputField;
           inputField.readOnly = false;
         });
       });
@@ -205,8 +207,10 @@ export default function MainBoard() {
   }, [tab]);
 
   useEffect(() => {
-    const handleOutsideClick = () => {
-      setIsInfoEdit(true);
+    if (tab !== "info") return;
+    const handleOutsideClick = (e) => {
+      if (editInputInfoRef.current.contains(e.target)) return;
+      setShowSaveInfoModal(true);
     };
     if (isEdit) {
       document.addEventListener("click", handleOutsideClick);
@@ -230,7 +234,7 @@ export default function MainBoard() {
     });
     getSelectedUserData();
     setIsEdit(false);
-    setIsInfoEdit(false);
+    setShowSaveInfoModal(false);
   };
 
   const customStyles = {
@@ -411,7 +415,7 @@ export default function MainBoard() {
       });
       if (unChanged) {
         setIsEdit(false);
-        setIsInfoEdit(false);
+        setShowSaveInfoModal(false);
         return;
       }
       const userPayload = {
@@ -430,7 +434,7 @@ export default function MainBoard() {
         update: newUserData[changedKey],
       });
       setIsEdit(false);
-      setIsInfoEdit(false);
+      setShowSaveInfoModal(false);
       toast.success("Saved successfully");
     } catch (error) {
       console.log("error in updating user =", error);
@@ -1418,7 +1422,7 @@ export default function MainBoard() {
           selectedOrder={selectedOrder}
         />
       )}
-      {isInfoEdit && (
+      {showSaveInfoModal && (
         <SaveUserInfoModal
           closeModal={closeSaveInfoModal}
           handleSaveInfo={updateUser}
