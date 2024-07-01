@@ -962,3 +962,8 @@ th {
 .text-bold-500 {
   font-weight: 500;
 }
+
+.info-section input:read-only {
+  background-color: transparent;
+  cursor: auto;
+}

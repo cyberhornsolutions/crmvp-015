@@ -839,7 +839,7 @@ export default function MainBoard() {
                     <span className="b-bottom">City</span>
                     <span className="b-bottom">Date registered</span>
                   </div>
-                  <div className="d-flex flex-column gap-4">
+                  <div className="d-flex flex-column gap-4 info-section">
                     <input
                       name="name"
                       type="text"
