@@ -4,6 +4,7 @@ import { Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
 import {
   addDocument,
+  getCommentsByUserId,
   getRecentChangesById,
   updateUserById,
 } from "../utills/firebaseHelpers";
@@ -93,6 +94,7 @@ export default function MainBoard() {
   const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [showColumns, setShowColumns] = useState({});
   const [recentChanges, setRecentChanges] = useState([]);
+  const [comments, setComments] = useState([]);
 
   const accounts = newUserData?.accounts || [];
   const account = accounts.find(
@@ -122,9 +124,11 @@ export default function MainBoard() {
       selectedUser.userId,
       setRecentChanges
     );
+    const unsubComments = getCommentsByUserId(selectedUser.userId, setComments);
     return () => {
       unsubUserData();
       unsubChanges();
+      unsubComments();
     };
   }, []);
 
@@ -188,7 +192,6 @@ export default function MainBoard() {
     if (tab === "info") {
       [
         "city",
-        "comment",
         "country",
         "email",
         "name",
@@ -216,12 +219,11 @@ export default function MainBoard() {
       document.addEventListener("click", handleOutsideClick);
     }
     return () => document.removeEventListener("click", handleOutsideClick);
-  }, [isEdit]);
+  }, [isEdit, tab]);
 
   const closeSaveInfoModal = () => {
     [
       "city",
-      "comment",
       "country",
       "email",
       "name",
@@ -419,14 +421,23 @@ export default function MainBoard() {
         closeSaveInfoModal();
         return;
       }
-      const userPayload = {
-        [changedKey]: newUserData[changedKey],
-      };
-      Object.keys(userPayload).forEach((key) => {
-        if (!userPayload[key]) userPayload[key] = "";
-      });
-      const userDocRef = doc(db, "users", newUserData.userId);
-      await updateDoc(userDocRef, userPayload);
+      if (changedKey === "comment") {
+        await addDocument("userComments", {
+          comment: newUserData[changedKey],
+          date: serverTimestamp(),
+          manager: user.id,
+          userId: newUserData.userId,
+        });
+      } else {
+        const userPayload = {
+          [changedKey]: newUserData[changedKey],
+        };
+        Object.keys(userPayload).forEach((key) => {
+          if (!userPayload[key]) userPayload[key] = "";
+        });
+        const userDocRef = doc(db, "users", newUserData.userId);
+        await updateDoc(userDocRef, userPayload);
+      }
       await addDocument("recentChanges", {
         userId: newUserData.userId,
         date: serverTimestamp(),
@@ -914,18 +925,46 @@ export default function MainBoard() {
                       )?.format("DD/MM/YYYY")}
                     />
                   </div>
-                  <div className="d-flex flex-column align-items-start gap-4">
-                    <span className="b-bottom">Comment</span>
-                  </div>
-                  <div className="d-flex flex-column gap-4">
-                    <input
-                      name="comment"
-                      type="text"
-                      placeholder="Comment"
-                      readOnly
-                      value={newUserData.comment}
-                      onChange={handleUserInfoChange}
-                    />
+                  <div className="d-flex flex-column align-items-start gap-4 ">
+                    <div className="d-flex flex-row gap-2">
+                      <input
+                        name="comment"
+                        onChange={handleUserInfoChange}
+                        placeholder="Add a comment..."
+                        type="text"
+                        value={newUserData.comment}
+                      />
+                      <button
+                        className="border px-4 py-1"
+                        onClick={updateUser}
+                        type="button"
+                      >
+                        Add comment
+                      </button>
+                    </div>
+                    <section className="comment-section">
+                      {comments.map((c, index) => (
+                        <div className="my-2" key={index}>
+                          <div className="d-flex flex-row gap-2">
+                            <p className="text-left m-0">
+                              @
+                              {
+                                managers.find((m) => m.id === c.manager)
+                                  ?.username
+                              }
+                            </p>
+                            {c.date && (
+                              <p className="text-left m-0">
+                                {moment(c.date?.seconds * 1000)?.format(
+                                  "DD/MM/YYYY"
+                                )}
+                              </p>
+                            )}
+                          </div>
+                          <p className="text-left m-0">{c.comment}</p>
+                        </div>
+                      ))}
+                    </section>
                   </div>
                 </div>
               </div>

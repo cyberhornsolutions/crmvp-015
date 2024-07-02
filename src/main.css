@@ -967,3 +967,11 @@ th {
   background-color: transparent;
   cursor: auto;
 }
+
+.comment-section {
+  background-color: white;
+  height: 20rem;
+  overflow: auto;
+  padding: 1rem;
+  width: 24rem;
+}
