@@ -399,8 +399,7 @@ export default function MainBoard() {
 
   const updateUser = async () => {
     try {
-      let changedKey;
-      const unChanged = [
+      const keys = [
         "name",
         "surname",
         "email",
@@ -408,14 +407,16 @@ export default function MainBoard() {
         "password",
         "country",
         "city",
-      ].every((key) => {
+        "comment",
+      ];
+      let changedKey;
+      const unChanged = keys.every((key) => {
         const isChanged = selectedUser[key] === newUserData[key];
         if (!isChanged) changedKey = key;
         return isChanged;
       });
       if (unChanged) {
-        setIsEdit(false);
-        setShowSaveInfoModal(false);
+        closeSaveInfoModal();
         return;
       }
       const userPayload = {
@@ -433,8 +434,7 @@ export default function MainBoard() {
         info: changedKey,
         update: newUserData[changedKey],
       });
-      setIsEdit(false);
-      setShowSaveInfoModal(false);
+      closeSaveInfoModal();
       toast.success("Saved successfully");
     } catch (error) {
       console.log("error in updating user =", error);
