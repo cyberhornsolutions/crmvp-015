@@ -454,6 +454,24 @@ export const getCommentsByUserId = (id, setState) => {
   return unsubscribe;
 };
 
+export const fetchComments = (setState) => {
+  const q = query(collection(db, "userComments"), orderBy("date", "desc"));
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const comments = [];
+      snapshot.forEach((snap) => {
+        comments.push({ id: snap.id, ...snap.data() });
+      });
+      setState(comments);
+    },
+    (error) => {
+      console.error("Error fetching comments by userId:", error);
+    }
+  );
+  return unsubscribe;
+};
+
 export const updateShowColumnsById = async (id, payload) => {
   const columnDocRef = doc(db, "columns", id);
   await setDoc(columnDocRef, payload, { merge: true });
