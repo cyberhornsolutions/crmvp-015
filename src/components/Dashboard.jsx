@@ -76,12 +76,14 @@ export default function Dashboard() {
         <div className="details-item">
           <h5>Reminders</h5>
           <DataTable
-            columns={remindersColumns(managers, players)}
-            data={fillArrayWithEmptyRows(comments, 10)}
+            // columns={remindersColumns(managers, players)}
+            columns={depositsColumns}
+            // data={fillArrayWithEmptyRows(comments, 10)}
+            data={fillArrayWithEmptyRows([], 10)}
             highlightOnHover
             // pointerOnHover
             pagination
-            paginationTotalRows={comments.length}
+            // paginationTotalRows={comments.length}
             paginationPerPage={10}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             striped

@@ -968,31 +968,42 @@ export default function MainBoard() {
                         </button>
                       </div>
                     </form>
-                    <section className="comment-section">
-                      {comments.map((c, index) => (
-                        <div key={index}>
-                          <div className="d-flex flex-row justify-content-between">
-                            <p className="text-left fw-medium m-0">
-                              {
-                                managers.find((m) => m.id === c.manager)
-                                  ?.username
-                              }
-                            </p>
-                            {c.date && (
-                              <p
-                                className="text-left m-0"
-                                style={{ fontSize: 10 }}
-                              >
-                                {moment(c.date?.seconds * 1000)?.format(
-                                  "DD/MM/YYYY hh:mm:ss A"
-                                )}
+                    <section
+                      className="comment-section"
+                      style={{
+                        alignItems: comments.length > 0 ? "" : "center",
+                        display: comments.length > 0 ? "" : "flex",
+                        justifyContent: comments.length > 0 ? "" : "center",
+                      }}
+                    >
+                      {comments.length > 0 ? (
+                        comments.map((c, index) => (
+                          <div key={index}>
+                            <div className="d-flex flex-row justify-content-between">
+                              <p className="text-left fw-medium m-0">
+                                {
+                                  managers.find((m) => m.id === c.manager)
+                                    ?.username
+                                }
                               </p>
-                            )}
+                              {c.date && (
+                                <p
+                                  className="text-left m-0"
+                                  style={{ fontSize: 10 }}
+                                >
+                                  {moment(c.date?.seconds * 1000)?.format(
+                                    "DD/MM/YYYY hh:mm:ss A"
+                                  )}
+                                </p>
+                              )}
+                            </div>
+                            <p className="text-left m-0">{c.comment}</p>
+                            <hr className="m-0" />
                           </div>
-                          <p className="text-left m-0">{c.comment}</p>
-                          <hr className="m-0" />
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p>No comments</p>
+                      )}
                     </section>
                   </div>
                 </div>
