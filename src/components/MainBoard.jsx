@@ -95,6 +95,7 @@ export default function MainBoard() {
   const [showColumns, setShowColumns] = useState({});
   const [recentChanges, setRecentChanges] = useState([]);
   const [comments, setComments] = useState([]);
+  const [formDataComment, setFormDataComment] = useState("");
 
   const accounts = newUserData?.accounts || [];
   const account = accounts.find(
@@ -409,7 +410,6 @@ export default function MainBoard() {
         "password",
         "country",
         "city",
-        "comment",
       ];
       let changedKey;
       const unChanged = keys.every((key) => {
@@ -428,23 +428,14 @@ export default function MainBoard() {
           return;
         }
       }
-      if (changedKey === "comment") {
-        await addDocument("userComments", {
-          comment: newUserData[changedKey],
-          date: serverTimestamp(),
-          manager: user.id,
-          userId: newUserData.userId,
-        });
-      } else {
-        const userPayload = {
-          [changedKey]: newUserData[changedKey],
-        };
-        Object.keys(userPayload).forEach((key) => {
-          if (!userPayload[key]) userPayload[key] = "";
-        });
-        const userDocRef = doc(db, "users", newUserData.userId);
-        await updateDoc(userDocRef, userPayload);
-      }
+      const userPayload = {
+        [changedKey]: newUserData[changedKey],
+      };
+      Object.keys(userPayload).forEach((key) => {
+        if (!userPayload[key]) userPayload[key] = "";
+      });
+      const userDocRef = doc(db, "users", newUserData.userId);
+      await updateDoc(userDocRef, userPayload);
       await addDocument("recentChanges", {
         userId: newUserData.userId,
         date: serverTimestamp(),
@@ -456,6 +447,29 @@ export default function MainBoard() {
       toast.success("Saved successfully");
     } catch (error) {
       console.log("error in updating user =", error);
+    }
+  };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await addDocument("userComments", {
+        comment: formDataComment,
+        date: serverTimestamp(),
+        manager: user.id,
+        userId: newUserData.userId,
+      });
+      setFormDataComment("");
+      toast.success("Comment added successfully");
+      await addDocument("recentChanges", {
+        date: serverTimestamp(),
+        info: "comment",
+        manager: user.id,
+        update: formDataComment,
+        userId: newUserData.userId,
+      });
+    } catch (error) {
+      console.log("error in adding comment = ", error);
     }
   };
 
@@ -845,8 +859,8 @@ export default function MainBoard() {
         <div className="tab-content">
           {tab === "info" && (
             <div id="menu0" className="h-100">
-              <div className="b-bottom">
-                <div className="d-flex justify-content-evenly py-4">
+              <div className="b-bottom" style={{ height: "56%" }}>
+                <div className="d-flex justify-content-evenly py-4 h-100">
                   <div className="d-flex flex-column align-items-start gap-4">
                     <span className="b-bottom">Name</span>
                     <span className="b-bottom">Surname</span>
@@ -932,43 +946,51 @@ export default function MainBoard() {
                       )?.format("DD/MM/YYYY")}
                     />
                   </div>
-                  <div className="d-flex flex-column align-items-start gap-4 ">
-                    <div className="d-flex flex-row gap-2">
-                      <input
-                        name="comment"
-                        onChange={handleUserInfoChange}
-                        placeholder="Add a comment..."
-                        type="text"
-                        value={newUserData.comment}
-                      />
-                      <button
-                        className="border px-4 py-1"
-                        onClick={updateUser}
-                        type="button"
-                      >
-                        Add comment
-                      </button>
-                    </div>
+                  <div className="d-flex flex-column align-items-start gap-2">
+                    <form onSubmit={handleCommentSubmit} className="w-100">
+                      <div className="form-group d-flex flex-row gap-2 w-100">
+                        <input
+                          className="form-control w-75"
+                          name="comment"
+                          onChange={(e) => {
+                            setFormDataComment(e.target.value);
+                          }}
+                          placeholder="Comment"
+                          required
+                          type="text"
+                          value={formDataComment}
+                        />
+                        <button
+                          className="btn btn-secondary btn-sm w-25"
+                          type="submit"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </form>
                     <section className="comment-section">
                       {comments.map((c, index) => (
-                        <div className="my-2" key={index}>
-                          <div className="d-flex flex-row gap-2">
-                            <p className="text-left m-0">
-                              @
+                        <div key={index}>
+                          <div className="d-flex flex-row justify-content-between">
+                            <p className="text-left fw-medium m-0">
                               {
                                 managers.find((m) => m.id === c.manager)
                                   ?.username
                               }
                             </p>
                             {c.date && (
-                              <p className="text-left m-0">
+                              <p
+                                className="text-left m-0"
+                                style={{ fontSize: 10 }}
+                              >
                                 {moment(c.date?.seconds * 1000)?.format(
-                                  "DD/MM/YYYY"
+                                  "DD/MM/YYYY hh:mm:ss A"
                                 )}
                               </p>
                             )}
                           </div>
                           <p className="text-left m-0">{c.comment}</p>
+                          <hr className="m-0" />
                         </div>
                       ))}
                     </section>

@@ -970,8 +970,8 @@ th {
 
 .comment-section {
   background-color: white;
-  height: 20rem;
+  height: 100%;
   overflow: auto;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   width: 24rem;
 }
