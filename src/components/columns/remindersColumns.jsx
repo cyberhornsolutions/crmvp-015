@@ -19,7 +19,7 @@ const remindersColumns = (managers, players) => [
   },
   {
     name: "Comment",
-    selector: (row) => row.comment,
+    selector: (row) => row && String(row.comment).substring(0, 20),
   },
 ];
 
