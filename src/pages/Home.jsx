@@ -17,6 +17,7 @@ import {
   getAllDeposits,
   getColumnsById,
   getCommentsByManager,
+  fetchComments,
 } from "../utills/firebaseHelpers";
 import { setOrdersState } from "../redux/slicer/orderSlicer";
 import { setDepositsState } from "../redux/slicer/transactionSlicer";
@@ -73,8 +74,10 @@ export default function Home() {
     const unsubPlayers = fetchPlayers(setPlayers);
     const unsubMangers = fetchManagers(setManagers);
     const unsubTeams = fetchTeams(setTeams);
-    const unsubComments = getCommentsByManager(user.id, setComments);
-
+    const unsubComments =
+      user.role === "Admin"
+        ? fetchComments(setComments)
+        : getCommentsByManager(user.id, setComments);
     return () => {
       unsubDeposits();
       unsubColumns();
