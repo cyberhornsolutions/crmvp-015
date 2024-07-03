@@ -454,8 +454,12 @@ export const getCommentsByUserId = (id, setState) => {
   return unsubscribe;
 };
 
-export const fetchComments = (setState) => {
-  const q = query(collection(db, "userComments"), orderBy("date", "desc"));
+export const getCommentsByManager = (manager, setState) => {
+  const q = query(
+    collection(db, "userComments"),
+    where("manager", "==", manager),
+    orderBy("date", "desc")
+  );
   const unsubscribe = onSnapshot(
     q,
     (snapshot) => {
@@ -466,7 +470,7 @@ export const fetchComments = (setState) => {
       setState(comments);
     },
     (error) => {
-      console.error("Error fetching comments by userId:", error);
+      console.error("Error fetching comments by manager:", error);
     }
   );
   return unsubscribe;
