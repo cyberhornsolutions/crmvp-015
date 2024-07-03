@@ -421,6 +421,13 @@ export default function MainBoard() {
         closeSaveInfoModal();
         return;
       }
+      for (let key of keys.slice(0, 5)) {
+        if (key === changedKey && !newUserData[changedKey]) {
+          closeSaveInfoModal();
+          toast.error(`${key} can't be empty`);
+          return;
+        }
+      }
       if (changedKey === "comment") {
         await addDocument("userComments", {
           comment: newUserData[changedKey],
