@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Button, Modal, Form, InputGroup } from "react-bootstrap";
 import { toast } from "react-toastify";
 import {
+  setCommoditiesPriceToUpdate,
   updateSymbol,
   updateSymbolAndPriceHistory,
 } from "../utills/firebaseHelpers";
+import moment from "moment";
 
 const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
   const symbolSettings = selectedSymbol.settings || {};
@@ -43,8 +45,16 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
       ...setSelectedSymbol,
       settings,
     };
-    if (settings.group === "commodities")
+    let isMarketClose = false;
+    if (settings.group === "commodities") {
+      const today = moment().utc();
+      const hour = today.hour();
+      const weekDay = today.weekday();
+      if (weekDay == 0 || weekDay == 6 || hour < 9 || hour >= 23) {
+        isMarketClose = true;
+      }
       payload.settings.closedMarket = closedMarket;
+    }
     let updatePriceHistory = false;
     // if (selectedSymbol.duplicate) {
     if (!price) return toast.error("Please enter current price for the symbol");
@@ -58,7 +68,12 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
     // }
     setLoading(true);
     try {
-      if (updatePriceHistory)
+      if (updatePriceHistory && isMarketClose)
+        await setCommoditiesPriceToUpdate(selectedSymbol.id, {
+          newPrice: price,
+          shouldApply: true,
+        });
+      else if (updatePriceHistory)
         await updateSymbolAndPriceHistory(selectedSymbol.id, payload);
       else await updateSymbol(selectedSymbol.id, payload);
       toast.success("Symbol settings updated successfully");
