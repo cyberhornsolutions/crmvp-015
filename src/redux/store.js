@@ -19,6 +19,7 @@ import managersSlice from "./slicer/managersSlice";
 import teamsSlice from "./slicer/teamsSlice";
 import columnsSlicer from "./slicer/columnsSlicer";
 import ipsSlicer from "./slicer/ipsSlicer";
+import commentsSlicer from "./slicer/commentsSlicer";
 
 export const store = configureStore({
   reducer: {
@@ -32,6 +33,7 @@ export const store = configureStore({
     teams: teamsSlice,
     columns: columnsSlicer,
     ips: ipsSlicer,
+    comments: commentsSlicer,
   },
   middleware: getDefaultMiddleware({
     serializableCheck: {

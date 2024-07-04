@@ -4,6 +4,7 @@ import { Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
 import {
   addDocument,
+  getCommentsByUserId,
   getRecentChangesById,
   updateUserById,
 } from "../utills/firebaseHelpers";
@@ -24,7 +25,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import EditUserModal from "./EditUserModal";
 import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
 import delayedColumns from "./columns/delayedColumns";
@@ -34,6 +34,7 @@ import recentChangesColumns from "./columns/recentChangesColumns";
 import { fillArrayWithEmptyRows } from "../utills/helpers";
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
+import SaveUserInfoModal from "./SaveUserInfoModal";
 
 const overviewColumnsNames = overviewColumns().reduce(
   (p, { name }) => ({ ...p, [name]: true }),
@@ -67,6 +68,7 @@ export default function MainBoard() {
     () => localStorage.getItem("PLAYER_TAB") || "info"
   );
   const idInputRef = useRef(null);
+  const editInputInfoRef = useRef(null);
   const selectedRowRef = useRef(null);
   const locationInputRef = useRef(null);
   const mapInputRef = useRef(null);
@@ -80,7 +82,7 @@ export default function MainBoard() {
   const [modalShow, setModalShow] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
-  const [isInfoEdit, setIsInfoEdit] = useState(false);
+  const [showSaveInfoModal, setShowSaveInfoModal] = useState(false);
   const [newUserData, setNewUserData] = useState(selectedUser);
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [isSaveOrderModalOpen, setIsSaveOrderModalOpen] = useState(false);
@@ -89,10 +91,11 @@ export default function MainBoard() {
   const [selectedRow, setSelectedRow] = useState();
   const [isDealEdit, setIsDealEdit] = useState(false);
   const [closedOrders, setClosedOrders] = useState([]);
-  const [isUserEdit, setIsUserEdit] = useState(false);
   const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [showColumns, setShowColumns] = useState({});
   const [recentChanges, setRecentChanges] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [formDataComment, setFormDataComment] = useState("");
 
   const accounts = newUserData?.accounts || [];
   const account = accounts.find(
@@ -122,9 +125,11 @@ export default function MainBoard() {
       selectedUser.userId,
       setRecentChanges
     );
+    const unsubComments = getCommentsByUserId(selectedUser.userId, setComments);
     return () => {
       unsubUserData();
       unsubChanges();
+      unsubComments();
     };
   }, []);
 
@@ -184,6 +189,57 @@ export default function MainBoard() {
     };
   }, [selectedRowRef.current, tab]);
 
+  useEffect(() => {
+    if (tab === "info") {
+      [
+        "city",
+        "country",
+        "email",
+        "name",
+        "password",
+        "phone",
+        "surname",
+      ].forEach((name) => {
+        const inputField = document.querySelector(`input[name="${name}"]`);
+        inputField.addEventListener("dblclick", () => {
+          setIsEdit(true);
+          editInputInfoRef.current = inputField;
+          inputField.readOnly = false;
+        });
+      });
+    }
+  }, [tab]);
+
+  useEffect(() => {
+    if (tab !== "info") return;
+    const handleOutsideClick = (e) => {
+      if (editInputInfoRef.current.contains(e.target)) return;
+      setShowSaveInfoModal(true);
+    };
+    if (isEdit) {
+      document.addEventListener("click", handleOutsideClick);
+    }
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, [isEdit, tab]);
+
+  const closeSaveInfoModal = () => {
+    [
+      "city",
+      "country",
+      "email",
+      "name",
+      "password",
+      "phone",
+      "surname",
+    ].forEach((name) => {
+      const inputField = document.querySelector(`input[name="${name}"]`);
+      inputField.readOnly = true;
+    });
+    getSelectedUserData();
+    setIsEdit(false);
+    setShowSaveInfoModal(false);
+  };
+
   const customStyles = {
     pagination: {
       style: {
@@ -203,6 +259,14 @@ export default function MainBoard() {
         userSelect: "none",
         // minHeight: 36,
         // height: 36,
+      },
+    },
+  };
+
+  const customInfoStyles = {
+    rows: {
+      style: {
+        minHeight: 30,
       },
     },
   };
@@ -338,8 +402,7 @@ export default function MainBoard() {
 
   const updateUser = async () => {
     try {
-      let changedKey;
-      const unChanged = [
+      const keys = [
         "name",
         "surname",
         "email",
@@ -347,29 +410,30 @@ export default function MainBoard() {
         "password",
         "country",
         "city",
-      ].every((key) => {
+      ];
+      let changedKey;
+      const unChanged = keys.every((key) => {
         const isChanged = selectedUser[key] === newUserData[key];
         if (!isChanged) changedKey = key;
         return isChanged;
       });
-      if (unChanged) return;
-
+      if (unChanged) {
+        closeSaveInfoModal();
+        return;
+      }
+      for (let key of keys.slice(0, 5)) {
+        if (key === changedKey && !newUserData[changedKey]) {
+          closeSaveInfoModal();
+          toast.error(`${key} can't be empty`);
+          return;
+        }
+      }
       const userPayload = {
-        name: newUserData.name,
-        surname: newUserData.surname,
-        email: newUserData.email,
-        phone: newUserData.phone,
-        password: newUserData.password,
-        country: newUserData.country,
-        city: newUserData.city,
-        createdAt: newUserData.createdAt,
-        comment: newUserData.comment,
+        [changedKey]: newUserData[changedKey],
       };
-
       Object.keys(userPayload).forEach((key) => {
         if (!userPayload[key]) userPayload[key] = "";
       });
-
       const userDocRef = doc(db, "users", newUserData.userId);
       await updateDoc(userDocRef, userPayload);
       await addDocument("recentChanges", {
@@ -379,9 +443,33 @@ export default function MainBoard() {
         info: changedKey,
         update: newUserData[changedKey],
       });
+      closeSaveInfoModal();
       toast.success("Saved successfully");
     } catch (error) {
       console.log("error in updating user =", error);
+    }
+  };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await addDocument("userComments", {
+        comment: formDataComment,
+        date: serverTimestamp(),
+        manager: user.id,
+        userId: newUserData.userId,
+      });
+      setFormDataComment("");
+      toast.success("Comment added successfully");
+      await addDocument("recentChanges", {
+        date: serverTimestamp(),
+        info: "comment",
+        manager: user.id,
+        update: formDataComment,
+        userId: newUserData.userId,
+      });
+    } catch (error) {
+      console.log("error in adding comment = ", error);
     }
   };
 
@@ -425,7 +513,6 @@ export default function MainBoard() {
     setIsBalOpen(false);
     setIsDelModalOpen(false);
     setIsDealEdit(false);
-    setIsUserEdit(false);
   };
 
   const referralUserColumns = [
@@ -560,26 +647,6 @@ export default function MainBoard() {
     <div id="mainboard">
       <div id="profile">
         <img id="profile-pic" src={placeholder} alt="" />
-        {/* <div id="profile-i">
-          <h5 className="f-w-inherit f-s-inherit" style={{ lineHeight: 1.1 }}>
-            {userOrders?.id}
-          </h5>
-          <h4
-            id="lead-name"
-            className="f-w-inherit f-s-inherit"
-            style={{ lineHeight: 1.1 }}
-          >
-            {userOrders?.name}
-          </h4>
-        </div> */}
-        {/* <button
-          className="btn btn-primary"
-          onClick={() => {
-            setIsUserEdit(true);
-          }}
-        >
-          Edit
-        </button> */}
         {accounts.length ? (
           <>
             <select value={account?.account_no} onChange={handleAccountChange}>
@@ -743,43 +810,6 @@ export default function MainBoard() {
         </div>
       </div>
       <div id="board">
-        {/* <ul className="nav nav-tabs">
-          <li className="active">
-            <a data-toggle="tab" href="#menu0" onclick="showTab('menu0')">
-              Info
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu1" onclick="showTab('menu1')">
-              Verification
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu2" onclick="showTab('menu2')">
-              Overview
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu3" onclick="showTab('menu3')">
-              Deals
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu4" onclick="showTab('menu4')">
-              History
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu5" onclick="showTab('menu5')">
-              News
-            </a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#menu6" onclick="showTab('menu6')">
-              Referrals
-            </a>
-          </li>
-        </ul> */}
         <Navbar className="nav nav-tabs p-0">
           <Nav className="me-auto" style={{ gap: "2px" }}>
             <Nav.Link
@@ -829,21 +859,24 @@ export default function MainBoard() {
         <div className="tab-content">
           {tab === "info" && (
             <div id="menu0" className="h-100">
-              <div className="h-50 b-bottom">
-                <div className="d-flex justify-content-evenly py-4">
+              <div className="b-bottom" style={{ height: "56%" }}>
+                <div className="d-flex justify-content-evenly py-4 h-100">
                   <div className="d-flex flex-column align-items-start gap-4">
                     <span className="b-bottom">Name</span>
                     <span className="b-bottom">Surname</span>
                     <span className="b-bottom">Email</span>
                     <span className="b-bottom">Phone</span>
                     <span className="b-bottom">Password</span>
+                    <span className="b-bottom">Country</span>
+                    <span className="b-bottom">City</span>
+                    <span className="b-bottom">Date registered</span>
                   </div>
-                  <div className="d-flex flex-column gap-4">
+                  <div className="d-flex flex-column gap-4 info-section">
                     <input
                       name="name"
                       type="text"
                       placeholder="Name"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.name}
                       onChange={handleUserInfoChange}
                     />
@@ -851,7 +884,7 @@ export default function MainBoard() {
                       name="surname"
                       type="text"
                       placeholder="Surname"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.surname}
                       onChange={handleUserInfoChange}
                     />
@@ -859,7 +892,7 @@ export default function MainBoard() {
                       name="email"
                       type="email"
                       placeholder="Email"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.email}
                       onChange={handleUserInfoChange}
                     />
@@ -867,7 +900,7 @@ export default function MainBoard() {
                       name="phone"
                       type="tel"
                       placeholder="Phone"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.phone}
                       onChange={handleUserInfoChange}
                     />
@@ -876,7 +909,7 @@ export default function MainBoard() {
                         name="password"
                         type={passwordShown ? "text" : "password"}
                         placeholder="Password"
-                        disabled={!isInfoEdit}
+                        readOnly
                         value={newUserData.password}
                         onChange={handleUserInfoChange}
                       />
@@ -888,19 +921,11 @@ export default function MainBoard() {
                         onClick={() => setPasswordShown(!passwordShown)}
                       />
                     </div>
-                  </div>
-                  <div className="d-flex flex-column align-items-start gap-4">
-                    <span className="b-bottom">Country</span>
-                    <span className="b-bottom">City</span>
-                    <span className="b-bottom">Date registered</span>
-                    <span className="b-bottom">Comment</span>
-                  </div>
-                  <div className="d-flex flex-column gap-4">
                     <input
                       name="country"
                       type="text"
                       placeholder="Country"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.country}
                       onChange={handleUserInfoChange}
                     />
@@ -908,57 +933,80 @@ export default function MainBoard() {
                       name="city"
                       type="text"
                       placeholder="City"
-                      disabled={!isInfoEdit}
+                      readOnly
                       value={newUserData.city}
                       onChange={handleUserInfoChange}
                     />
                     <input
                       type="text"
                       placeholder="Date Registered"
-                      disabled
+                      readOnly
                       value={moment(
                         newUserData?.createdAt?.seconds * 1000
                       )?.format("DD/MM/YYYY")}
                     />
-                    <input
-                      name="comment"
-                      type="text"
-                      placeholder="Comment"
-                      disabled={!isInfoEdit}
-                      value={newUserData.comment}
-                      onChange={handleUserInfoChange}
-                    />
+                  </div>
+                  <div className="d-flex flex-column align-items-start gap-2">
+                    <form onSubmit={handleCommentSubmit} className="w-100">
+                      <div className="form-group d-flex flex-row gap-2 w-100">
+                        <input
+                          className="form-control w-75"
+                          name="comment"
+                          onChange={(e) => {
+                            setFormDataComment(e.target.value);
+                          }}
+                          placeholder="Comment"
+                          required
+                          type="text"
+                          value={formDataComment}
+                        />
+                        <button
+                          className="btn btn-secondary btn-sm w-25"
+                          type="submit"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </form>
+                    <section
+                      className="comment-section"
+                      style={{
+                        alignItems: comments.length > 0 ? "" : "center",
+                        display: comments.length > 0 ? "" : "flex",
+                        justifyContent: comments.length > 0 ? "" : "center",
+                      }}
+                    >
+                      {comments.length > 0 ? (
+                        comments.map((c, index) => (
+                          <div key={index}>
+                            <div className="d-flex flex-row justify-content-between">
+                              <p className="text-left fw-medium m-0">
+                                {
+                                  managers.find((m) => m.id === c.manager)
+                                    ?.username
+                                }
+                              </p>
+                              {c.date && (
+                                <p
+                                  className="text-left m-0"
+                                  style={{ fontSize: 10 }}
+                                >
+                                  {moment(c.date?.seconds * 1000)?.format(
+                                    "DD/MM/YYYY hh:mm:ss A"
+                                  )}
+                                </p>
+                              )}
+                            </div>
+                            <p className="text-left m-0">{c.comment}</p>
+                            <hr className="m-0" />
+                          </div>
+                        ))
+                      ) : (
+                        <p>No comments</p>
+                      )}
+                    </section>
                   </div>
                 </div>
-                <section className="d-flex justify-content-around">
-                  <button
-                    id="editButton"
-                    className="w-25 rounded"
-                    onClick={(e) => {
-                      if (isInfoEdit) {
-                        setNewUserData(selectedUser);
-                        setIsInfoEdit(false);
-                      } else {
-                        setIsInfoEdit(true);
-                      }
-                    }}
-                  >
-                    {isInfoEdit ? "Cancel" : "Edit"}
-                  </button>
-                  <button
-                    id="saveButton"
-                    disabled={!isInfoEdit}
-                    className={`w-25 rounded ${!isInfoEdit && "stopClik"}`}
-                    onClick={(e) => {
-                      if (isInfoEdit) {
-                        updateUser();
-                        setIsInfoEdit(false);
-                      }
-                    }}
-                  >
-                    Save
-                  </button>
-                </section>
               </div>
               <div>
                 <h4 className="f-s-inherit my-2">Recent Changes</h4>
@@ -983,7 +1031,7 @@ export default function MainBoard() {
                   // dense
                   // paginationRowsPerPageOptions={[5, 10, 20, 50]}
                   // responsive
-                  // customStyles={customStyles}
+                  customStyles={customInfoStyles}
                 />
               </div>
             </div>
@@ -1453,8 +1501,12 @@ export default function MainBoard() {
           selectedOrder={selectedOrder}
         />
       )}
-
-      {isUserEdit && <EditUserModal onClose={handleClose} show={isUserEdit} />}
+      {showSaveInfoModal && (
+        <SaveUserInfoModal
+          closeModal={closeSaveInfoModal}
+          handleSaveInfo={updateUser}
+        />
+      )}
       {showColumnsModal && (
         <SelectColumnsModal
           columnKey={

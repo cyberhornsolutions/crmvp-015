@@ -16,6 +16,7 @@ import {
   fetchPlayers,
   getAllDeposits,
   getColumnsById,
+  fetchComments,
 } from "../utills/firebaseHelpers";
 import { setOrdersState } from "../redux/slicer/orderSlicer";
 import { setDepositsState } from "../redux/slicer/transactionSlicer";
@@ -24,6 +25,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setPlayersState } from "../redux/slicer/playersSlicer";
 import { setManagersState } from "../redux/slicer/managersSlice";
 import { setTeamsState } from "../redux/slicer/teamsSlice";
+import { setCommentsState } from "../redux/slicer/commentsSlicer";
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -61,12 +63,17 @@ export default function Home() {
     dispatch(setTeamsState(data));
   }, []);
 
+  const setComments = useCallback((data) => {
+    dispatch(setCommentsState(data));
+  }, []);
+
   useEffect(() => {
     const unsubDeposits = getAllDeposits(setDeposits);
     const unsubColumns = getColumnsById(user.id, setColumns);
     const unsubPlayers = fetchPlayers(setPlayers);
     const unsubMangers = fetchManagers(setManagers);
     const unsubTeams = fetchTeams(setTeams);
+    const unsubComments = fetchComments(setComments);
 
     return () => {
       unsubDeposits();
@@ -74,6 +81,7 @@ export default function Home() {
       unsubPlayers();
       unsubMangers();
       unsubTeams();
+      unsubComments();
     };
   }, []);
 

@@ -4,8 +4,12 @@ import moment from "moment";
 import { fillArrayWithEmptyRows } from "../utills/helpers";
 import depositsColumns from "./columns/depositsColumns";
 import DataTable from "react-data-table-component";
+import remindersColumns from "./columns/remindersColumns";
 
 export default function Dashboard() {
+  const comments = useSelector((state) => state.comments);
+  const managers = useSelector((state) => state.managers);
+  const players = useSelector((state) => state.players);
   const username = useSelector((state) => state.user.user.username);
   let allTransaction = useSelector((state) => state.deposits);
   allTransaction = allTransaction.filter(({ manager }) => manager === username);
@@ -72,12 +76,14 @@ export default function Dashboard() {
         <div className="details-item">
           <h5>Reminders</h5>
           <DataTable
+            // columns={remindersColumns(managers, players)}
             columns={depositsColumns}
+            // data={fillArrayWithEmptyRows(comments, 10)}
             data={fillArrayWithEmptyRows([], 10)}
             highlightOnHover
             // pointerOnHover
             pagination
-            // paginationTotalRows={0}
+            // paginationTotalRows={comments.length}
             paginationPerPage={10}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             striped
