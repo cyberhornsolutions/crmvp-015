@@ -367,6 +367,11 @@ export const updateSymbolAndPriceHistory = async (id, symbol) => {
   }
 };
 
+export const setCommoditiesPriceToUpdate = async (id, payload) => {
+  const commoditiesDocRef = doc(db, "commodities", id);
+  return await updateDoc(commoditiesDocRef, payload);
+};
+
 export const addNewDepsit = async (newDeposit) => {
   const depositRef = collection(db, "deposits");
   await addDoc(depositRef, {
