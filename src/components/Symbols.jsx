@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
+import AddNewGroupModal from "./AddNewGroupModal";
 
 const Symbols = () => {
   const dispatch = useDispatch();
@@ -22,6 +23,7 @@ const Symbols = () => {
   const [selectedSymbol, setSelectedSymbol] = useState(false);
   const [deleteDuplicate, setDeleteDuplicate] = useState(false);
   const [symbolSettings, setSymbolSettings] = useState(false);
+  const [showAddNewGroupModal, setShowAddNewGroupModal] = useState(false);
 
   const setSymbols = useCallback((symbolsData) => {
     dispatch(setSymbolsState(symbolsData));
@@ -70,6 +72,11 @@ const Symbols = () => {
     },
   };
 
+  const closeAddNewGroupModal = () => {
+    setShowAddNewGroupModal(false);
+    setTab("cryptoTab");
+  };
+
   return (
     <div>
       <Navbar className="nav nav-tabs p-0 mx-2">
@@ -97,6 +104,15 @@ const Symbols = () => {
             onClick={() => setTab("commoditiesTab")}
           >
             Commodities
+          </Nav.Link>
+          <Nav.Link
+            className={tab === "newGroupTab" && "active"}
+            onClick={() => {
+              setShowAddNewGroupModal(true);
+              setTab("newGroupTab");
+            }}
+          >
+            +
           </Nav.Link>
         </Nav>
       </Navbar>
@@ -226,6 +242,10 @@ const Symbols = () => {
           selectedSymbol={deleteDuplicate}
           setSelectedSymbol={setDeleteDuplicate}
         />
+      )}
+
+      {showAddNewGroupModal && (
+        <AddNewGroupModal closeModal={closeAddNewGroupModal} />
       )}
     </div>
   );
