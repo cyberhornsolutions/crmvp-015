@@ -29,6 +29,7 @@ export default function Leads({ setTab }) {
   const players = useSelector((state) => state.players);
   const orders = useSelector((state) => state.orders);
   const selectedUser = useSelector((state) => state.user.selectedUser);
+  const deposits = useSelector((state) => state.deposits);
   const symbols = useSelector((state) => state?.symbols);
   const managers = useSelector((state) => state.managers);
   const columns = useSelector((state) => state.columns);
@@ -100,7 +101,9 @@ export default function Leads({ setTab }) {
     if (columns.playersColumns) {
       setShowPlayersColumns(columns.playersColumns);
     } else {
-      const playersCols = userColumns.reduce(
+      const cols =
+        user.role === "Sale" ? userColumnsForSale : userColumnsForAdmin;
+      const playersCols = cols.reduce(
         (p, { name }) => ({ ...p, [name]: true }),
         {}
       );
@@ -154,10 +157,10 @@ export default function Leads({ setTab }) {
       !o.enableOpenPrice
   );
 
-  let userColumns = [
+  let userColumnsForSale = [
     {
       name: "Account",
-      selector: (row, i) =>
+      selector: (row) =>
         row ? (
           <div className="d-flex align-items-center gap-1">
             {row.onlineStatus ? (
@@ -177,7 +180,7 @@ export default function Leads({ setTab }) {
     },
     {
       name: "Type",
-      selector: (row, i) =>
+      selector: (row) =>
         row ? (
           <div className="d-flex align-items-center gap-1">
             {row?.account?.account_type || "N/A"}
@@ -357,10 +360,208 @@ export default function Leads({ setTab }) {
     },
   ];
 
-  if (user.role !== "Admin")
-    userColumns = userColumns.filter(
-      ({ name }) => name !== "Status" && name !== "Manager"
+  const calculateDepositedOrWithdrawn = (r, t) => {
+    return deposits
+      .filter(({ userId }) => userId === r?.userId)
+      .filter(({ account_no }) => account_no === r?.account?.account_no)
+      .filter(({ type }) => type === t)
+      .reduce((p, { sum }) => p + +sum, 0);
+  };
+
+  const calculateEquity = (r) => {
+    return (
+      parseFloat(r?.account?.totalBalance) +
+      parseFloat(r?.account?.activeOrdersProfit) -
+      parseFloat(r?.account?.activeOrdersSwap)
     );
+  };
+
+  let userColumnsForAdmin = [
+    {
+      name: "Group",
+      selector: (row) =>
+        row ? (
+          <div className="d-flex align-items-center gap-1">
+            {row?.account?.account_type || "N/A"}
+          </div>
+        ) : (
+          ""
+        ),
+      sortable: false,
+      compact: true,
+      width: "80px",
+      omit: !showPlayersColumns.Group,
+    },
+    {
+      name: "Account",
+      selector: (row) =>
+        row ? (
+          <div className="d-flex align-items-center gap-1">
+            {row.onlineStatus ? (
+              <CircleIcon className="onlineGreen" />
+            ) : (
+              <CircleIcon className="onlineRed" />
+            )}
+            {row?.account?.account_no || "N/A"}
+          </div>
+        ) : (
+          ""
+        ),
+      sortable: false,
+      compact: true,
+      width: "60px",
+      omit: !showPlayersColumns.Account,
+    },
+    {
+      name: "Name",
+      cell: (row) => row && `${row?.name} ${row?.surname}`,
+      sortable: true,
+      sortFunction: (a, b) => (a.name > b.name ? 1 : -1),
+      omit: !showPlayersColumns.Name,
+    },
+    {
+      name: "Leverage",
+      cell: (row) => row?.settings?.leverage,
+      sortable: true,
+      sortFunction: (a, b) => (a.name > b.name ? 1 : -1),
+      omit: !showPlayersColumns.Leverage,
+    },
+
+    {
+      name: "Deposited",
+      selector: (row) => {
+        if (!row || !row?.account) return;
+        return calculateDepositedOrWithdrawn(row, "Deposit");
+      },
+      omit: !showPlayersColumns.Deposited,
+    },
+    {
+      name: "Withdrawn",
+      selector: (row) => {
+        if (!row || !row?.account) return;
+        return calculateDepositedOrWithdrawn(row, "Withdraw");
+      },
+      omit: !showPlayersColumns.Withdrawn,
+    },
+    {
+      name: "Bonuses",
+      selector: (row) => row?.account?.bonus,
+      omit: !showPlayersColumns.Bonuses,
+    },
+    {
+      name: "Deposited-Withdrawn",
+      selector: (row) => {
+        if (!row || !row?.account) return;
+        const deposited = calculateDepositedOrWithdrawn(row, "Deposit");
+        const withdrawn = calculateDepositedOrWithdrawn(row, "Withdraw");
+        const diff = parseFloat(deposited) - parseFloat(withdrawn);
+        return +parseFloat(diff).toFixed(2);
+      },
+      omit: !showPlayersColumns["Deposited-Withdrawn"],
+    },
+    {
+      name: "Orders",
+      selector: (row) => {
+        if (!row || !row?.account) return;
+        return orders.filter(
+          (o) =>
+            o.userId === row?.userId &&
+            o.account_no === row?.account?.account_no &&
+            o.status === "Pending" &&
+            !o.enableOpenPrice
+        ).length;
+      },
+      omit: !showPlayersColumns.Orders,
+    },
+    {
+      name: "Level",
+      selector: (row) => {
+        if (!row || !row?.account) return;
+        const equity = calculateEquity(row);
+        const totalMargin = row?.account?.totalMargin;
+        const userLevel = row?.settings?.level || 100;
+        const level =
+          totalMargin > 0 ? (equity / totalMargin) * (userLevel / 100) : 0;
+        return `${+parseFloat(level)?.toFixed(2)}%`;
+      },
+      omit: !showPlayersColumns.Level,
+    },
+    {
+      name: "Bonuses Used",
+      selector: (row) => row?.account?.bonusSpent,
+      omit: !showPlayersColumns["Bonuses Used"],
+    },
+    {
+      name: "Profit",
+      selector: (row) => {
+        if (!row || !row?.account) return;
+        return +parseFloat(row?.account?.activeOrdersProfit).toFixed(2);
+      },
+      omit: !showPlayersColumns.Profit,
+    },
+    {
+      name: "Margin",
+      selector: (row) => row?.account?.totalMargin,
+      omit: !showPlayersColumns.Margin,
+    },
+    {
+      name: "Free",
+      selector: (row) => {
+        if (!row || !row?.account) return;
+        const acc = row.account;
+        let equity = calculateEquity(row);
+        if (row?.settings?.allowBonus) equity += parseFloat(acc.bonus);
+        const dealSum = orders
+          .filter(
+            (o) =>
+              o.userId === row.userId &&
+              o.account_no === acc.account_no &&
+              o.status === "Pending"
+          )
+          .reduce((p, v) => p + +v.sum, 0);
+        const freeMargin = equity - dealSum;
+        const free = freeMargin - parseFloat(acc.bonus);
+        return +parseFloat(free)?.toFixed(2);
+      },
+      omit: !showPlayersColumns.Free,
+    },
+    {
+      name: "Equity",
+      selector: (row) => {
+        if (!row || !row?.account) return;
+        const equity = calculateEquity(row);
+        return +parseFloat(equity).toFixed(2);
+      },
+      omit: !showPlayersColumns.Equity,
+    },
+    {
+      name: "Balance",
+      selector: (row) => {
+        if (!row || !row?.account) return;
+        const acc = row.account;
+        let equity = calculateEquity(row);
+        if (row?.settings?.allowBonus) equity += parseFloat(acc.bonus);
+        const dealSum = orders
+          .filter(
+            (o) =>
+              o.userId === row.userId &&
+              o.account_no === acc.account_no &&
+              o.status === "Pending"
+          )
+          .reduce((p, v) => p + +v.sum, 0);
+        const freeMargin = equity - dealSum;
+        const balance =
+          freeMargin + parseFloat(acc.totalMargin) + parseFloat(acc.bonus);
+        return +parseFloat(balance)?.toFixed(2);
+      },
+      omit: !showPlayersColumns.Balance,
+    },
+    {
+      name: "Own Equity",
+      selector: () => "",
+      omit: !showPlayersColumns["Own Equity"],
+    },
+  ];
 
   const conditionalRowStyles = [
     {
@@ -371,6 +572,7 @@ export default function Leads({ setTab }) {
       },
     },
   ];
+
   const handleKeyPress = (event) => {
     const keyCode = event.keyCode || event.which;
     const keyValue = String.fromCharCode(keyCode);
@@ -398,11 +600,17 @@ export default function Leads({ setTab }) {
                 <option className="dropdown-item" value="All">
                   All
                 </option>
-                {userColumns.map(({ name }, i) => (
-                  <option key={i} className="dropdown-item">
-                    {name}
-                  </option>
-                ))}
+                {user.role === "Sale"
+                  ? userColumnsForSale.map(({ name }, i) => (
+                      <option key={i} className="dropdown-item">
+                        {name}
+                      </option>
+                    ))
+                  : userColumnsForAdmin.map(({ name }, i) => (
+                      <option key={i} className="dropdown-item">
+                        {name}
+                      </option>
+                    ))}
               </select>
               <input
                 className="form-control-sm"
@@ -428,7 +636,9 @@ export default function Leads({ setTab }) {
             </div>
           </div>
           <DataTable
-            columns={userColumns}
+            columns={
+              user.role === "Sale" ? userColumnsForSale : userColumnsForAdmin
+            }
             data={fillArrayWithEmptyRows(filteredUsers, 10)}
             highlightOnHover
             pointerOnHover
