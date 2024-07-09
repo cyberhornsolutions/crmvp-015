@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { db } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { Dropdown, ProgressBar } from "react-bootstrap";
@@ -45,6 +45,9 @@ export default function Leads({ setTab }) {
   const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [showPlayersColumns, setShowPlayersColumns] = useState({});
   const [showDealsColumns, setShowDealsColumns] = useState({});
+  const [isHidden, setIsHidden] = useState(false);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   const dispatch = useDispatch();
   const progressBarConfig = {
     New: { variant: "success", now: 25 },
@@ -586,7 +589,7 @@ export default function Leads({ setTab }) {
   return (
     <>
       <div id="leads" className="active">
-        <div id="leads-div">
+        <div id="leads-div" style={{ height: isHidden ? "98%" : "64%" }}>
           <div className="d-flex align-items-center justify-content-between">
             <div className="input-group input-group-sm gap-1">
               <select
@@ -639,17 +642,21 @@ export default function Leads({ setTab }) {
             columns={
               user.role === "Sale" ? userColumnsForSale : userColumnsForAdmin
             }
-            data={fillArrayWithEmptyRows(filteredUsers, 10)}
+            data={
+              isHidden
+                ? fillArrayWithEmptyRows(filteredUsers, 15)
+                : fillArrayWithEmptyRows(filteredUsers, 10)
+            }
             highlightOnHover
             pointerOnHover
             pagination
             paginationComponentOptions={{
-              noRowsPerPage: 1,
+              noRowsPerPage: true,
               // rowsPerPageText: "ok",
               // rangeSeparatorText: "ok"
             }}
             paginationTotalRows={players.length}
-            paginationPerPage={10}
+            paginationPerPage={isHidden ? 15 : 10}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             conditionalRowStyles={conditionalRowStyles}
             onRowClicked={(row) => row && dispatch(setSelectedUser(row))}
@@ -658,8 +665,8 @@ export default function Leads({ setTab }) {
               pagination: {
                 style: {
                   fontSize: "1rem",
-                  minHeight: 28,
-                  height: 28,
+                  minHeight: 32,
+                  height: 32,
                 },
               },
               headCells: {
@@ -670,8 +677,8 @@ export default function Leads({ setTab }) {
               rows: {
                 style: {
                   fontSize: "1rem",
-                  minHeight: 36,
-                  height: 36,
+                  minHeight: 32,
+                  height: 32,
                 },
               },
             }}
@@ -682,10 +689,33 @@ export default function Leads({ setTab }) {
             // }}
           />
         </div>
-        <div id="lead-transactions">
-          <div className="d-flex gap-3">
-            <h6 className="m-0">Deals</h6>
-            <h6 className="m-0">{selectedUser?.id}</h6>
+        <div
+          id="lead-transactions"
+          style={{
+            height: isHidden ? "" : "36%",
+          }}
+        >
+          <div className="d-flex items-center justify-between">
+            <h6
+              className="m-0"
+              style={{ visibility: isHidden ? "hidden" : "visible" }}
+            >
+              Deals
+            </h6>
+            <h6
+              className="m-0"
+              style={{ visibility: isHidden ? "hidden" : "visible" }}
+            >
+              {selectedUser?.id}
+            </h6>
+            <button
+              className="btn btn-secondary btn-sm px-4"
+              onClick={() => {
+                setIsHidden(!isHidden);
+              }}
+            >
+              {isHidden ? "Show deals" : "Hide deals"}
+            </button>
           </div>
           <DataTable
             columns={dealsColumns({
@@ -704,14 +734,20 @@ export default function Leads({ setTab }) {
             highlightOnHover
             pointerOnHover
             onRowClicked={(row) => row && setSelectedOrder(row)}
-            onRowDoubleClicked={(row) => setShowNewOrderModal(true)}
+            onRowDoubleClicked={() => setShowNewOrderModal(true)}
             dense
             customStyles={{
+              table: {
+                style: {
+                  display: isHidden ? "none" : "",
+                },
+              },
               pagination: {
                 style: {
                   fontSize: "1rem",
-                  minHeight: 24,
-                  height: 24,
+                  minHeight: 26,
+                  height: 26,
+                  display: isHidden ? "none" : "",
                 },
               },
               headCells: {
@@ -723,7 +759,7 @@ export default function Leads({ setTab }) {
                 style: {
                   fontSize: "1rem",
                   minHeight: "auto !important",
-                  height: 30,
+                  height: 27,
                 },
               },
             }}
