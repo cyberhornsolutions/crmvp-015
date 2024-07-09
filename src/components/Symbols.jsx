@@ -16,6 +16,7 @@ import AddNewGroupModal from "./AddNewGroupModal";
 
 const Symbols = () => {
   const dispatch = useDispatch();
+  const assetGroups = useSelector((state) => state.assetGroups);
   const symbols = useSelector((state) => state.symbols);
   const [tab, setTab] = useState("cryptoTab");
   const [searchText, setSearchText] = useState("");
@@ -42,12 +43,21 @@ const Symbols = () => {
   const crypto = [],
     currencies = [],
     stocks = [],
-    commodities = [];
+    commodities = [],
+    otherGroups = [];
   filteredSymbols.forEach((s) => {
     if (s?.settings?.group === "crypto" || !s.settings) crypto.push(s);
     else if (s?.settings?.group === "currencies") currencies.push(s);
     else if (s?.settings?.group === "stocks") stocks.push(s);
     else if (s?.settings?.group === "commodities") commodities.push(s);
+    else {
+      assetGroups.forEach((g) => {
+        if (!otherGroups[g.title]) {
+          otherGroups[g.title] = [];
+        }
+        if (s?.settings?.group === g.title) otherGroups[g.title].push(s);
+      });
+    }
   });
 
   const customStyles = {
@@ -105,6 +115,16 @@ const Symbols = () => {
           >
             Commodities
           </Nav.Link>
+          {assetGroups.length > 0 &&
+            assetGroups.map((g, i) => (
+              <Nav.Link
+                className={tab === g.title && "active"}
+                key={i}
+                onClick={() => setTab(g.title)}
+              >
+                {g.title}
+              </Nav.Link>
+            ))}
           <Nav.Link
             className={tab === "newGroupTab" && "active"}
             onClick={() => {
@@ -222,6 +242,29 @@ const Symbols = () => {
             customStyles={customStyles}
           />
         )}
+        {assetGroups.length > 0 &&
+          assetGroups.map(
+            (g, i) =>
+              tab === g.title && (
+                <DataTable
+                  key={i}
+                  data={fillArrayWithEmptyRows(otherGroups[g.title] || [], 15)}
+                  columns={symbolsColumns({
+                    setSelectedSymbol,
+                    setDeleteDuplicate,
+                    setSymbolSettings,
+                  })}
+                  pagination
+                  paginationPerPage={15}
+                  paginationComponentOptions={{
+                    noRowsPerPage: 1,
+                  }}
+                  paginationTotalRows={otherGroups[g.title]?.length || 0}
+                  highlightOnHover
+                  customStyles={customStyles}
+                />
+              )
+          )}
       </div>
 
       {selectedSymbol && (

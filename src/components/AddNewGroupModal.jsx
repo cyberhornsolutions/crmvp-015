@@ -1,6 +1,30 @@
+import { addNewAssetGroup } from "../utills/firebaseHelpers";
 import { Button, Form, Modal } from "react-bootstrap";
+import { toast } from "react-toastify";
+import { useState } from "react";
 
 const AddNewGroupModal = ({ closeModal }) => {
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({
+    closedMarket: false,
+    title: "",
+  });
+
+  const handleClick = async () => {
+    setLoading(true);
+    if (!formData.title.trim()) {
+      toast.error("Title cannot be empty");
+      return;
+    }
+    try {
+      await addNewAssetGroup(formData);
+      closeModal();
+      toast.success("New asset group added successfully");
+    } catch (e) {
+      console.log("🚀 -> handleClick -> e:", e);
+    }
+  };
+
   return (
     <Modal backdrop="static" centered onHide={closeModal} show size="sm">
       <Modal.Header className="text-center " closeButton>
@@ -14,33 +38,36 @@ const AddNewGroupModal = ({ closeModal }) => {
             </Form.Label>
             <div className="col">
               <Form.Control
-                disabled
                 id="title"
                 name="title"
+                onChange={(e) => {
+                  setLoading(false);
+                  setFormData({
+                    ...formData,
+                    title: e.target.value,
+                  });
+                }}
                 placeholder="Title"
                 required
                 type="text"
+                value={formData.title}
               />
             </div>
           </Form.Group>
-          <Form.Group className="row align-items-center mb-2">
-            <Form.Label className="col-4" htmlFor="market-open">
-              Market open
-            </Form.Label>
-            <div className="col">
-              <Form.Control
-                disabled
-                id="market-open"
-                type="text"
-                value="Mon-Fri: 9AM-23PM"
-              />
-            </div>
-          </Form.Group>
-          <Form.Group className="d-flex align-items-center gap-3 pt-2">
+          <Form.Group className="d-flex align-items-center gap-2 ml-8">
             <Form.Label className="mb-0" htmlFor="closed-trading">
               Closed market trading
             </Form.Label>
-            <Form.Check checked id="closed-trading" />
+            <Form.Check
+              checked={formData.closedMarket}
+              id="closed-trading"
+              onChange={(e) => {
+                setFormData({
+                  ...formData,
+                  closedMarket: e.target.checked,
+                });
+              }}
+            />
           </Form.Group>
         </Form>
       </Modal.Body>
@@ -51,15 +78,16 @@ const AddNewGroupModal = ({ closeModal }) => {
           size="sm"
           variant="secondary"
         >
-          No
+          Cancel
         </Button>
         <Button
           className="px-3"
-          onClick={closeModal}
+          disabled={loading}
+          onClick={handleClick}
           size="sm"
           variant="danger"
         >
-          Yes
+          Add
         </Button>
       </Modal.Footer>
     </Modal>

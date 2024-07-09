@@ -7,8 +7,10 @@ import {
   updateSymbolAndPriceHistory,
 } from "../utills/firebaseHelpers";
 import moment from "moment";
+import { useSelector } from "react-redux";
 
 const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
+  const assetGroups = useSelector((state) => state.assetGroups);
   const symbolSettings = selectedSymbol.settings || {};
   const [title, setTitle] = useState(selectedSymbol?.symbol);
   const [price, setPrice] = useState(selectedSymbol?.price);
@@ -84,6 +86,12 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
       setLoading(false);
     }
   };
+
+  function checkClosedMarketStatus(t) {
+    const group = assetGroups.find((g) => g.title === t);
+    if (!group) return false;
+    return group.closedMarket;
+  }
 
   return (
     <>
@@ -231,7 +239,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                   />
                 </div>
               </Form.Group>
-              {symbolSettings?.group === "commodities" && (
+              {(symbolSettings?.group === "commodities" ||
+                checkClosedMarketStatus(symbolSettings?.group)) && (
                 <Form.Group className="row align-items-center mb-2">
                   <Form.Label htmlFor="market-open" className="col-4">
                     Market open
@@ -275,7 +284,7 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     id="group"
                     name="group"
                     placeholder="Group"
-                    disabled={!selectedSymbol.duplicate}
+                    disabled={!(assetGroups.length > 0)}
                     required
                     value={settings.group}
                     onChange={handleChange}
@@ -284,6 +293,12 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                     <option value="crypto">Crypto</option>
                     <option value="stocks">Stocks</option>
                     <option value="commodities">Commodities</option>
+                    {assetGroups.length > 0 &&
+                      assetGroups.map((g, i) => (
+                        <option key={i} value={g.title}>
+                          {g.title}
+                        </option>
+                      ))}
                   </Form.Select>
                 </div>
               </Form.Group>
@@ -419,7 +434,8 @@ const SymbolSettings = ({ selectedSymbol, setSelectedSymbol }) => {
                   />
                 </div>
               </Form.Group>
-              {symbolSettings?.group === "commodities" && (
+              {(symbolSettings?.group === "commodities" ||
+                checkClosedMarketStatus(symbolSettings?.group)) && (
                 <>
                   <Form.Group className="row align-items-center mb-2">
                     <Form.Label htmlFor="lot" className="col-4 m-0">

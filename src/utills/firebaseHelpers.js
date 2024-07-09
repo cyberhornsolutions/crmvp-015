@@ -623,3 +623,37 @@ export const getBlockedIPs = async () => {
     console.log("Error while getting blocked ips");
   }
 };
+
+export const addNewAssetGroup = async (d) => {
+  const assetGroupsRef = collection(db, "assetGroups");
+  await addDoc(assetGroupsRef, {
+    ...d,
+    createdAt: serverTimestamp(),
+  });
+};
+
+export const getAssetGroups = (setState) => {
+  try {
+    const assetGroupsRef = collection(db, "assetGroups");
+    const unsubscribe = onSnapshot(
+      assetGroupsRef,
+      (snapshot) => {
+        const assetGroupsData = [];
+        snapshot.forEach((doc) => {
+          const docData = doc.data();
+          assetGroupsData.push({
+            id: doc.id,
+            ...docData,
+          });
+        });
+        setState(assetGroupsData);
+      },
+      (error) => {
+        console.error("Error fetching asset groups data: ", error);
+      }
+    );
+    return unsubscribe;
+  } catch (error) {
+    console.error("Error: ", error);
+  }
+};
