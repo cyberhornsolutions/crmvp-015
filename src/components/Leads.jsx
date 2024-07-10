@@ -639,14 +639,11 @@ export default function Leads({ setTab }) {
             </div>
           </div>
           <DataTable
+            key={isHidden}
             columns={
               user.role === "Sale" ? userColumnsForSale : userColumnsForAdmin
             }
-            data={
-              isHidden
-                ? fillArrayWithEmptyRows(filteredUsers, 15)
-                : fillArrayWithEmptyRows(filteredUsers, 10)
-            }
+            data={fillArrayWithEmptyRows(filteredUsers, isHidden ? 17 : 10)}
             highlightOnHover
             pointerOnHover
             pagination
@@ -656,7 +653,7 @@ export default function Leads({ setTab }) {
               // rangeSeparatorText: "ok"
             }}
             paginationTotalRows={players.length}
-            paginationPerPage={isHidden ? 15 : 10}
+            paginationPerPage={isHidden ? 17 : 10}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             conditionalRowStyles={conditionalRowStyles}
             onRowClicked={(row) => row && dispatch(setSelectedUser(row))}
