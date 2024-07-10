@@ -973,3 +973,13 @@ th {
   padding: 0.5rem 1rem;
   width: 24rem;
 }
+
+#resize-bar {
+  background-color: var(--main-elc2);
+  border-radius: 2px;
+  cursor: n-resize;
+  display: block;
+  height: 4px;
+  margin: 0 auto;
+  width: 10%;
+}

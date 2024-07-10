@@ -586,6 +586,47 @@ export default function Leads({ setTab }) {
     }
   };
 
+  useEffect(() => {
+    if (isHidden) return;
+    const maxHeightPercentage = 96;
+    const minHeightPercentage = 64;
+    const leadsDiv = document.getElementById("leads-div");
+    const leadTransactions = document.getElementById("lead-transactions");
+    const resizeBar = document.getElementById("resize-bar");
+    const handleMouseDown = (e) => {
+      e.preventDefault();
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    };
+    const handleMouseMove = (e) => {
+      const windowHeight = window.innerHeight;
+      let currentHeightPercentage = (e.clientY / windowHeight) * 100;
+      currentHeightPercentage = Math.min(
+        currentHeightPercentage,
+        maxHeightPercentage
+      );
+      currentHeightPercentage = Math.max(
+        currentHeightPercentage,
+        minHeightPercentage
+      );
+      leadsDiv.style.height = `${currentHeightPercentage}%`;
+      leadTransactions.style.height = `${100 - currentHeightPercentage}%`;
+      let rows = 10;
+      if (currentHeightPercentage > 73) rows = 12;
+      if (currentHeightPercentage > 80) rows = 13;
+      if (currentHeightPercentage > 92) rows = 16;
+      setRowsPerPage(rows);
+    };
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+    resizeBar.addEventListener("mousedown", handleMouseDown);
+    return () => {
+      resizeBar.removeEventListener("mousedown", handleMouseDown);
+    };
+  }, [isHidden]);
+
   return (
     <>
       <div id="leads" className="active">
@@ -620,7 +661,7 @@ export default function Leads({ setTab }) {
                 type="search"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
-                placeholder="Search.."
+                placeholder="Search..."
               />
             </div>
             <div className="show_all d-flex gap-2 flex-wrap flex-sm-nowrap">
@@ -639,11 +680,11 @@ export default function Leads({ setTab }) {
             </div>
           </div>
           <DataTable
-            key={isHidden}
+            key={rowsPerPage}
             columns={
               user.role === "Sale" ? userColumnsForSale : userColumnsForAdmin
             }
-            data={fillArrayWithEmptyRows(filteredUsers, isHidden ? 17 : 10)}
+            data={fillArrayWithEmptyRows(filteredUsers, rowsPerPage)}
             highlightOnHover
             pointerOnHover
             pagination
@@ -653,7 +694,7 @@ export default function Leads({ setTab }) {
               // rangeSeparatorText: "ok"
             }}
             paginationTotalRows={players.length}
-            paginationPerPage={isHidden ? 17 : 10}
+            paginationPerPage={rowsPerPage}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             conditionalRowStyles={conditionalRowStyles}
             onRowClicked={(row) => row && dispatch(setSelectedUser(row))}
@@ -686,29 +727,26 @@ export default function Leads({ setTab }) {
             // }}
           />
         </div>
+        {!isHidden && <div id="resize-bar"></div>}
         <div
           id="lead-transactions"
           style={{
-            height: isHidden ? "" : "36%",
+            height: isHidden ? "" : "37%",
           }}
         >
           <div className="d-flex items-center justify-between">
-            <h6
-              className="m-0"
+            <div
+              className="d-flex gap-4"
               style={{ visibility: isHidden ? "hidden" : "visible" }}
             >
-              Deals
-            </h6>
-            <h6
-              className="m-0"
-              style={{ visibility: isHidden ? "hidden" : "visible" }}
-            >
-              {selectedUser?.id}
-            </h6>
+              <h6 className="m-0">Deals</h6>
+              <h6 className="m-0">{selectedUser?.id}</h6>
+            </div>
             <button
               className="btn btn-secondary btn-sm px-4"
               onClick={() => {
                 setIsHidden(!isHidden);
+                isHidden ? setRowsPerPage(10) : setRowsPerPage(17);
               }}
             >
               {isHidden ? "Show deals" : "Hide deals"}
