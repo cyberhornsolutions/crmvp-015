@@ -31,7 +31,12 @@ const AddNewGroupModal = ({ closeModal }) => {
         Add new group
       </Modal.Header>
       <Modal.Body className="border-0 pb-0">
-        <Form className="row row-gap-3" onSubmit={closeModal}>
+        <Form
+          className="row row-gap-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
           <Form.Group className="row align-items-center mb-2">
             <Form.Label className="col-4" htmlFor="title">
               Title

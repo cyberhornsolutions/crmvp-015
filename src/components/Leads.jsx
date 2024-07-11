@@ -390,9 +390,6 @@ export default function Leads({ setTab }) {
         ) : (
           ""
         ),
-      sortable: false,
-      compact: true,
-      width: "80px",
       omit: !showPlayersColumns.Group,
     },
     {
@@ -410,23 +407,17 @@ export default function Leads({ setTab }) {
         ) : (
           ""
         ),
-      sortable: false,
-      compact: true,
-      width: "60px",
       omit: !showPlayersColumns.Account,
     },
     {
       name: "Name",
       cell: (row) => row && `${row?.name} ${row?.surname}`,
-      sortable: true,
-      sortFunction: (a, b) => (a.name > b.name ? 1 : -1),
       omit: !showPlayersColumns.Name,
+      width: "200px",
     },
     {
       name: "Leverage",
       cell: (row) => row?.settings?.leverage,
-      sortable: true,
-      sortFunction: (a, b) => (a.name > b.name ? 1 : -1),
       omit: !showPlayersColumns.Leverage,
     },
 
@@ -461,6 +452,7 @@ export default function Leads({ setTab }) {
         return +parseFloat(diff).toFixed(2);
       },
       omit: !showPlayersColumns["Deposited-Withdrawn"],
+      width: "145px",
     },
     {
       name: "Orders",
@@ -493,6 +485,7 @@ export default function Leads({ setTab }) {
       name: "Bonuses Used",
       selector: (row) => row?.account?.bonusSpent,
       omit: !showPlayersColumns["Bonuses Used"],
+      width: "110px",
     },
     {
       name: "Profit",
