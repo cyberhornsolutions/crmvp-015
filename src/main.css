@@ -353,7 +353,7 @@ td:hover {
 /* LEADS TAB */
 #leads {
   height: 100%;
-  padding: 0 10px;
+  padding: 0 4px;
 }
 /* Updated Modal Styling with Dark Grey Background Opacity */
 .modal-style-edit .modal-dialog-centered {
@@ -445,17 +445,15 @@ td:hover {
   border: 2px solid white;
 }
 #leads-div {
+  border-radius: 4px;
   overflow-y: auto;
-  border-radius: 5px;
-  height: 66%;
 }
 #leads-div .show_all button {
   width: 120px !important;
   border: 1px solid lightgray;
 }
 #lead-transactions {
-  border-radius: 5px;
-  max-height: 35%;
+  border-radius: 4px;
   overflow-y: auto;
 }
 #lead-transactions-header {
@@ -974,4 +972,14 @@ th {
   overflow: auto;
   padding: 0.5rem 1rem;
   width: 24rem;
+}
+
+#resize-bar {
+  background-color: var(--main-elc2);
+  border-radius: 2px;
+  cursor: n-resize;
+  display: block;
+  height: 4px;
+  margin: 0 auto;
+  width: 10%;
 }
