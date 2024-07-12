@@ -19,8 +19,9 @@ import { setSelectedUser } from "../redux/slicer/userSlice";
 
 const NewOrder = ({ onClose, selectedOrder }) => {
   const dispatch = useDispatch();
-  const selectedUser = useSelector((state) => state.user.selectedUser);
+  const assetGroups = useSelector((state) => state.assetGroups);
   const orders = useSelector((state) => state.orders);
+  const selectedUser = useSelector((state) => state.user.selectedUser);
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState({
     volume: 0,
@@ -142,6 +143,12 @@ const NewOrder = ({ onClose, selectedOrder }) => {
         +order.volume * lot * (order.tp - selectedSymbol.price) - symbolFee;
   }
 
+  const checkClosedMarketStatus = (t) => {
+    const group = assetGroups.find((g) => g.title === t);
+    if (!group) return false;
+    return group.closedMarket;
+  };
+
   const placeOrder = async (e, type) => {
     e.preventDefault();
     if (!account) return toast.error("Need an account number to start trading");
@@ -179,12 +186,19 @@ const NewOrder = ({ onClose, selectedOrder }) => {
         ? +order.volume * +lot
         : +order.volume;
 
-    if (group === "commodities" && !closedMarket) {
+    if (
+      (group === "commodities" && !closedMarket) ||
+      (checkClosedMarketStatus(group) && !closedMarket)
+    ) {
       const today = moment().utc();
       const weekDay = today.weekday();
       const hour = today.hour();
       if (weekDay == 0 || weekDay == 6 || hour < 9 || hour >= 23) {
-        return toast.error("Commodities Market open on Mon-Fri: 9AM-23PM");
+        return toast.error(
+          `${
+            group === "commodities" ? "Commodities" : group
+          } Market open on Mon-Fri: 9AM-23PM`
+        );
       }
     }
 
