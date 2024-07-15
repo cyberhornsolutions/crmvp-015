@@ -160,6 +160,29 @@ export default function Leads({ setTab }) {
       !o.enableOpenPrice
   );
 
+  const getKeyValue = (r, k) => {
+    return String(k.split(".").reduce((sr, sk) => sr && sr[sk], r)) || "";
+  };
+
+  const isRowEmpty = (r) => {
+    return Object.values(r).every((value) => value === "");
+  };
+
+  const sortFunction = (key) => (rowA, rowB) => {
+    const a = getKeyValue(rowA, key).toLowerCase();
+    const b = getKeyValue(rowB, key).toLowerCase();
+    const isRowAEmpty = isRowEmpty(rowA);
+    const isRowBEmpty = isRowEmpty(rowB);
+    if (isRowAEmpty || isRowBEmpty) return 0;
+    if (a > b) {
+      return 1;
+    } else if (a < b) {
+      return -1;
+    } else {
+      return 0;
+    }
+  };
+
   let userColumnsForSale = [
     {
       name: "Account",
@@ -208,14 +231,14 @@ export default function Leads({ setTab }) {
       name: "Name",
       cell: (row) => row.name,
       sortable: true,
-      sortFunction: (a, b) => (a.name > b.name ? 1 : -1),
+      sortFunction: sortFunction("name"),
       omit: !showPlayersColumns.Name,
     },
     {
       name: "Surname",
       cell: (row) => row.surname,
       sortable: true,
-      sortFunction: (a, b) => (a.surname > b.surname ? 1 : -1),
+      sortFunction: sortFunction("surname"),
       omit: !showPlayersColumns.Surname,
     },
     {
@@ -260,20 +283,7 @@ export default function Leads({ setTab }) {
       name: "Email",
       selector: (row) => row.email,
       sortable: true,
-      sortFunction: (rowA, rowB) => {
-        const a = rowA.email;
-        const b = rowB.email;
-
-        if (a > b) {
-          return 1;
-        }
-
-        if (b > a) {
-          return -1;
-        }
-
-        return 0;
-      },
+      sortFunction: sortFunction("email"),
       omit: !showPlayersColumns.Email,
     },
     {
@@ -390,6 +400,8 @@ export default function Leads({ setTab }) {
         ) : (
           ""
         ),
+      sortable: true,
+      sortFunction: sortFunction("account.account_type"),
       omit: !showPlayersColumns.Group,
     },
     {
@@ -407,17 +419,23 @@ export default function Leads({ setTab }) {
         ) : (
           ""
         ),
+      sortable: true,
+      sortFunction: sortFunction("account.account_no"),
       omit: !showPlayersColumns.Account,
     },
     {
       name: "Name",
       cell: (row) => row && `${row?.name} ${row?.surname}`,
+      sortable: true,
+      sortFunction: sortFunction("name"),
       omit: !showPlayersColumns.Name,
       width: "200px",
     },
     {
       name: "Leverage",
       cell: (row) => row?.settings?.leverage,
+      sortable: true,
+      sortFunction: sortFunction("settings.leverage"),
       omit: !showPlayersColumns.Leverage,
     },
 
@@ -440,6 +458,8 @@ export default function Leads({ setTab }) {
     {
       name: "Bonuses",
       selector: (row) => row?.account?.bonus,
+      sortable: true,
+      sortFunction: sortFunction("account.bonus"),
       omit: !showPlayersColumns.Bonuses,
     },
     {
@@ -493,11 +513,15 @@ export default function Leads({ setTab }) {
         if (!row || !row?.account) return;
         return +parseFloat(row?.account?.activeOrdersProfit).toFixed(2);
       },
+      sortable: true,
+      sortFunction: sortFunction("account.activeOrdersProfit"),
       omit: !showPlayersColumns.Profit,
     },
     {
       name: "Margin",
       selector: (row) => row?.account?.totalMargin,
+      sortable: true,
+      sortFunction: sortFunction("account.totalMargin"),
       omit: !showPlayersColumns.Margin,
     },
     {
