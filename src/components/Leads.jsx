@@ -35,6 +35,7 @@ export default function Leads({ setTab }) {
   const columns = useSelector((state) => state.columns);
   const [searchBy, setSearchBy] = useState("");
   const [searchText, setSearchText] = useState("");
+  const [selectedManager, setSelectedManager] = useState("");
   const [selectedOrder, setSelectedOrder] = useState();
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [showEditOrderModal, setShowEditOrderModal] = useState(false);
@@ -69,11 +70,19 @@ export default function Leads({ setTab }) {
     dispatch(setSymbolsState(symbolsData));
   }, []);
 
+  const filterPlayersByManager = (s, m, p) => {
+    const manager = m.find((obj) => obj.username === s);
+    const id = manager.id;
+    return p.filter((obj) => obj.manager === id);
+  };
+
   let filteredUsers = isOnline
     ? players.filter((el) => el.onlineStatus == true)
     : players;
   if (searchText)
     filteredUsers = filterSearchObjects(searchText, filteredUsers);
+  if (selectedManager)
+    filteredUsers = filterPlayersByManager(selectedManager, managers, players);
   filteredUsers = filteredUsers
     .map((player) =>
       player?.accounts?.length
@@ -86,6 +95,10 @@ export default function Leads({ setTab }) {
         : { ...player, userId: player.id }
     )
     .flat();
+
+  useEffect(() => {
+    if (searchBy !== "Manager") setSelectedManager("");
+  }, [searchBy]);
 
   useEffect(() => {
     if (!symbols.length) getAllSymbols(setSymbols);
@@ -673,13 +686,30 @@ export default function Leads({ setTab }) {
                       </option>
                     ))}
               </select>
-              <input
-                className="form-control-sm"
-                type="search"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder="Search..."
-              />
+              {searchBy === "Manager" ? (
+                <select
+                  className="input-group-text"
+                  value={selectedManager}
+                  onChange={(e) => setSelectedManager(e.target.value)}
+                >
+                  <option className="d-none" disabled value="">
+                    All
+                  </option>
+                  {managers.map(({ username }, i) => (
+                    <option key={i} className="dropdown-item">
+                      {username}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  className="form-control-sm"
+                  type="search"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  placeholder="Search..."
+                />
+              )}
             </div>
             <div className="show_all d-flex gap-2 flex-wrap flex-sm-nowrap">
               <button
