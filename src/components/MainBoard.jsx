@@ -317,11 +317,11 @@ export default function MainBoard() {
     fileStateSetter((prevFiles) => [...prevFiles, ...fileArray]);
   };
 
-  const progressBarConfig = {
-    New: { variant: "success", now: 25 },
-    InProgress: { variant: "info", now: 50 },
-    Confirmed: { variant: "warning", now: 75 },
-    Closed: { variant: "danger", now: 100 },
+  const statuses = useSelector((state) => state.statuses);
+
+  const getStatusColor = (id) => {
+    const status = statuses.find((s) => s.id === id);
+    return status ? status.color : "";
   };
 
   const getSelectedUserData = () => {
@@ -539,9 +539,8 @@ export default function MainBoard() {
       cell: (row) =>
         row && (
           <ProgressBar
-            variant={progressBarConfig[row.status]?.variant}
-            now={progressBarConfig[row.status]?.now}
             className="progressbar"
+            style={{ background: `${getStatusColor(row.status)}` }}
           />
         ),
       sortable: false,

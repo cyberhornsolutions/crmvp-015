@@ -14,6 +14,9 @@ import {
   updateManager,
   updateBlockedIp,
   addBlockedIp,
+  fetchStatuses,
+  addStatus,
+  updateStatus,
 } from "../utills/firebaseHelpers";
 import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,6 +27,8 @@ import CreateTeamModal from "./CreateTeamModal";
 import CreatePlayerModal from "./CreatePlayerModal";
 import SelectColumnsModal from "./SelectColumnsModal";
 import ChangeManagerPasswordModal from "./ChangeManagerPasswordModal";
+import statusColumns from "./columns/statusColumns";
+import { setStatusesState } from "../redux/slicer/statusesSlicer";
 
 export default function Users() {
   const dispatch = useDispatch();
@@ -41,6 +46,7 @@ export default function Users() {
   const players = useSelector((state) => state.players);
   const ips = useSelector((state) => state.ips);
   const columns = useSelector((state) => state.columns);
+  const statuses = useSelector((state) => state.statuses);
 
   const playersOnlineCount = players.filter((el) => el.onlineStatus).length;
   const managersOnlineCount = managers.filter((m) => m.onlineStatus).length;
@@ -53,6 +59,7 @@ export default function Users() {
   const [showRepeatPasswordModal, setShowRepeatPasswordModal] = useState(false);
   const [managerInfo, setManagerInfo] = useState({});
   const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
+  const [processedStatuses, setProcessedStatuses] = useState([]);
 
   const [user, setUser] = useState({
     name: "",
@@ -75,6 +82,20 @@ export default function Users() {
 
   useEffect(() => {
     if (!ips.length) fetchBlockedIps(setIps);
+  }, []);
+
+  const setStatuses = useCallback((data) => {
+    if (data.length < 10)
+      for (let i = data.length; i < 10; i++)
+        data.push({ id: i + 1, status: "", isActive: false });
+    dispatch(setStatusesState(data));
+  }, []);
+
+  useEffect(() => {
+    const unsubStatuses = fetchStatuses(setStatuses);
+    return () => {
+      unsubStatuses();
+    };
   }, []);
 
   const customStyles = {
@@ -112,6 +133,60 @@ export default function Users() {
         return ip.id === id ? { ...ip, [key]: value } : ip;
       })
     );
+  };
+
+  const handleChangeStatus = (id, k, v) => {
+    setProcessedStatuses((p) =>
+      p.map((status) => {
+        if (k === "isEdit" && v) delete status.isEdit;
+        return status.id === id ? { ...status, [k]: v } : status;
+      })
+    );
+  };
+
+  const handleSaveStatus = async (status) => {
+    if (!status && selectedRow)
+      status = processedStatuses.find(({ id }) => id === selectedRow.id);
+    const statusBefore = statuses.find(({ id }) => id === status.id);
+    const unChanged = Object.keys(statusBefore).every(
+      (key) => statusBefore[key] === status[key]
+    );
+    if (unChanged) {
+      handleChangeStatus(status.id, "isEdit", false);
+      return;
+    }
+    if (!status.status) return toast.error("Status value cannot be empty");
+    try {
+      delete status.isEdit;
+      if (status.id < 10) {
+        delete status.id;
+        await addStatus(status);
+        toast.success("Status added successfully");
+      } else {
+        await updateStatus(status.id, status);
+        toast.success("Status updated successfully");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating status");
+    }
+  };
+
+  const toggleDisableStatus = async (id, isActive) => {
+    if (id < 10) return;
+    try {
+      await updateStatus(id, {
+        isActive: isActive,
+      });
+      toast.success(
+        isActive
+          ? "Status activated successfully"
+          : "Status deactivated successfully"
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating status");
+    }
   };
 
   const handleChangeManager = (id, key, value) =>
@@ -251,6 +326,11 @@ export default function Users() {
   }, [ips, tab]);
 
   useEffect(() => {
+    selectedRowRef.current = null;
+    setProcessedStatuses(statuses);
+  }, [statuses, tab]);
+
+  useEffect(() => {
     if (!selectedRowRef.current || tab !== "IP Monitor") return;
     const handleOutsideClick = (e) => {
       if (selectedRowRef.current.contains(e.target)) return;
@@ -324,9 +404,15 @@ export default function Users() {
               >
                 Teams
               </Nav.Link>
+              <Nav.Link
+                className={tab === "Statuses" ? "active" : ""}
+                onClick={() => setTab("Statuses")}
+              >
+                Statuses
+              </Nav.Link>
             </Nav>
           </Navbar>
-          {tab === "IP Monitor" ? (
+          {tab === "IP Monitor" || tab === "Statuses" ? (
             <div className="d-flex justify-content-between font-bold px-3 my-2">
               <span className="text-bold-500">
                 Players online: {playersOnlineCount}
@@ -430,6 +516,30 @@ export default function Users() {
                 paginationComponentOptions={{
                   noRowsPerPage: 1,
                 }}
+                dense
+                customStyles={customStyles}
+                highlightOnHover
+                pointerOnHover
+                responsive
+              />
+            )}
+            {tab === "Statuses" && (
+              <DataTable
+                columns={statusColumns({
+                  handleChangeStatus,
+                  handleSaveStatus,
+                  selectedRowRef,
+                  setSelectedRow,
+                  toggleDisableStatus,
+                })}
+                data={fillArrayWithEmptyRows(processedStatuses, 10)}
+                // pagination
+                paginationTotalRows={statuses.length}
+                // paginationPerPage={10}
+                paginationComponentOptions={{
+                  noRowsPerPage: 1,
+                }}
+                // paginationRowsPerPageOptions={[5, 10, 20, 50]}
                 dense
                 customStyles={customStyles}
                 highlightOnHover

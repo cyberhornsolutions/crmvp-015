@@ -19,6 +19,7 @@ import {
   getCommentsByManager,
   fetchComments,
   getAssetGroups,
+  fetchStatuses,
 } from "../utills/firebaseHelpers";
 import { setOrdersState } from "../redux/slicer/orderSlicer";
 import { setDepositsState } from "../redux/slicer/transactionSlicer";
@@ -29,6 +30,7 @@ import { setManagersState } from "../redux/slicer/managersSlice";
 import { setTeamsState } from "../redux/slicer/teamsSlice";
 import { setCommentsState } from "../redux/slicer/commentsSlicer";
 import { setAssetGroupsState } from "../redux/slicer/assetGroupsSlicer";
+import { setStatusesState } from "../redux/slicer/statusesSlicer";
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -74,6 +76,10 @@ export default function Home() {
     dispatch(setAssetGroupsState(data));
   }, []);
 
+  const setStatuses = useCallback((data) => {
+    dispatch(setStatusesState(data));
+  }, []);
+
   useEffect(() => {
     const unsubDeposits = getAllDeposits(setDeposits);
     const unsubColumns = getColumnsById(user.id, setColumns);
@@ -85,6 +91,8 @@ export default function Home() {
         ? fetchComments(setComments)
         : getCommentsByManager(user.id, setComments);
     const unsubAssetGrops = getAssetGroups(setAssetGroups);
+    const unsubStatuses = fetchStatuses(setStatuses);
+
     return () => {
       unsubDeposits();
       unsubColumns();
@@ -93,6 +101,7 @@ export default function Home() {
       unsubTeams();
       unsubComments();
       unsubAssetGrops();
+      unsubStatuses();
     };
   }, []);
 
