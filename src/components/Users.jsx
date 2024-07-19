@@ -1,21 +1,20 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Nav, Navbar, Form } from "react-bootstrap";
-import { auth, db } from "../firebase";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Nav, Navbar } from "react-bootstrap";
+import { serverTimestamp } from "firebase/firestore";
 import DataTable from "react-data-table-component";
 import { toast } from "react-toastify";
 import managerColumns from "./columns/managerColumns";
 import ipMonitorsColumns from "./columns/ipMonitorColumns";
 import teamsColumns from "./columns/teamsColumns";
 import {
-  addTeam,
+  addBlockedIp,
+  addNewAssetGroup,
+  addStatus,
   fetchBlockedIps,
   getManagerByUsername,
-  updateManager,
+  updateAssetGroups,
   updateBlockedIp,
-  addBlockedIp,
-  fetchStatuses,
-  addStatus,
+  updateManager,
   updateStatus,
 } from "../utills/firebaseHelpers";
 import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
@@ -28,7 +27,7 @@ import CreatePlayerModal from "./CreatePlayerModal";
 import SelectColumnsModal from "./SelectColumnsModal";
 import ChangeManagerPasswordModal from "./ChangeManagerPasswordModal";
 import statusColumns from "./columns/statusColumns";
-import { setStatusesState } from "../redux/slicer/statusesSlicer";
+import assetGroupsColumns from "./columns/assetGroupsColumns";
 
 export default function Users() {
   const dispatch = useDispatch();
@@ -47,6 +46,7 @@ export default function Users() {
   const ips = useSelector((state) => state.ips);
   const columns = useSelector((state) => state.columns);
   const statuses = useSelector((state) => state.statuses);
+  const assetGroups = useSelector((state) => state.assetGroups);
 
   const playersOnlineCount = players.filter((el) => el.onlineStatus).length;
   const managersOnlineCount = managers.filter((m) => m.onlineStatus).length;
@@ -58,16 +58,16 @@ export default function Users() {
   const [showManagerColumnsModal, setShowManagerColumnsModal] = useState(false);
   const [showRepeatPasswordModal, setShowRepeatPasswordModal] = useState(false);
   const [managerInfo, setManagerInfo] = useState({});
-  const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
   const [processedStatuses, setProcessedStatuses] = useState([]);
+  const [processedAssetGroups, setProcessedAssetGroups] = useState([]);
 
+  const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
   const [user, setUser] = useState({
     name: "",
     username: "",
     role: "",
     team: "",
   });
-
   const [team, setTeam] = useState({
     name: "",
     desk: "",
@@ -82,20 +82,6 @@ export default function Users() {
 
   useEffect(() => {
     if (!ips.length) fetchBlockedIps(setIps);
-  }, []);
-
-  const setStatuses = useCallback((data) => {
-    if (data.length < 10)
-      for (let i = data.length; i < 10; i++)
-        data.push({ id: i + 1, status: "", isActive: false });
-    dispatch(setStatusesState(data));
-  }, []);
-
-  useEffect(() => {
-    const unsubStatuses = fetchStatuses(setStatuses);
-    return () => {
-      unsubStatuses();
-    };
   }, []);
 
   const customStyles = {
@@ -120,9 +106,9 @@ export default function Users() {
     },
   };
 
+  const handleIsPasswordConfirmed = () => setIsPasswordConfirmed(true);
   const handleChangeUser = (e) =>
     setUser((p) => ({ ...p, [e.target.name]: e.target.value }));
-
   const handleChangeTeam = (e) =>
     setTeam((p) => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -186,6 +172,62 @@ export default function Users() {
     } catch (error) {
       console.error(error);
       toast.error("Error updating status");
+    }
+  };
+
+  const handleChangeAssetGroups = (id, k, v) => {
+    setProcessedAssetGroups((p) =>
+      p.map((group) => {
+        if (k === "isEdit" && v) delete group.isEdit;
+        return group.id === id ? { ...group, [k]: v } : group;
+      })
+    );
+  };
+
+  const handleSaveAssetGroups = async (group) => {
+    console.log("🚀 -> handleSaveAssetGroups -> group:", group);
+    if (!group && selectedRow)
+      group = processedAssetGroups.find(({ id }) => id === selectedRow.id);
+    const groupBefore = assetGroups.find(({ id }) => id === group.id);
+    const unChanged = Object.keys(groupBefore).every(
+      (key) => groupBefore[key] === group[key]
+    );
+    if (unChanged) {
+      console.log("🚀 -> handleSaveAssetGroups -> unChanged:", unChanged);
+      handleChangeAssetGroups(group.id, "isEdit", false);
+      return;
+    }
+    if (!group.title) return toast.error("Title value cannot be empty");
+    try {
+      delete group.isEdit;
+      if (group.id < 10) {
+        delete group.id;
+        await addNewAssetGroup(group);
+        toast.success("Asset group added successfully");
+      } else {
+        await updateAssetGroups(group.id, group);
+        toast.success("Asset group updated successfully");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating asset group");
+    }
+  };
+
+  const toggleDisableAssetGroups = async (id, closedMarket) => {
+    if (id < 10) return;
+    try {
+      await updateAssetGroups(id, {
+        closedMarket: closedMarket,
+      });
+      toast.success(
+        closedMarket
+          ? "Closed Market activated successfully"
+          : "Closed Market deactivated successfully"
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating Closed Market");
     }
   };
 
@@ -311,10 +353,6 @@ export default function Users() {
     setSelectedRow();
   };
 
-  const handleIsPasswordConfirmed = () => {
-    setIsPasswordConfirmed(true);
-  };
-
   useEffect(() => {
     setProcessedManagers(
       managers.filter(({ username }) => username !== "admin")
@@ -326,9 +364,24 @@ export default function Users() {
   }, [ips, tab]);
 
   useEffect(() => {
+    if (tab !== "Statuses") return;
+    let data = [...statuses];
+    if (statuses.length < 10)
+      for (let i = statuses.length; i < 10; i++)
+        data.push({ id: i + 1, status: "", isActive: false });
     selectedRowRef.current = null;
-    setProcessedStatuses(statuses);
+    setProcessedStatuses(data);
   }, [statuses, tab]);
+
+  useEffect(() => {
+    if (tab !== "Groups") return;
+    let data = [...assetGroups];
+    if (assetGroups.length < 10)
+      for (let i = assetGroups.length; i < 10; i++)
+        data.push({ id: i + 1, title: "", closedMarket: false });
+    selectedRowRef.current = null;
+    setProcessedAssetGroups(data);
+  }, [assetGroups, tab]);
 
   useEffect(() => {
     if (!selectedRowRef.current || tab !== "IP Monitor") return;
@@ -410,9 +463,15 @@ export default function Users() {
               >
                 Statuses
               </Nav.Link>
+              <Nav.Link
+                className={tab === "Groups" ? "active" : ""}
+                onClick={() => setTab("Groups")}
+              >
+                Groups
+              </Nav.Link>
             </Nav>
           </Navbar>
-          {tab === "IP Monitor" || tab === "Statuses" ? (
+          {tab === "IP Monitor" || tab === "Statuses" || tab === "Groups" ? (
             <div className="d-flex justify-content-between font-bold px-3 my-2">
               <span className="text-bold-500">
                 Players online: {playersOnlineCount}
@@ -535,6 +594,30 @@ export default function Users() {
                 data={fillArrayWithEmptyRows(processedStatuses, 10)}
                 // pagination
                 paginationTotalRows={statuses.length}
+                // paginationPerPage={10}
+                paginationComponentOptions={{
+                  noRowsPerPage: 1,
+                }}
+                // paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                dense
+                customStyles={customStyles}
+                highlightOnHover
+                pointerOnHover
+                responsive
+              />
+            )}
+            {tab === "Groups" && (
+              <DataTable
+                columns={assetGroupsColumns({
+                  handleChangeAssetGroups,
+                  handleSaveAssetGroups,
+                  selectedRowRef,
+                  setSelectedRow,
+                  toggleDisableAssetGroups,
+                })}
+                data={fillArrayWithEmptyRows(processedAssetGroups, 10)}
+                // pagination
+                paginationTotalRows={assetGroups.length}
                 // paginationPerPage={10}
                 paginationComponentOptions={{
                   noRowsPerPage: 1,

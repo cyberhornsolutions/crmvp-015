@@ -35,22 +35,31 @@ import { setStatusesState } from "../redux/slicer/statusesSlicer";
 export default function Home() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
+
   const [tab, setTab] = useState(
     () => localStorage.getItem("TAB") || "Dashboard"
   );
-
   useEffect(() => {
     localStorage.setItem("TAB", tab);
   }, [tab]);
 
-  const setOrders = useCallback((orders) => {
-    dispatch(setOrdersState(orders));
+  const setAssetGroups = useCallback((data) => {
+    dispatch(setAssetGroupsState(data));
+  }, []);
+  const setColumns = useCallback((data) => {
+    dispatch(setColumnsState(data));
+  }, []);
+  const setComments = useCallback((data) => {
+    dispatch(setCommentsState(data));
   }, []);
   const setDeposits = useCallback((data) => {
     dispatch(setDepositsState(data));
   }, []);
-  const setColumns = useCallback((data) => {
-    dispatch(setColumnsState(data));
+  const setManagers = useCallback((data) => {
+    dispatch(setManagersState(data));
+  }, []);
+  const setOrders = useCallback((orders) => {
+    dispatch(setOrdersState(orders));
   }, []);
   const setPlayers = useCallback((players) => {
     if (user.role !== "Admin")
@@ -61,54 +70,40 @@ export default function Home() {
       players.map((p) => p.id)
     );
   }, []);
-  const setManagers = useCallback((data) => {
-    dispatch(setManagersState(data));
+  const setStatuses = useCallback((data) => {
+    dispatch(setStatusesState(data));
   }, []);
   const setTeams = useCallback((data) => {
     dispatch(setTeamsState(data));
   }, []);
 
-  const setComments = useCallback((data) => {
-    dispatch(setCommentsState(data));
-  }, []);
-
-  const setAssetGroups = useCallback((data) => {
-    dispatch(setAssetGroupsState(data));
-  }, []);
-
-  const setStatuses = useCallback((data) => {
-    dispatch(setStatusesState(data));
-  }, []);
-
   useEffect(() => {
-    const unsubDeposits = getAllDeposits(setDeposits);
+    const unsubAssetGrops = getAssetGroups(setAssetGroups);
     const unsubColumns = getColumnsById(user.id, setColumns);
-    const unsubPlayers = fetchPlayers(setPlayers);
-    const unsubMangers = fetchManagers(setManagers);
-    const unsubTeams = fetchTeams(setTeams);
     const unsubComments =
       user.role === "Admin"
         ? fetchComments(setComments)
         : getCommentsByManager(user.id, setComments);
-    const unsubAssetGrops = getAssetGroups(setAssetGroups);
+    const unsubDeposits = getAllDeposits(setDeposits);
+    const unsubMangers = fetchManagers(setManagers);
+    const unsubPlayers = fetchPlayers(setPlayers);
     const unsubStatuses = fetchStatuses(setStatuses);
-
+    const unsubTeams = fetchTeams(setTeams);
     return () => {
-      unsubDeposits();
-      unsubColumns();
-      unsubPlayers();
-      unsubMangers();
-      unsubTeams();
-      unsubComments();
       unsubAssetGrops();
+      unsubColumns();
+      unsubComments();
+      unsubDeposits();
+      unsubMangers();
+      unsubPlayers();
       unsubStatuses();
+      unsubTeams();
     };
   }, []);
 
   return (
     <div id="content">
       <ToastContainer />
-
       <Sidebar tab={tab} setTab={setTab} />
       <div id="main">
         <Header title={tab} />

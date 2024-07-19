@@ -663,6 +663,11 @@ export const getAssetGroups = (setState) => {
   }
 };
 
+export const updateAssetGroups = async (id, payload) => {
+  const docRef = doc(db, "assetGroups", id);
+  return await updateDoc(docRef, payload);
+};
+
 export const fetchStatuses = (setState) => {
   try {
     const q = query(collection(db, "saleStatuses"));
