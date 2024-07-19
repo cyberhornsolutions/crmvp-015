@@ -21,6 +21,7 @@ import columnsSlicer from "./slicer/columnsSlicer";
 import ipsSlicer from "./slicer/ipsSlicer";
 import commentsSlicer from "./slicer/commentsSlicer";
 import assetGroupsSlicer from "./slicer/assetGroupsSlicer";
+import statusesSlicer from "./slicer/statusesSlicer";
 
 export const store = configureStore({
   reducer: {
@@ -36,6 +37,7 @@ export const store = configureStore({
     ips: ipsSlicer,
     comments: commentsSlicer,
     assetGroups: assetGroupsSlicer,
+    statuses: statusesSlicer,
   },
   middleware: getDefaultMiddleware({
     serializableCheck: {

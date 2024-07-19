@@ -16,7 +16,12 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { convertTimestamptToDate, getAskValue, getBidValue } from "./helpers";
+import {
+  convertTimestamptToDate,
+  getAskValue,
+  getBidValue,
+  getRandomColorHex,
+} from "./helpers";
 
 export const getData = async (collectionName) => {
   try {
@@ -656,4 +661,51 @@ export const getAssetGroups = (setState) => {
   } catch (error) {
     console.error("Error: ", error);
   }
+};
+
+export const updateAssetGroups = async (id, payload) => {
+  const docRef = doc(db, "assetGroups", id);
+  return await updateDoc(docRef, payload);
+};
+
+export const fetchStatuses = (setState) => {
+  try {
+    const q = query(collection(db, "saleStatuses"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const statusesData = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        statusesData.push({ ...data, id: doc.id });
+      });
+      setState(statusesData);
+    });
+    return unsubscribe;
+  } catch (error) {
+    console.error("Error fetching statuses: ", error);
+  }
+};
+
+async function isColorHexUnique(colorHex) {
+  const statusesRef = collection(db, "saleStatuses");
+  const colorQuery = query(statusesRef, where("color", "==", colorHex));
+  const querySnapshot = await getDocs(colorQuery);
+  return querySnapshot.empty;
+}
+
+export const addStatus = async (status) => {
+  let colorHex;
+  do {
+    colorHex = getRandomColorHex();
+  } while (!(await isColorHexUnique(colorHex)));
+  return await addDoc(collection(db, "saleStatuses"), {
+    ...status,
+    color: colorHex,
+    createdAt: serverTimestamp(),
+    isActive: true,
+  });
+};
+
+export const updateStatus = async (id, payload) => {
+  const docRef = doc(db, "saleStatuses", id);
+  return await updateDoc(docRef, payload);
 };

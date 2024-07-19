@@ -72,3 +72,14 @@ export function getIPRange(startIP, endIP) {
   }
   return range;
 }
+
+export const getRandomColorHex = () => {
+  const randomChannel = () => Math.floor(Math.random() * 256);
+  const b = randomChannel();
+  const g = randomChannel();
+  const r = randomChannel();
+  const bHex = b.toString(16).padStart(2, "0");
+  const gHex = g.toString(16).padStart(2, "0");
+  const rHex = r.toString(16).padStart(2, "0");
+  return `#${rHex}${gHex}${bHex}`;
+};

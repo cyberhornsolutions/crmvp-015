@@ -48,14 +48,10 @@ export default function Leads({ setTab }) {
   const [showDealsColumns, setShowDealsColumns] = useState({});
   const [isHidden, setIsHidden] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const statuses = useSelector((state) => state.statuses);
 
   const dispatch = useDispatch();
-  const progressBarConfig = {
-    New: { variant: "success", now: 25 },
-    Sale: { variant: "info", now: 50 },
-    Reten: { variant: "warning", now: 75 },
-    VIP: { variant: "danger", now: 100 },
-  };
+
   const handleEditOrder = (row) => {
     setSelectedOrder(row);
     setShowEditOrderModal(true);
@@ -165,6 +161,11 @@ export default function Leads({ setTab }) {
     }
   };
 
+  const getStatusColor = (id) => {
+    const status = statuses.find((s) => s.id === id);
+    return status ? status.color : "";
+  };
+
   const deals = orders.filter(
     (o) =>
       o.userId === selectedUser?.userId &&
@@ -260,11 +261,10 @@ export default function Leads({ setTab }) {
         row && (
           <Dropdown data-bs-theme="light" className="custom-dropdown">
             <Dropdown.Toggle variant="none" id="dropdown-basic">
-              {row.status && progressBarConfig[row.status] && (
+              {row.status && statuses && (
                 <ProgressBar
-                  variant={progressBarConfig[row.status].variant}
-                  now={progressBarConfig[row.status].now}
                   className="progressbar"
+                  style={{ background: `${getStatusColor(row.status)}` }}
                 />
               )}
             </Dropdown.Toggle>
@@ -272,13 +272,13 @@ export default function Leads({ setTab }) {
               className="custom-dropdown-menu"
               data-bs-theme="dark"
             >
-              {Object.keys(progressBarConfig).map((status) => (
+              {statuses.map((s) => (
                 <Dropdown.Item
-                  key={status}
-                  onClick={() => handleDropdownItemClick(status, row.userId)}
-                  className={row.status === status ? "active-status" : ""}
+                  key={s.id}
+                  onClick={() => handleDropdownItemClick(s.id, row.userId)}
+                  className={row.status === s.id ? "active-status" : ""}
                 >
-                  {row.status === status ? <span>&#10004;</span> : " "} {status}
+                  {row.status === s.id ? <span>&#10004;</span> : ""} {s.status}
                 </Dropdown.Item>
               ))}
             </Dropdown.Menu>
