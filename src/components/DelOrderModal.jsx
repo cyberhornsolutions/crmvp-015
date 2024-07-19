@@ -21,6 +21,7 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
   const [type, setType] = useState("Full");
 
   const closedPrice = selectedOrder?.currentPrice;
+  const potentialProfit = selectedOrder?.profit;
 
   const updateOrderStatus = async (orderId, newStatus, newVolume) => {
     const orderRef = doc(db, "orders", orderId);
@@ -239,6 +240,16 @@ const DelOrderModal = ({ onClose, selectedOrder }) => {
           <div className="ps-3 fs-5">
             Current Price:
             <span className="ms-2 text-success">{closedPrice}</span>
+          </div>
+          <div className="ps-3 fs-5">
+            Potential profit:
+            <span
+              className={`ms-2 ${
+                potentialProfit > 0 ? "text-success" : "text-danger"
+              }`}
+            >
+              {potentialProfit}
+            </span>
           </div>
           <div className="w-100 text-center my-2">
             <button
