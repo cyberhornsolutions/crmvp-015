@@ -83,3 +83,37 @@ export const getRandomColorHex = () => {
   const rHex = r.toString(16).padStart(2, "0");
   return `#${rHex}${gHex}${bHex}`;
 };
+
+export const filterCombinedSearch = (data = [], keys = [], search = "") => {
+  // const k = keys.map((key) => key.toLowerCase());
+  // return data.filter((o) =>
+  //   k.length > 0
+  //     ? k.some(
+  //         (k) =>
+  //           o[k] && o[k].toString().toLowerCase().includes(search.toLowerCase())
+  //       )
+  //     : Object.values(o).some(
+  //         (value) =>
+  //           value &&
+  //           value.toString().toLowerCase().includes(search.toLowerCase())
+  //       )
+  // );
+
+  const searchInnerObject = (obj, search) => {
+    if (obj === undefined || obj === null) {
+      return false;
+    }
+    if (typeof obj !== "object") {
+      return obj.toString().toLowerCase().includes(search.toLowerCase());
+    }
+    return Object.values(obj).some((value) => {
+      return searchInnerObject(value, search);
+    });
+  };
+  const lowercaseKeys = keys.map((key) => key.toLowerCase());
+  return data.filter((obj) =>
+    lowercaseKeys.length > 0
+      ? lowercaseKeys.some((key) => searchInnerObject(obj[key], search))
+      : Object.values(obj).some((value) => searchInnerObject(value, search))
+  );
+};

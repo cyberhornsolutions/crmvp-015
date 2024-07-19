@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { db } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
-import { Dropdown, ProgressBar } from "react-bootstrap";
+import { Dropdown, ProgressBar, Button, ButtonGroup } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
@@ -18,6 +18,7 @@ import TradingSettings from "./TradingSettings";
 import {
   convertTimestamptToDate,
   fillArrayWithEmptyRows,
+  filterCombinedSearch,
   filterSearchObjects,
 } from "../utills/helpers";
 import dealsColumns from "./columns/dealsColumns";
@@ -25,30 +26,30 @@ import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import SelectColumnsModal from "./SelectColumnsModal";
 
 export default function Leads({ setTab }) {
-  const user = useSelector((state) => state.user.user);
-  const players = useSelector((state) => state.players);
-  const orders = useSelector((state) => state.orders);
-  const selectedUser = useSelector((state) => state.user.selectedUser);
-  const deposits = useSelector((state) => state.deposits);
-  const symbols = useSelector((state) => state?.symbols);
-  const managers = useSelector((state) => state.managers);
   const columns = useSelector((state) => state.columns);
-  const [searchBy, setSearchBy] = useState("");
+  const deposits = useSelector((state) => state.deposits);
+  const managers = useSelector((state) => state.managers);
+  const orders = useSelector((state) => state.orders);
+  const players = useSelector((state) => state.players);
+  const selectedUser = useSelector((state) => state.user.selectedUser);
+  const statuses = useSelector((state) => state.statuses);
+  const symbols = useSelector((state) => state?.symbols);
+  const user = useSelector((state) => state.user.user);
+  const [isBalanceModal, setIsBalanceModal] = useState(false);
+  const [isDelModalOpen, setIsDelModalOpen] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchText, setSearchText] = useState("");
+  const [selectedFilters, setSelectedFilters] = useState([]);
   const [selectedManager, setSelectedManager] = useState("");
   const [selectedOrder, setSelectedOrder] = useState();
-  const [isDelModalOpen, setIsDelModalOpen] = useState(false);
+  const [showColumnsModal, setShowColumnsModal] = useState(false);
+  const [showDealsColumns, setShowDealsColumns] = useState({});
   const [showEditOrderModal, setShowEditOrderModal] = useState(false);
   const [showNewOrderModal, setShowNewOrderModal] = useState(false);
-  const [isOnline, setIsOnline] = useState(false);
-  const [isBalanceModal, setIsBalanceModal] = useState(false);
-  const [tradingSettingsModal, setTradingSettingsModal] = useState(false);
-  const [showColumnsModal, setShowColumnsModal] = useState(false);
   const [showPlayersColumns, setShowPlayersColumns] = useState({});
-  const [showDealsColumns, setShowDealsColumns] = useState({});
-  const [isHidden, setIsHidden] = useState(false);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const statuses = useSelector((state) => state.statuses);
+  const [tradingSettingsModal, setTradingSettingsModal] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -76,9 +77,14 @@ export default function Leads({ setTab }) {
     ? players.filter((el) => el.onlineStatus == true)
     : players;
   if (searchText)
-    filteredUsers = filterSearchObjects(searchText, filteredUsers);
+    filteredUsers = filterCombinedSearch(
+      filteredUsers,
+      selectedFilters,
+      searchText
+    );
   if (selectedManager)
     filteredUsers = filterPlayersByManager(selectedManager, managers, players);
+  console.log("🚀 -> Leads -> filteredUsers:", filteredUsers);
   filteredUsers = filteredUsers
     .map((player) =>
       player?.accounts?.length
@@ -93,8 +99,8 @@ export default function Leads({ setTab }) {
     .flat();
 
   useEffect(() => {
-    if (searchBy !== "Manager") setSelectedManager("");
-  }, [searchBy]);
+    if (!selectedFilters.includes("Manager")) setSelectedManager("");
+  }, [selectedFilters]);
 
   useEffect(() => {
     if (!symbols.length) getAllSymbols(setSymbols);
@@ -657,36 +663,69 @@ export default function Leads({ setTab }) {
     };
   }, [isHidden]);
 
+  const handleFilterDeselect = (e) => {
+    e.preventDefault();
+    setSelectedFilters(
+      selectedFilters.filter((item) => item !== e.target.name)
+    );
+  };
+  const handleFilterSelect = (e) => {
+    e.preventDefault();
+    if (!selectedFilters.includes(e.target.name)) {
+      setSelectedFilters([...selectedFilters, e.target.name]);
+    }
+  };
+  const isFilterSelected = (f) => {
+    return selectedFilters.includes(f);
+  };
+
   return (
     <>
       <div id="leads" className="active">
         <div id="leads-div" style={{ height: isHidden ? "98%" : "64%" }}>
           <div className="d-flex align-items-center justify-content-between">
             <div className="input-group input-group-sm gap-1">
-              <select
-                className="input-group-text"
-                value={searchBy}
-                onChange={(e) => setSearchBy(e.target.value)}
-              >
-                <option className="d-none" disabled value="">
-                  Search By
-                </option>
-                <option className="dropdown-item" value="All">
-                  All
-                </option>
-                {user.role === "Sale"
-                  ? userColumnsForSale.map(({ name }, i) => (
-                      <option key={i} className="dropdown-item">
-                        {name}
-                      </option>
-                    ))
-                  : userColumnsForAdmin.map(({ name }, i) => (
-                      <option key={i} className="dropdown-item">
-                        {name}
-                      </option>
-                    ))}
-              </select>
-              {searchBy === "Manager" ? (
+              <Dropdown as={ButtonGroup}>
+                <Button variant="secondary btn-sm px-4">Select filters</Button>
+                <Dropdown.Toggle split variant="secondary btn-sm" />
+                <Dropdown.Menu
+                  style={{
+                    height: isHidden ? "" : "302px",
+                    overflow: "auto",
+                  }}
+                >
+                  {user.role === "Sale"
+                    ? userColumnsForSale.map(({ name }, i) => (
+                        <Dropdown.Item
+                          active={isFilterSelected(name)}
+                          key={i}
+                          name={name}
+                          onClick={
+                            isFilterSelected(name)
+                              ? handleFilterDeselect
+                              : handleFilterSelect
+                          }
+                        >
+                          {name}
+                        </Dropdown.Item>
+                      ))
+                    : userColumnsForAdmin.map(({ name }, i) => (
+                        <Dropdown.Item
+                          active={isFilterSelected(name)}
+                          key={i}
+                          name={name}
+                          onClick={
+                            isFilterSelected(name)
+                              ? handleFilterDeselect
+                              : handleFilterSelect
+                          }
+                        >
+                          {name}
+                        </Dropdown.Item>
+                      ))}
+                </Dropdown.Menu>
+              </Dropdown>
+              {selectedFilters.includes("Manager") ? (
                 <select
                   className="input-group-text"
                   value={selectedManager}
@@ -704,10 +743,10 @@ export default function Leads({ setTab }) {
               ) : (
                 <input
                   className="form-control-sm"
-                  type="search"
-                  value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   placeholder="Search..."
+                  type="search"
+                  value={searchText}
                 />
               )}
             </div>
