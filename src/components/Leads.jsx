@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { db } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { Dropdown, ProgressBar, Button, ButtonGroup } from "react-bootstrap";
@@ -19,11 +19,11 @@ import {
   convertTimestamptToDate,
   fillArrayWithEmptyRows,
   filterCombinedSearch,
-  filterSearchObjects,
 } from "../utills/helpers";
 import dealsColumns from "./columns/dealsColumns";
 import { setSymbolsState } from "../redux/slicer/symbolsSlicer";
 import SelectColumnsModal from "./SelectColumnsModal";
+import PlayersActionModal from "./PlayersActionModal";
 
 export default function Leads({ setTab }) {
   const columns = useSelector((state) => state.columns);
@@ -32,6 +32,7 @@ export default function Leads({ setTab }) {
   const orders = useSelector((state) => state.orders);
   const players = useSelector((state) => state.players);
   const selectedUser = useSelector((state) => state.user.selectedUser);
+  const selectedUserRef = useRef(null);
   const statuses = useSelector((state) => state.statuses);
   const symbols = useSelector((state) => state?.symbols);
   const user = useSelector((state) => state.user.user);
@@ -39,6 +40,7 @@ export default function Leads({ setTab }) {
   const [isDelModalOpen, setIsDelModalOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchText, setSearchText] = useState("");
   const [selectedFilters, setSelectedFilters] = useState([]);
@@ -48,6 +50,7 @@ export default function Leads({ setTab }) {
   const [showDealsColumns, setShowDealsColumns] = useState({});
   const [showEditOrderModal, setShowEditOrderModal] = useState(false);
   const [showNewOrderModal, setShowNewOrderModal] = useState(false);
+  const [showPlayersActionModal, setShowPlayersActionModal] = useState(false);
   const [showPlayersColumns, setShowPlayersColumns] = useState({});
   const [tradingSettingsModal, setTradingSettingsModal] = useState(false);
 
@@ -84,7 +87,6 @@ export default function Leads({ setTab }) {
     );
   if (selectedManager)
     filteredUsers = filterPlayersByManager(selectedManager, managers, players);
-  console.log("🚀 -> Leads -> filteredUsers:", filteredUsers);
   filteredUsers = filteredUsers
     .map((player) =>
       player?.accounts?.length
@@ -679,6 +681,22 @@ export default function Leads({ setTab }) {
     return selectedFilters.includes(f);
   };
 
+  useEffect(() => {
+    if (user.role === "Sale") return;
+    const selectedUserDiv = selectedUserRef.current;
+    if (!selectedUserDiv) return;
+    const handleRightClick = (e) => {
+      e.preventDefault();
+      setModalPosition({ x: e.clientX, y: e.clientY });
+      console.log("🚀 -> useEffect -> selectedUserDiv:", selectedUserDiv);
+      setShowPlayersActionModal(true);
+    };
+    selectedUserDiv.addEventListener("contextmenu", handleRightClick);
+    return () => {
+      selectedUserDiv.removeEventListener("contextmenu", handleRightClick);
+    };
+  }, [selectedUser, user]);
+
   return (
     <>
       <div id="leads" className="active">
@@ -783,7 +801,12 @@ export default function Leads({ setTab }) {
             paginationPerPage={rowsPerPage}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             conditionalRowStyles={conditionalRowStyles}
-            onRowClicked={(row) => row && dispatch(setSelectedUser(row))}
+            onRowClicked={(row, e) => {
+              if (row) {
+                dispatch(setSelectedUser(row));
+                selectedUserRef.current = e.target.parentElement;
+              }
+            }}
             onRowDoubleClicked={(row) => row && setTab("Player Card")}
             customStyles={{
               pagination: {
@@ -935,6 +958,13 @@ export default function Leads({ setTab }) {
           position={
             showColumnsModal === "deals" ? "deals-columns" : "players-columns"
           }
+        />
+      )}
+      {showPlayersActionModal && (
+        <PlayersActionModal
+          closePlayersActionModal={setShowPlayersActionModal}
+          modalPosition={modalPosition}
+          selectedUser={selectedUser}
         />
       )}
     </>

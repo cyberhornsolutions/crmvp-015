@@ -185,7 +185,6 @@ export default function Users() {
   };
 
   const handleSaveAssetGroups = async (group) => {
-    console.log("🚀 -> handleSaveAssetGroups -> group:", group);
     if (!group && selectedRow)
       group = processedAssetGroups.find(({ id }) => id === selectedRow.id);
     const groupBefore = assetGroups.find(({ id }) => id === group.id);
@@ -193,7 +192,6 @@ export default function Users() {
       (key) => groupBefore[key] === group[key]
     );
     if (unChanged) {
-      console.log("🚀 -> handleSaveAssetGroups -> unChanged:", unChanged);
       handleChangeAssetGroups(group.id, "isEdit", false);
       return;
     }

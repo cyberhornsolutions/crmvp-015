@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import placeholder from "../acc-img-placeholder.png";
-import { Nav, Navbar, ProgressBar } from "react-bootstrap";
+import { Button, Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
 import {
   addDocument,
@@ -35,6 +35,7 @@ import { fillArrayWithEmptyRows } from "../utills/helpers";
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
 import SaveUserInfoModal from "./SaveUserInfoModal";
+import CreateAccountModal from "./CreateAccountModal";
 
 const overviewColumnsNames = overviewColumns().reduce(
   (p, { name }) => ({ ...p, [name]: true }),
@@ -96,6 +97,7 @@ export default function MainBoard() {
   const [recentChanges, setRecentChanges] = useState([]);
   const [comments, setComments] = useState([]);
   const [formDataComment, setFormDataComment] = useState("");
+  const [showNewAccountModal, setShowNewAccountModal] = useState(false);
 
   const accounts = newUserData?.accounts || [];
   const account = accounts.find(
@@ -646,24 +648,37 @@ export default function MainBoard() {
     <div id="mainboard">
       <div id="profile">
         <img id="profile-pic" src={placeholder} alt="" />
-        {accounts.length ? (
-          <>
-            <select value={account?.account_no} onChange={handleAccountChange}>
-              {accounts.map((ac, i) => (
-                <option key={i} value={ac.account_no}>
-                  {ac.account_no}
-                </option>
-              ))}
-            </select>
+        <div className="d-flex flex-col align-items-center gap-2">
+          <Button
+            className="btn-secondary btn-sm"
+            onClick={() => {
+              setShowNewAccountModal(true);
+            }}
+          >
+            Create account
+          </Button>
+          {accounts.length ? (
+            <>
+              <select
+                onChange={handleAccountChange}
+                value={account?.account_no}
+              >
+                {accounts.map((ac, i) => (
+                  <option key={i} value={ac.account_no}>
+                    {ac.account_no}
+                  </option>
+                ))}
+              </select>
+              <div className="d-flex align-items-center justify-content-center gap-2">
+                <h6>Type: </h6>
+                <h6>{account?.account_type} </h6>
+              </div>
+            </>
+          ) : (
+            ""
+          )}
+        </div>
 
-            <div className="d-flex align-items-center justify-content-center mt-2 gap-3">
-              <h6>Type: </h6>
-              <h6>{account?.account_type} </h6>
-            </div>
-          </>
-        ) : (
-          ""
-        )}
         <div id="profile-deals">
           <div id="sdelki-numbers">
             <div>
@@ -1520,6 +1535,14 @@ export default function MainBoard() {
           setModal={setShowColumnsModal}
           columns={showColumns}
           setColumns={setShowColumns}
+        />
+      )}
+      {showNewAccountModal && (
+        <CreateAccountModal
+          onClose={() => {
+            setShowNewAccountModal(false);
+          }}
+          userProfile={selectedUser}
         />
       )}
     </div>

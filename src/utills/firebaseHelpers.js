@@ -709,3 +709,32 @@ export const updateStatus = async (id, payload) => {
   const docRef = doc(db, "saleStatuses", id);
   return await updateDoc(docRef, payload);
 };
+
+export async function getDocument(collectionPath, documentId) {
+  try {
+    const docRef = doc(db, collectionPath, documentId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) return { id: docSnap.id, ...docSnap.data() };
+  } catch (error) {
+    console.error("Error fetching document: ", error.message);
+  }
+}
+
+export async function updateDocument(id, collectionPath, payload) {
+  try {
+    const docRef = doc(db, collectionPath, id);
+    await updateDoc(docRef, payload);
+  } catch (error) {
+    console.error("Error updating document: ", error.message);
+  }
+}
+
+export const incrementLastAccountNo = async () => {
+  const { lastAccountNo } = await getDocument(
+    "configs",
+    "8VaY8WzBNUl6Ca8KbpWD"
+  );
+  await updateDocument("8VaY8WzBNUl6Ca8KbpWD", "configs", {
+    lastAccountNo: +lastAccountNo + 1,
+  });
+};

@@ -225,7 +225,7 @@ td:hover {
   overflow: auto;
 }
 #profile-pic {
-  max-width: 68%;
+  max-width: 56%;
   margin: auto;
 }
 #profile-balance {
@@ -982,4 +982,8 @@ th {
   height: 4px;
   margin: 0 auto;
   width: 10%;
+}
+
+.players-action p {
+  cursor: pointer;
 }
