@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Modal } from "react-bootstrap";
 import CreateAccountModal from "./CreateAccountModal";
 import CreatePlayerModal from "./CreatePlayerModal";
+import TradingSettings from "./TradingSettings";
+import AddBalanceModal from "./AddBalanceModal";
 
 const PlayersActionModal = ({
   closePlayersActionModal,
@@ -9,8 +11,11 @@ const PlayersActionModal = ({
   selectedUser,
 } = {}) => {
   // const [showModal, setShowModal] = useState(true);
-  const [showNewAccountModal, setShowNewAccountModal] = useState(false);
+  const [showBalanceModal, setShowBalanceModal] = useState(false);
   const [showEditAccountModal, setShowEditAccountModal] = useState(false);
+  const [showNewAccountModal, setShowNewAccountModal] = useState(false);
+  const [showTradingSettingsModal, setShowTradingSettingsModal] =
+    useState(false);
 
   const close = () => {
     closePlayersActionModal(false);
@@ -50,14 +55,16 @@ const PlayersActionModal = ({
           </p>
           <p
             onClick={() => {
-              close();
+              // setShowModal(false);
+              setShowTradingSettingsModal(true);
             }}
           >
             Trading settings
           </p>
           <p
             onClick={() => {
-              close();
+              // setShowModal(false);
+              setShowBalanceModal(true);
             }}
           >
             Deposit-Withdraw
@@ -98,6 +105,12 @@ const PlayersActionModal = ({
           playerAccount={selectedUser}
           setShowModal={setShowEditAccountModal}
         />
+      )}
+      {showTradingSettingsModal && (
+        <TradingSettings setShowModal={setShowTradingSettingsModal} />
+      )}
+      {showBalanceModal && (
+        <AddBalanceModal setShowModal={setShowBalanceModal} />
       )}
     </>
   );
