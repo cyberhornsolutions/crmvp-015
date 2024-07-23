@@ -169,6 +169,11 @@ export default function Leads({ setTab }) {
     }
   };
 
+  const getStatus = (id) => {
+    const status = statuses.find((s) => s.id === id);
+    return status ? status.status : "";
+  };
+
   const getStatusColor = (id) => {
     const status = statuses.find((s) => s.id === id);
     return status ? status.color : "";
@@ -350,7 +355,8 @@ export default function Leads({ setTab }) {
                 .filter(
                   (m) =>
                     m.isActive &&
-                    (row.status === "New" || row.status === "Sale"
+                    (getStatus(row.status) === "New" ||
+                    getStatus(row.status) === "Sale"
                       ? m.role === "Sale"
                       : m.role === "Reten")
                 )

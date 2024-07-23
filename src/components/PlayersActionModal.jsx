@@ -4,6 +4,7 @@ import CreateAccountModal from "./CreateAccountModal";
 import CreatePlayerModal from "./CreatePlayerModal";
 import TradingSettings from "./TradingSettings";
 import AddBalanceModal from "./AddBalanceModal";
+import ChangeManagerModal from "./ChangeManagerModal";
 
 const PlayersActionModal = ({
   closePlayersActionModal,
@@ -12,6 +13,7 @@ const PlayersActionModal = ({
 } = {}) => {
   // const [showModal, setShowModal] = useState(true);
   const [showBalanceModal, setShowBalanceModal] = useState(false);
+  const [showChangeManagerModal, setShowChangeManagerModal] = useState(false);
   const [showEditAccountModal, setShowEditAccountModal] = useState(false);
   const [showNewAccountModal, setShowNewAccountModal] = useState(false);
   const [showTradingSettingsModal, setShowTradingSettingsModal] =
@@ -78,7 +80,8 @@ const PlayersActionModal = ({
           </p>
           <p
             onClick={() => {
-              close();
+              // setShowModal(false);
+              setShowChangeManagerModal(true);
             }}
           >
             Change manager
@@ -111,6 +114,9 @@ const PlayersActionModal = ({
       )}
       {showBalanceModal && (
         <AddBalanceModal setShowModal={setShowBalanceModal} />
+      )}
+      {showChangeManagerModal && (
+        <ChangeManagerModal setShowModal={setShowChangeManagerModal} />
       )}
     </>
   );
