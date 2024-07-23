@@ -688,7 +688,6 @@ export default function Leads({ setTab }) {
     const handleRightClick = (e) => {
       e.preventDefault();
       setModalPosition({ x: e.clientX, y: e.clientY });
-      console.log("🚀 -> useEffect -> selectedUserDiv:", selectedUserDiv);
       setShowPlayersActionModal(true);
     };
     selectedUserDiv.addEventListener("contextmenu", handleRightClick);

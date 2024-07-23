@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Modal } from "react-bootstrap";
 import CreateAccountModal from "./CreateAccountModal";
+import CreatePlayerModal from "./CreatePlayerModal";
 
 const PlayersActionModal = ({
   closePlayersActionModal,
@@ -9,6 +10,7 @@ const PlayersActionModal = ({
 } = {}) => {
   // const [showModal, setShowModal] = useState(true);
   const [showNewAccountModal, setShowNewAccountModal] = useState(false);
+  const [showEditAccountModal, setShowEditAccountModal] = useState(false);
 
   const close = () => {
     closePlayersActionModal(false);
@@ -40,7 +42,8 @@ const PlayersActionModal = ({
           </p>
           <p
             onClick={() => {
-              close();
+              // setShowModal(false);
+              setShowEditAccountModal(true);
             }}
           >
             Edit account
@@ -88,6 +91,12 @@ const PlayersActionModal = ({
             setShowNewAccountModal(false);
           }}
           userProfile={selectedUser}
+        />
+      )}
+      {showEditAccountModal && (
+        <CreatePlayerModal
+          playerAccount={selectedUser}
+          setShowModal={setShowEditAccountModal}
         />
       )}
     </>
