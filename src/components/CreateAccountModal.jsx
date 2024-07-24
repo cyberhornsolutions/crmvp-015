@@ -29,7 +29,7 @@ const CreateAccountModal = ({ onClose, userProfile } = {}) => {
   const createNewAccount = async () => {
     if (
       userProfile?.accounts?.length === 2 &&
-      userProfile?.accounts?.find((a) => !a.isDeleted)
+      userProfile?.accounts?.find((a) => !a?.isDeleted)
     )
       return toast.error("You have reached max account limit");
     try {
