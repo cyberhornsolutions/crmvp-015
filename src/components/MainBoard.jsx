@@ -285,9 +285,9 @@ export default function MainBoard() {
 
   const handleAccountChange = async (e) => {
     const updatedAccounts = newUserData?.accounts?.map((ac) => ({
-      ...ac,
-      isDefault: +e.target.value === ac.account_no,
-    }));
+        ...ac,
+        isDefault: +e.target.value === ac.account_no,
+      }));
     try {
       const ans = await updateUserById(newUserData.userId, {
         accounts: updatedAccounts,
@@ -663,11 +663,13 @@ export default function MainBoard() {
                 onChange={handleAccountChange}
                 value={account?.account_no}
               >
-                {accounts.map((ac, i) => (
-                  <option key={i} value={ac.account_no}>
-                    {ac.account_no}
-                  </option>
-                ))}
+                {accounts
+                  .filter((account) => !account?.isDeleted)
+                  ?.map((ac, i) => (
+                    <option key={i} value={ac.account_no}>
+                      {ac.account_no}
+                    </option>
+                  ))}
               </select>
               <div className="d-flex align-items-center justify-content-center gap-2">
                 <h6>Type: </h6>

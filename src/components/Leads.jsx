@@ -90,12 +90,14 @@ export default function Leads({ setTab }) {
   filteredUsers = filteredUsers
     .map((player) =>
       player?.accounts?.length
-        ? player?.accounts?.map((account) => ({
-            ...player,
-            account,
-            id: account?.account_no,
-            userId: player.id,
-          }))
+        ? player?.accounts
+            ?.filter((account) => !account?.isDeleted)
+            ?.map((account) => ({
+              ...player,
+              account,
+              id: account?.account_no,
+              userId: player.id,
+            }))
         : { ...player, userId: player.id }
     )
     .flat();
@@ -802,7 +804,7 @@ export default function Leads({ setTab }) {
               // rowsPerPageText: "ok",
               // rangeSeparatorText: "ok"
             }}
-            paginationTotalRows={players.length}
+            paginationTotalRows={filteredUsers.length}
             paginationPerPage={rowsPerPage}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             conditionalRowStyles={conditionalRowStyles}
