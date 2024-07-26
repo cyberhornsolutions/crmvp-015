@@ -768,6 +768,7 @@ export default function Leads({ setTab }) {
               ) : (
                 <input
                   className="form-control-sm"
+                  disabled={showPlayersActionModal}
                   onChange={(e) => setSearchText(e.target.value)}
                   placeholder="Search..."
                   type="search"
