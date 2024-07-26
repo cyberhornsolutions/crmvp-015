@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClose, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
 import { Form } from "react-bootstrap";
 import { convertTimestamptToDate } from "../../utills/helpers";
 
@@ -10,12 +10,14 @@ const managerColumns = (
     toggleActiveManager,
     teams,
     showColumns,
+    managerSettings,
   } = {
     handleChangeManager: () => {},
     handleSaveManager: () => {},
     toggleActiveManager: () => {},
     teams: [],
     showColumns: {},
+    managerSettings: {},
   }
 ) => [
   {
@@ -210,13 +212,21 @@ const managerColumns = (
             <FontAwesomeIcon
               icon={faEdit}
               className="btn btn-outline-secondary btn-sm"
-              onClick={() => handleChangeManager(row.id, "isEdit", true)}
+              onClick={() =>
+                managerSettings?.editManager &&
+                handleChangeManager(row.id, "isEdit", true)
+              }
+              style={{
+                cursor: managerSettings?.editManager ? "" : "not-allowed",
+                opacity: managerSettings?.editManager ? "" : "0.5",
+              }}
             />
           )}
           <Form.Check
-            type="switch"
             checked={row.isActive}
+            disabled={!managerSettings?.disableManager}
             onChange={(e) => toggleActiveManager(row.id, e.target.checked)}
+            type="switch"
           />
         </div>
       ),

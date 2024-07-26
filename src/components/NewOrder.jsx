@@ -10,7 +10,12 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import moment from "moment";
-import { calculateProfit, getAskValue, getBidValue } from "../utills/helpers";
+import {
+  calculateProfit,
+  getAskValue,
+  getBidValue,
+  getManagerSettings,
+} from "../utills/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,6 +27,9 @@ const NewOrder = ({ onClose, selectedOrder }) => {
   const assetGroups = useSelector((state) => state.assetGroups);
   const orders = useSelector((state) => state.orders);
   const selectedUser = useSelector((state) => state.user.selectedUser);
+  const user = useSelector((state) => state?.user?.user);
+  const managers = useSelector((state) => state.managers);
+  const managerSettings = getManagerSettings(managers, user.id);
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState({
     volume: 0,
@@ -345,200 +353,206 @@ const NewOrder = ({ onClose, selectedOrder }) => {
           <h5 className="mb-0">New deal</h5>
         </Modal.Header>
         <Modal.Body>
-          <form className="d-flex gap-4 flex-column">
-            <div className="form-group row align-items-center">
-              <label className="col-4" htmlFor="sl">
-                Symbol
-              </label>
-              <div className="col">
-                <select
-                  name="symbol"
-                  id="symbol"
-                  className="form-select"
-                  required
-                  value={selectedSymbol.id}
-                  onChange={(e) => {
-                    const symbol = symbols.find((s) => s.id === e.target.value);
-                    if (symbol) setSelectedSymbol(symbol);
-                  }}
-                >
-                  {symbols.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.symbol}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-1"></div>
-            </div>
-            <div className="form-group row align-items-center">
-              <label className="col-4" htmlFor="description">
-                Description
-              </label>
-              <div className="col">
-                <input
-                  name="description"
-                  id="description"
-                  className="form-control"
-                  disabled
-                  readOnly
-                  value={selectedSymbol.settings.description}
-                ></input>
-              </div>
-              <div className="col-1"></div>
-            </div>
-            <div className="form-group row align-items-center">
-              <label className="col-4" htmlFor="price">
-                Price
-              </label>
-              <div className="col">
-                <input
-                  name="price"
-                  id="price"
-                  type="number"
-                  step="any"
-                  placeholder="Price"
-                  className="form-control"
-                  // value={selectedSymbol.price}
-                  required
-                  readOnly={!enableOpenPrice}
-                  disabled={!enableOpenPrice}
-                  value={
-                    enableOpenPrice ? openPriceValue : selectedSymbol.price
-                  }
-                  onChange={(e) => setOpenPriceValue(e.target.value)}
-                  // onChange={handleOrderChange}
-                />
-              </div>
-              <div className="col-1">
-                <FontAwesomeIcon
-                  cursor="pointer"
-                  onClick={() =>
-                    setOpenPriceValue(parseFloat(selectedSymbol.price))
-                  }
-                  icon={faRefresh}
-                />
-              </div>
-            </div>
-            <div className="form-group row">
-              <label className="col-4" htmlFor="volume">
-                Volume
-              </label>
-              <div className="col">
-                <input
-                  name="volume"
-                  id="volume"
-                  type="number"
-                  step="any"
-                  placeholder="Volume"
-                  className="form-control"
-                  value={order.volume}
-                  required
-                  onChange={handleOrderChange}
-                />
-                <label className="mt-1">
-                  Margin: {+calculatedSum?.toFixed(2)} USDT
+          {managerSettings?.trade ? (
+            <form className="d-flex gap-4 flex-column">
+              <div className="form-group row align-items-center">
+                <label className="col-4" htmlFor="sl">
+                  Symbol
                 </label>
-              </div>
-              <div className="col-1"></div>
-            </div>
-            <div className="form-group row">
-              <div className="col-4"></div>
-              <div className="col d-flex justify-content-center gap-5">
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    id="market"
-                    checked={!enableOpenPrice}
-                    onChange={(e) => setEnableOpenPrice(false)}
-                  />
-                  <label className="form-check-label m-0" htmlFor="market">
-                    Market
-                  </label>
-                </div>
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    id="limit"
-                    checked={enableOpenPrice}
+                <div className="col">
+                  <select
+                    name="symbol"
+                    id="symbol"
+                    className="form-select"
+                    required
+                    value={selectedSymbol.id}
                     onChange={(e) => {
-                      if (openPriceValue !== selectedSymbol.price)
-                        setOpenPriceValue(parseFloat(selectedSymbol.price));
-                      setEnableOpenPrice(true);
+                      const symbol = symbols.find(
+                        (s) => s.id === e.target.value
+                      );
+                      if (symbol) setSelectedSymbol(symbol);
                     }}
+                  >
+                    {symbols.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.symbol}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-1"></div>
+              </div>
+              <div className="form-group row align-items-center">
+                <label className="col-4" htmlFor="description">
+                  Description
+                </label>
+                <div className="col">
+                  <input
+                    name="description"
+                    id="description"
+                    className="form-control"
+                    disabled
+                    readOnly
+                    value={selectedSymbol.settings.description}
+                  ></input>
+                </div>
+                <div className="col-1"></div>
+              </div>
+              <div className="form-group row align-items-center">
+                <label className="col-4" htmlFor="price">
+                  Price
+                </label>
+                <div className="col">
+                  <input
+                    name="price"
+                    id="price"
+                    type="number"
+                    step="any"
+                    placeholder="Price"
+                    className="form-control"
+                    // value={selectedSymbol.price}
+                    required
+                    readOnly={!enableOpenPrice}
+                    disabled={!enableOpenPrice}
+                    value={
+                      enableOpenPrice ? openPriceValue : selectedSymbol.price
+                    }
+                    onChange={(e) => setOpenPriceValue(e.target.value)}
+                    // onChange={handleOrderChange}
                   />
-                  <label className="form-check-label m-0" htmlFor="limit">
-                    Limit
-                  </label>
+                </div>
+                <div className="col-1">
+                  <FontAwesomeIcon
+                    cursor="pointer"
+                    onClick={() =>
+                      setOpenPriceValue(parseFloat(selectedSymbol.price))
+                    }
+                    icon={faRefresh}
+                  />
                 </div>
               </div>
-              <div className="col-1" />
-            </div>
-            <div className="form-group row">
-              <label className="col-4" htmlFor="sl">
-                SL
-              </label>
-              <div className="col">
-                <input
-                  name="sl"
-                  id="sl"
-                  type="number"
-                  step="any"
-                  placeholder="SL"
-                  className="form-control"
-                  value={order.sl}
-                  onChange={handleOrderChange}
-                />
-                <label className="text-muted">
-                  Potential: {+parseFloat(potentialSL)?.toFixed(2)}
+              <div className="form-group row">
+                <label className="col-4" htmlFor="volume">
+                  Volume
                 </label>
+                <div className="col">
+                  <input
+                    name="volume"
+                    id="volume"
+                    type="number"
+                    step="any"
+                    placeholder="Volume"
+                    className="form-control"
+                    value={order.volume}
+                    required
+                    onChange={handleOrderChange}
+                  />
+                  <label className="mt-1">
+                    Margin: {+calculatedSum?.toFixed(2)} USDT
+                  </label>
+                </div>
+                <div className="col-1"></div>
               </div>
-              <div className="col-1"></div>
-            </div>
-            <div className="form-group row">
-              <label className="col-4" htmlFor="tp">
-                TP
-              </label>
-              <div className="col">
-                <input
-                  name="tp"
-                  id="tp"
-                  type="number"
-                  step="any"
-                  placeholder="TP"
-                  className="form-control"
-                  value={order.tp}
-                  onChange={handleOrderChange}
-                />
-                <label className="text-muted">
-                  Potential: {+parseFloat(potentialTP)?.toFixed(2)}
+              <div className="form-group row">
+                <div className="col-4"></div>
+                <div className="col d-flex justify-content-center gap-5">
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      id="market"
+                      checked={!enableOpenPrice}
+                      onChange={(e) => setEnableOpenPrice(false)}
+                    />
+                    <label className="form-check-label m-0" htmlFor="market">
+                      Market
+                    </label>
+                  </div>
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      id="limit"
+                      checked={enableOpenPrice}
+                      onChange={(e) => {
+                        if (openPriceValue !== selectedSymbol.price)
+                          setOpenPriceValue(parseFloat(selectedSymbol.price));
+                        setEnableOpenPrice(true);
+                      }}
+                    />
+                    <label className="form-check-label m-0" htmlFor="limit">
+                      Limit
+                    </label>
+                  </div>
+                </div>
+                <div className="col-1" />
+              </div>
+              <div className="form-group row">
+                <label className="col-4" htmlFor="sl">
+                  SL
                 </label>
+                <div className="col">
+                  <input
+                    name="sl"
+                    id="sl"
+                    type="number"
+                    step="any"
+                    placeholder="SL"
+                    className="form-control"
+                    value={order.sl}
+                    onChange={handleOrderChange}
+                  />
+                  <label className="text-muted">
+                    Potential: {+parseFloat(potentialSL)?.toFixed(2)}
+                  </label>
+                </div>
+                <div className="col-1"></div>
               </div>
-              <div className="col-1"></div>
-            </div>
-            <div className="d-flex flex-column gap-2 mb-2">
-              <Button
-                className="w-50 mx-auto"
-                variant="success"
-                type="submit"
-                onClick={(e) => placeOrder(e, "Buy")}
-                disabled={loading}
-              >
-                Buy
-              </Button>
-              <Button
-                className="w-50 mx-auto"
-                variant="danger"
-                type="submit"
-                disabled={loading}
-                onClick={(e) => placeOrder(e, "Sell")}
-              >
-                Sell
-              </Button>
-            </div>
-          </form>
+              <div className="form-group row">
+                <label className="col-4" htmlFor="tp">
+                  TP
+                </label>
+                <div className="col">
+                  <input
+                    name="tp"
+                    id="tp"
+                    type="number"
+                    step="any"
+                    placeholder="TP"
+                    className="form-control"
+                    value={order.tp}
+                    onChange={handleOrderChange}
+                  />
+                  <label className="text-muted">
+                    Potential: {+parseFloat(potentialTP)?.toFixed(2)}
+                  </label>
+                </div>
+                <div className="col-1"></div>
+              </div>
+              <div className="d-flex flex-column gap-2 mb-2">
+                <Button
+                  className="w-50 mx-auto"
+                  variant="success"
+                  type="submit"
+                  onClick={(e) => placeOrder(e, "Buy")}
+                  disabled={loading}
+                >
+                  Buy
+                </Button>
+                <Button
+                  className="w-50 mx-auto"
+                  variant="danger"
+                  type="submit"
+                  disabled={loading}
+                  onClick={(e) => placeOrder(e, "Sell")}
+                >
+                  Sell
+                </Button>
+              </div>
+            </form>
+          ) : (
+            "You do not have permission to perform this action."
+          )}
         </Modal.Body>
       </Modal>
     </>

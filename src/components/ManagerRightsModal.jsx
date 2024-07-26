@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Button, Modal, Form } from "react-bootstrap";
+import { Button, Form, Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { updateManager } from "../utills/firebaseHelpers";
+import { useState } from "react";
 
 const ManagerRightsModal = ({ setShowModal, manager }) => {
   const [settings, setSettings] = useState({
@@ -32,7 +32,7 @@ const ManagerRightsModal = ({ setShowModal, manager }) => {
       e.preventDefault();
       setLoading(true);
       await updateManager(manager.id, { settings });
-      toast.success("Saved Successfully");
+      toast.success("Settings saved successfully");
       closeModal();
     } catch (error) {
       console.log(error);

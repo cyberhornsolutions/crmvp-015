@@ -7,6 +7,7 @@ import {
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { getManagerSettings } from "../utills/helpers";
 
 function AddBalanceModal({ setShowModal }) {
   const [newBalance, setNewBalance] = useState(0);
@@ -14,6 +15,8 @@ function AddBalanceModal({ setShowModal }) {
   const [balanceType, setBalanceType] = useState("Bonus");
   const [loading, setLoading] = useState(false);
   const { selectedUser, user } = useSelector((state) => state.user);
+  const managers = useSelector((state) => state.managers);
+  const managerSettings = getManagerSettings(managers, user.id);
   const [account] = useState(selectedUser?.account);
 
   const handleAddNewBalance = async (amount) => {
@@ -80,71 +83,75 @@ function AddBalanceModal({ setShowModal }) {
         <h5 className="m-0">Add Balance</h5>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="row mb-3 align-items-center">
-            <div className="col-3">
-              <Form.Label className="mb-0" htmlFor="balance">
-                Balance
-              </Form.Label>
-            </div>
-            <div className="col">
-              <Form.Control
-                id="balance"
-                type="number"
-                placeholder="Enter balance"
-                required
-                value={newBalance}
-                onChange={(e) => {
-                  const { value } = e.target;
-                  if (value >= 0) setNewBalance(parseFloat(value));
-                }}
-              />
-            </div>
-          </Form.Group>
-          <Form.Group className="row mb-3 align-items-center">
-            <div className="col-3">
-              <Form.Label className="mb-0" htmlFor="balance-type">
-                Type
-              </Form.Label>
-            </div>
-            <div className="col">
-              <Form.Select
-                id="balance-type"
-                aria-label="Default select example"
-                required
-                value={balanceType}
-                onChange={(e) => setBalanceType(e.target.value)}
-              >
-                <option value="Bonus">Bonus</option>
-                <option value="Deposit">Deposit</option>
-                <option value="Withdraw">Withdraw</option>
-              </Form.Select>
-            </div>
-          </Form.Group>
-          <Form.Group className="row mb-3 align-items-center">
-            <div className="col-3">
-              <Form.Label className="mb-0" htmlFor="comment">
-                Comment
-              </Form.Label>
-            </div>
-            <div className="col">
-              <Form.Control
-                id="comment"
-                type="text"
-                placeholder="Comment"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-              />
-            </div>
-          </Form.Group>
-          <button
-            className="btn btn-primary w-100 "
-            type="submit"
-            disabled={loading}
-          >
-            Add Balance
-          </button>
-        </Form>
+        {managerSettings?.depositWithdraw ? (
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="row mb-3 align-items-center">
+              <div className="col-3">
+                <Form.Label className="mb-0" htmlFor="balance">
+                  Balance
+                </Form.Label>
+              </div>
+              <div className="col">
+                <Form.Control
+                  id="balance"
+                  type="number"
+                  placeholder="Enter balance"
+                  required
+                  value={newBalance}
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    if (value >= 0) setNewBalance(parseFloat(value));
+                  }}
+                />
+              </div>
+            </Form.Group>
+            <Form.Group className="row mb-3 align-items-center">
+              <div className="col-3">
+                <Form.Label className="mb-0" htmlFor="balance-type">
+                  Type
+                </Form.Label>
+              </div>
+              <div className="col">
+                <Form.Select
+                  id="balance-type"
+                  aria-label="Default select example"
+                  required
+                  value={balanceType}
+                  onChange={(e) => setBalanceType(e.target.value)}
+                >
+                  <option value="Bonus">Bonus</option>
+                  <option value="Deposit">Deposit</option>
+                  <option value="Withdraw">Withdraw</option>
+                </Form.Select>
+              </div>
+            </Form.Group>
+            <Form.Group className="row mb-3 align-items-center">
+              <div className="col-3">
+                <Form.Label className="mb-0" htmlFor="comment">
+                  Comment
+                </Form.Label>
+              </div>
+              <div className="col">
+                <Form.Control
+                  id="comment"
+                  type="text"
+                  placeholder="Comment"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+              </div>
+            </Form.Group>
+            <button
+              className="btn btn-primary w-100 "
+              type="submit"
+              disabled={loading}
+            >
+              Add Balance
+            </button>
+          </Form>
+        ) : (
+          "You do not have permission to perform this action."
+        )}
       </Modal.Body>
     </Modal>
   );

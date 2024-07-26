@@ -10,11 +10,13 @@ const statusColumns = (
     selectedRowRef,
     setSelectedRow,
     toggleDisableStatus,
+    managerSettings,
   } = {
     handleChangeStatus: () => {},
     handleSaveStatus: () => {},
     setSelectedRow: () => {},
     toggleDisableStatus: () => {},
+    managerSettings: {},
   }
 ) => [
   {
@@ -63,6 +65,7 @@ const statusColumns = (
               handleChangeStatus(row.id, "isEdit", true);
             }}
             title="Edit"
+            disabled={!managerSettings?.createEditStatus}
           >
             <FontAwesomeIcon
               icon={faEdit}
@@ -73,6 +76,7 @@ const statusColumns = (
         )}
         <Form.Check
           checked={row.isActive}
+          disabled={!managerSettings?.createEditStatus}
           onChange={(e) => toggleDisableStatus(row.id, e.target.checked)}
           title="Active"
           type="switch"

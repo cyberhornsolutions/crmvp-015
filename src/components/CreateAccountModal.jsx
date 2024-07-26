@@ -3,11 +3,16 @@ import {
   incrementLastAccountNo,
   updateUserById,
 } from "../utills/firebaseHelpers";
+import { getManagerSettings } from "../utills/helpers";
 import { Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const CreateAccountModal = ({ onClose, userProfile } = {}) => {
+  const user = useSelector((state) => state?.user?.user);
+  const managers = useSelector((state) => state.managers);
+  const managerSettings = getManagerSettings(managers, user.id);
   const [accountNo, setAccountNo] = useState("");
   const [accountType, setAccountType] = useState("Standard");
   const [isLoading, setIsLoading] = useState(true);
@@ -66,46 +71,54 @@ const CreateAccountModal = ({ onClose, userProfile } = {}) => {
     <Modal centered onHide={onClose} show>
       <Modal.Header closeButton>Create an account</Modal.Header>
       <Modal.Body>
-        <div className="d-flex justify-content-center align-items-baseline gap-2">
-          <label>Type:</label>
-          <div className="d-flex gap-4">
-            <div className="form-check form-check-inline">
-              <input
-                checked={accountType === "Standard"}
-                className="form-check-input"
-                id="inlineRadio1"
-                name="inlineRadioOptions"
-                onChange={() => setAccountType("Standard")}
-                type="radio"
-              />
-              <label htmlFor="inlineRadio1">Standard</label>
+        {managerSettings?.createPlayer ? (
+          <>
+            <div className="d-flex justify-content-center align-items-baseline gap-2">
+              <label>Type:</label>
+              <div className="d-flex gap-4">
+                <div className="form-check form-check-inline">
+                  <input
+                    checked={accountType === "Standard"}
+                    className="form-check-input"
+                    id="inlineRadio1"
+                    name="inlineRadioOptions"
+                    onChange={() => setAccountType("Standard")}
+                    type="radio"
+                  />
+                  <label htmlFor="inlineRadio1">Standard</label>
+                </div>
+                <div className="form-check form-check-inline">
+                  <input
+                    checked={accountType === "Islamic"}
+                    className="form-check-input"
+                    id="inlineRadio2"
+                    name="inlineRadioOptions"
+                    onChange={() => setAccountType("Islamic")}
+                    type="radio"
+                  />
+                  <label htmlFor="inlineRadio2">Islamic</label>
+                </div>
+              </div>
             </div>
-            <div className="form-check form-check-inline">
-              <input
-                checked={accountType === "Islamic"}
-                className="form-check-input"
-                id="inlineRadio2"
-                name="inlineRadioOptions"
-                onChange={() => setAccountType("Islamic")}
-                type="radio"
-              />
-              <label htmlFor="inlineRadio2">Islamic</label>
+            <div className="fs-5 my-2">
+              Account Number:
+              <span className="ms-2 text-success">
+                {accountNo || "Loading..."}
+              </span>
             </div>
-          </div>
-        </div>
-        <div className="fs-5 my-2">
-          Account Number:
-          <span className="ms-2 text-success">{accountNo || "Loading..."}</span>
-        </div>
-        <div className="text-center my-4">
-          <button
-            className="btn btn-success"
-            disabled={isLoading}
-            onClick={createNewAccount}
-          >
-            Create account
-          </button>
-        </div>
+            <div className="text-center my-4">
+              <button
+                className="btn btn-success"
+                disabled={isLoading}
+                onClick={createNewAccount}
+              >
+                Create account
+              </button>
+            </div>
+          </>
+        ) : (
+          "You do not have permission to perform this action."
+        )}
       </Modal.Body>
     </Modal>
   );

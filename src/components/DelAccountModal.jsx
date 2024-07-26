@@ -1,9 +1,14 @@
 import { Button, Form, Modal } from "react-bootstrap";
+import { getManagerSettings } from "../utills/helpers";
 import { toast } from "react-toastify";
-import { useState } from "react";
 import { updateUserById } from "../utills/firebaseHelpers";
+import { useSelector } from "react-redux";
+import { useState } from "react";
 
 const DelAccountModal = ({ selectedUser, setShowModal }) => {
+  const user = useSelector((state) => state?.user?.user);
+  const managers = useSelector((state) => state.managers);
+  const managerSettings = getManagerSettings(managers, user.id);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,26 +61,36 @@ const DelAccountModal = ({ selectedUser, setShowModal }) => {
         <Modal.Header className="text-center" closeButton>
           Delete Account
         </Modal.Header>
-        <Modal.Body className="border-0 pb-0">
-          <Form.Control
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter password"
-            required
-            type="password"
-            value={password}
-          />
-          <small className="form-text text-muted">
-            Enter player password to delete account.
-          </small>
-        </Modal.Body>
-        <Modal.Footer className="border-0">
-          <Button onClick={() => closeModal()} variant="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleClick} variant="danger" disabled={isLoading}>
-            Delete
-          </Button>
-        </Modal.Footer>
+        {managerSettings?.deletePlayerAccount ? (
+          <>
+            <Modal.Body className="border-0 pb-0">
+              <Form.Control
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+                required
+                type="password"
+                value={password}
+              />
+              <small className="form-text text-muted">
+                Enter player password to delete account.
+              </small>
+            </Modal.Body>
+            <Modal.Footer className="border-0">
+              <Button onClick={() => closeModal()} variant="secondary">
+                Cancel
+              </Button>
+              <Button
+                onClick={handleClick}
+                variant="danger"
+                disabled={isLoading}
+              >
+                Delete
+              </Button>
+            </Modal.Footer>
+          </>
+        ) : (
+          "You do not have permission to perform this action."
+        )}
       </Modal>
     </>
   );

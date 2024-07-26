@@ -31,7 +31,7 @@ import delayedColumns from "./columns/delayedColumns";
 import overviewColumns from "./columns/overviewColumns";
 import depositsColumns from "./columns/depositsColumns";
 import recentChangesColumns from "./columns/recentChangesColumns";
-import { fillArrayWithEmptyRows } from "../utills/helpers";
+import { fillArrayWithEmptyRows, getManagerSettings } from "../utills/helpers";
 import moment from "moment";
 import SelectColumnsModal from "./SelectColumnsModal";
 import SaveUserInfoModal from "./SaveUserInfoModal";
@@ -57,6 +57,7 @@ export default function MainBoard() {
   const user = useSelector((state) => state?.user?.user);
   const orders = useSelector((state) => state.orders);
   const managers = useSelector((state) => state.managers);
+  const managerSettings = getManagerSettings(managers, user.id);
   const [userOrders, setUserOrders] = useState([]);
   const columns = useSelector((state) => state?.columns);
   const selectedUser =
@@ -285,9 +286,9 @@ export default function MainBoard() {
 
   const handleAccountChange = async (e) => {
     const updatedAccounts = newUserData?.accounts?.map((ac) => ({
-        ...ac,
-        isDefault: +e.target.value === ac.account_no,
-      }));
+      ...ac,
+      isDefault: +e.target.value === ac.account_no,
+    }));
     try {
       const ans = await updateUserById(newUserData.userId, {
         accounts: updatedAccounts,
@@ -654,6 +655,7 @@ export default function MainBoard() {
             onClick={() => {
               setShowNewAccountModal(true);
             }}
+            disabled={!managerSettings?.createPlayer}
           >
             Create account
           </Button>

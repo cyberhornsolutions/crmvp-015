@@ -85,20 +85,6 @@ export const getRandomColorHex = () => {
 };
 
 export const filterCombinedSearch = (data = [], keys = [], search = "") => {
-  // const k = keys.map((key) => key.toLowerCase());
-  // return data.filter((o) =>
-  //   k.length > 0
-  //     ? k.some(
-  //         (k) =>
-  //           o[k] && o[k].toString().toLowerCase().includes(search.toLowerCase())
-  //       )
-  //     : Object.values(o).some(
-  //         (value) =>
-  //           value &&
-  //           value.toString().toLowerCase().includes(search.toLowerCase())
-  //       )
-  // );
-
   const searchInnerObject = (obj, search) => {
     if (obj === undefined || obj === null) {
       return false;
@@ -116,4 +102,9 @@ export const filterCombinedSearch = (data = [], keys = [], search = "") => {
       ? lowercaseKeys.some((key) => searchInnerObject(obj[key], search))
       : Object.values(obj).some((value) => searchInnerObject(value, search))
   );
+};
+
+export const getManagerSettings = (managers, id) => {
+  const manager = managers.find((manager) => manager.id === id);
+  return manager ? manager.settings : null;
 };

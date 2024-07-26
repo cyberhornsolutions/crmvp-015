@@ -17,7 +17,11 @@ import {
   updateManager,
   updateStatus,
 } from "../utills/firebaseHelpers";
-import { fillArrayWithEmptyRows, filterSearchObjects } from "../utills/helpers";
+import {
+  fillArrayWithEmptyRows,
+  filterSearchObjects,
+  getManagerSettings,
+} from "../utills/helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { setIpsState } from "../redux/slicer/ipsSlicer";
 import SaveOrderModal from "./SaveOrderModal";
@@ -431,6 +435,9 @@ export default function Users() {
     }
   }, [tab]);
 
+  const userData = useSelector((state) => state?.user?.user);
+  const managerSettings = getManagerSettings(managers, userData.id);
+
   return (
     <>
       <div id="users" className="active">
@@ -549,6 +556,7 @@ export default function Users() {
                   toggleActiveManager,
                   teams,
                   showColumns: showManagerColumns,
+                  managerSettings,
                 })}
                 data={fillArrayWithEmptyRows(filteredManagers, 10)}
                 conditionalRowStyles={[
@@ -604,6 +612,7 @@ export default function Users() {
                   selectedRowRef,
                   setSelectedRow,
                   toggleDisableStatus,
+                  managerSettings,
                 })}
                 data={fillArrayWithEmptyRows(processedStatuses, 10)}
                 // pagination
