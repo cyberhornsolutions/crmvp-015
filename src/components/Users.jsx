@@ -24,6 +24,7 @@ import SaveOrderModal from "./SaveOrderModal";
 import CreateManagerModal from "./CreateManagerModal";
 import CreateTeamModal from "./CreateTeamModal";
 import CreatePlayerModal from "./CreatePlayerModal";
+import ManagerRightsModal from "./ManagerRightsModal";
 import SelectColumnsModal from "./SelectColumnsModal";
 import ChangeManagerPasswordModal from "./ChangeManagerPasswordModal";
 import statusColumns from "./columns/statusColumns";
@@ -38,7 +39,9 @@ export default function Users() {
   const [showCreateManagerModal, setShowCreateManagerModal] = useState(false);
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
   const [showCreatePlayerModal, setShowCreatePlayerModal] = useState(false);
+  const [showManagerRightsModal, setShowManagerRightsModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState();
+  const [selectedManager, setSelectedManager] = useState();
   const selectedRowRef = useRef(null);
   const managers = useSelector((state) => state.managers);
   const teams = useSelector((state) => state.teams);
@@ -548,6 +551,19 @@ export default function Users() {
                   showColumns: showManagerColumns,
                 })}
                 data={fillArrayWithEmptyRows(filteredManagers, 10)}
+                conditionalRowStyles={[
+                  {
+                    when: (row) => row && row.id === selectedManager?.id,
+                    style: {
+                      backgroundColor: "#D1FFBD",
+                      userSelect: "none",
+                    },
+                  },
+                ]}
+                onRowClicked={(row) => row && setSelectedManager(row)}
+                onRowDoubleClicked={(row) =>
+                  row && setShowManagerRightsModal(true)
+                }
                 pagination
                 paginationTotalRows={managers.length}
                 paginationPerPage={10}
@@ -672,6 +688,12 @@ export default function Users() {
       )}
       {showCreatePlayerModal && (
         <CreatePlayerModal setShowModal={setShowCreatePlayerModal} />
+      )}
+      {showManagerRightsModal && (
+        <ManagerRightsModal
+          setShowModal={setShowManagerRightsModal}
+          manager={selectedManager}
+        />
       )}
       {showManagerColumnsModal && (
         <SelectColumnsModal
