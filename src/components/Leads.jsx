@@ -833,7 +833,7 @@ export default function Leads({ setTab }) {
             customStyles={{
               cells: {
                 style: {
-                  border: "1px solid",
+                  border: "1px solid silver",
                 },
               },
               pagination: {
