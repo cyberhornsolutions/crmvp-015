@@ -433,6 +433,7 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.account_type"),
       omit: !showPlayersColumns.Group,
+      // width: "82px",
     },
     {
       name: "Account",
@@ -452,6 +453,7 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.account_no"),
       omit: !showPlayersColumns.Account,
+      // width: "85px",
     },
     {
       name: "Name",
@@ -459,7 +461,7 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("name"),
       omit: !showPlayersColumns.Name,
-      width: "200px",
+      width: "120px",
     },
     {
       name: "Leverage",
@@ -475,7 +477,23 @@ export default function Leads({ setTab }) {
         if (!row || !row?.account) return;
         return calculateDepositedOrWithdrawn(row, "Deposit");
       },
+      sortable: true,
+      sortFunction: (rowA, rowB) => {
+        const a = calculateDepositedOrWithdrawn(rowA, "Deposit");
+        const b = calculateDepositedOrWithdrawn(rowB, "Deposit");
+        const isRowAEmpty = isRowEmpty(rowA);
+        const isRowBEmpty = isRowEmpty(rowB);
+        if (isRowAEmpty || isRowBEmpty) return 0;
+        if (a > b) {
+          return 1;
+        } else if (a < b) {
+          return -1;
+        } else {
+          return 0;
+        }
+      },
       omit: !showPlayersColumns.Deposited,
+      width: "102px",
     },
     {
       name: "Withdrawn",
@@ -483,7 +501,23 @@ export default function Leads({ setTab }) {
         if (!row || !row?.account) return;
         return calculateDepositedOrWithdrawn(row, "Withdraw");
       },
+      sortable: true,
+      sortFunction: (rowA, rowB) => {
+        const a = calculateDepositedOrWithdrawn(rowA, "Withdraw");
+        const b = calculateDepositedOrWithdrawn(rowB, "Withdraw");
+        const isRowAEmpty = isRowEmpty(rowA);
+        const isRowBEmpty = isRowEmpty(rowB);
+        if (isRowAEmpty || isRowBEmpty) return 0;
+        if (a > b) {
+          return 1;
+        } else if (a < b) {
+          return -1;
+        } else {
+          return 0;
+        }
+      },
       omit: !showPlayersColumns.Withdrawn,
+      width: "105px",
     },
     {
       name: "Bonuses",
@@ -501,8 +535,27 @@ export default function Leads({ setTab }) {
         const diff = parseFloat(deposited) - parseFloat(withdrawn);
         return +parseFloat(diff).toFixed(2);
       },
+      sortable: true,
+      sortFunction: (rowA, rowB) => {
+        const depositedA = calculateDepositedOrWithdrawn(rowA, "Deposit");
+        const withdrawnA = calculateDepositedOrWithdrawn(rowA, "Withdraw");
+        const a = parseFloat(depositedA) - parseFloat(withdrawnA);
+        const depositedB = calculateDepositedOrWithdrawn(rowB, "Deposit");
+        const withdrawnB = calculateDepositedOrWithdrawn(rowB, "Withdraw");
+        const b = parseFloat(depositedB) - parseFloat(withdrawnB);
+        const isRowAEmpty = isRowEmpty(rowA);
+        const isRowBEmpty = isRowEmpty(rowB);
+        if (isRowAEmpty || isRowBEmpty) return 0;
+        if (a > b) {
+          return 1;
+        } else if (a < b) {
+          return -1;
+        } else {
+          return 0;
+        }
+      },
       omit: !showPlayersColumns["Deposited-Withdrawn"],
-      width: "145px",
+      width: "165px",
     },
     {
       name: "Orders",
@@ -515,6 +568,33 @@ export default function Leads({ setTab }) {
             o.status === "Pending" &&
             !o.enableOpenPrice
         ).length;
+      },
+      sortable: true,
+      sortFunction: (rowA, rowB) => {
+        const a = orders.filter(
+          (o) =>
+            o.userId === rowA?.userId &&
+            o.account_no === rowA?.account?.account_no &&
+            o.status === "Pending" &&
+            !o.enableOpenPrice
+        ).length;
+        const b = orders.filter(
+          (o) =>
+            o.userId === rowB?.userId &&
+            o.account_no === rowB?.account?.account_no &&
+            o.status === "Pending" &&
+            !o.enableOpenPrice
+        ).length;
+        const isRowAEmpty = isRowEmpty(rowA);
+        const isRowBEmpty = isRowEmpty(rowB);
+        if (isRowAEmpty || isRowBEmpty) return 0;
+        if (a > b) {
+          return 1;
+        } else if (a < b) {
+          return -1;
+        } else {
+          return 0;
+        }
       },
       omit: !showPlayersColumns.Orders,
     },
@@ -529,13 +609,38 @@ export default function Leads({ setTab }) {
           totalMargin > 0 ? (equity / totalMargin) * (userLevel / 100) : 0;
         return `${+parseFloat(level)?.toFixed(2)}%`;
       },
+      sortable: true,
+      sortFunction: (rowA, rowB) => {
+        const equityA = calculateEquity(rowA);
+        const totalMarginA = rowA?.account?.totalMargin;
+        const userLevelA = rowA?.settings?.level || 100;
+        const a =
+          totalMarginA > 0 ? (equityA / totalMarginA) * (userLevelA / 100) : 0;
+        const equityB = calculateEquity(rowB);
+        const totalMarginB = rowB?.account?.totalMargin;
+        const userLevelB = rowB?.settings?.level || 100;
+        const b =
+          totalMarginB > 0 ? (equityB / totalMarginB) * (userLevelB / 100) : 0;
+        const isRowAEmpty = isRowEmpty(rowA);
+        const isRowBEmpty = isRowEmpty(rowB);
+        if (isRowAEmpty || isRowBEmpty) return 0;
+        if (a > b) {
+          return 1;
+        } else if (a < b) {
+          return -1;
+        } else {
+          return 0;
+        }
+      },
       omit: !showPlayersColumns.Level,
     },
     {
       name: "Bonuses Used",
       selector: (row) => row?.account?.bonusSpent,
+      sortable: true,
+      sortFunction: sortFunction("account.bonusSpent"),
       omit: !showPlayersColumns["Bonuses Used"],
-      width: "110px",
+      width: "125px",
     },
     {
       name: "Profit",
@@ -573,6 +678,45 @@ export default function Leads({ setTab }) {
         const free = freeMargin - parseFloat(acc.bonus);
         return +parseFloat(free)?.toFixed(2);
       },
+      sortable: true,
+      sortFunction: (rowA, rowB) => {
+        const accA = rowA.account;
+        let equityA = calculateEquity(rowA);
+        if (rowA?.settings?.allowBonus) equityA += parseFloat(accA?.bonus);
+        const dealSumA = orders
+          .filter(
+            (o) =>
+              o.userId === rowA.userId &&
+              o.account_no === accA.account_no &&
+              o.status === "Pending"
+          )
+          .reduce((p, v) => p + +v.sum, 0);
+        const freeMarginA = equityA - dealSumA;
+        const a = freeMarginA - parseFloat(accA?.bonus);
+        const accB = rowB.account;
+        let equityB = calculateEquity(rowB);
+        if (rowB?.settings?.allowBonus) equityB += parseFloat(accB?.bonus);
+        const dealSumB = orders
+          .filter(
+            (o) =>
+              o.userId === rowB.userId &&
+              o.account_no === accB.account_no &&
+              o.status === "Pending"
+          )
+          .reduce((p, v) => p + +v.sum, 0);
+        const freeMarginB = equityB - dealSumB;
+        const b = freeMarginB - parseFloat(accB?.bonus);
+        const isRowAEmpty = isRowEmpty(rowA);
+        const isRowBEmpty = isRowEmpty(rowB);
+        if (isRowAEmpty || isRowBEmpty) return 0;
+        if (a > b) {
+          return 1;
+        } else if (a < b) {
+          return -1;
+        } else {
+          return 0;
+        }
+      },
       omit: !showPlayersColumns.Free,
     },
     {
@@ -581,6 +725,21 @@ export default function Leads({ setTab }) {
         if (!row || !row?.account) return;
         const equity = calculateEquity(row);
         return +parseFloat(equity).toFixed(2);
+      },
+      sortable: true,
+      sortFunction: (rowA, rowB) => {
+        const a = calculateEquity(rowA);
+        const b = calculateEquity(rowB);
+        const isRowAEmpty = isRowEmpty(rowA);
+        const isRowBEmpty = isRowEmpty(rowB);
+        if (isRowAEmpty || isRowBEmpty) return 0;
+        if (a > b) {
+          return 1;
+        } else if (a < b) {
+          return -1;
+        } else {
+          return 0;
+        }
       },
       omit: !showPlayersColumns.Equity,
     },
@@ -604,12 +763,55 @@ export default function Leads({ setTab }) {
           freeMargin + parseFloat(acc.totalMargin) + parseFloat(acc.bonus);
         return +parseFloat(balance)?.toFixed(2);
       },
+      sortable: true,
+      sortFunction: (rowA, rowB) => {
+        const accA = rowA.account;
+        let equityA = calculateEquity(rowA);
+        if (rowA?.settings?.allowBonus) equityA += parseFloat(accA?.bonus);
+        const dealSumA = orders
+          .filter(
+            (o) =>
+              o.userId === rowA.userId &&
+              o.account_no === accA.account_no &&
+              o.status === "Pending"
+          )
+          .reduce((p, v) => p + +v.sum, 0);
+        const freeMarginA = equityA - dealSumA;
+        const a =
+          freeMarginA + parseFloat(accA?.totalMargin) + parseFloat(accA?.bonus);
+        const accB = rowB.account;
+        let equityB = calculateEquity(rowB);
+        if (rowB?.settings?.allowBonus) equityB += parseFloat(accB?.bonus);
+        const dealSumB = orders
+          .filter(
+            (o) =>
+              o.userId === rowB.userId &&
+              o.account_no === accB.account_no &&
+              o.status === "Pending"
+          )
+          .reduce((p, v) => p + +v.sum, 0);
+        const freeMarginB = equityB - dealSumB;
+        const b =
+          freeMarginB + parseFloat(accB?.totalMargin) + parseFloat(accB?.bonus);
+        const isRowAEmpty = isRowEmpty(rowA);
+        const isRowBEmpty = isRowEmpty(rowB);
+        if (isRowAEmpty || isRowBEmpty) return 0;
+        if (a > b) {
+          return 1;
+        } else if (a < b) {
+          return -1;
+        } else {
+          return 0;
+        }
+      },
       omit: !showPlayersColumns.Balance,
     },
     {
       name: "Own Equity",
       selector: () => "",
+      sortable: true,
       omit: !showPlayersColumns["Own Equity"],
+      width: "110px",
     },
   ];
 
