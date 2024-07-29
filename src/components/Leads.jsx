@@ -41,7 +41,8 @@ export default function Leads({ setTab }) {
   const [isHidden, setIsHidden] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [dealRows, setDealRows] = useState(5);
+  const [playerRows, setPlayersRow] = useState(10);
   const [searchText, setSearchText] = useState("");
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [selectedManager, setSelectedManager] = useState("");
@@ -657,11 +658,24 @@ export default function Leads({ setTab }) {
       );
       leadsDiv.style.height = `${currentHeightPercentage}%`;
       leadTransactions.style.height = `${100 - currentHeightPercentage}%`;
-      let rows = 10;
-      if (currentHeightPercentage > 73) rows = 12;
-      if (currentHeightPercentage > 80) rows = 13;
-      if (currentHeightPercentage > 92) rows = 16;
-      setRowsPerPage(rows);
+      let dRows = 5;
+      if (currentHeightPercentage > 65) dRows = 4;
+      if (currentHeightPercentage > 70) dRows = 3;
+      if (currentHeightPercentage > 75) dRows = 2;
+      if (currentHeightPercentage > 77) dRows = 1;
+      if (currentHeightPercentage > 82) {
+        setIsHidden(true);
+        currentHeightPercentage = 96;
+        dRows = 5;
+        leadsDiv.style.height = "96%";
+        leadTransactions.style.height = "4%";
+      }
+      setDealRows(dRows);
+      let pRows = 10;
+      if (currentHeightPercentage > 73) pRows = 12;
+      if (currentHeightPercentage > 80) pRows = 13;
+      if (currentHeightPercentage > 92) pRows = 16;
+      setPlayersRow(pRows);
     };
     const handleMouseUp = () => {
       document.removeEventListener("mousemove", handleMouseMove);
@@ -792,11 +806,11 @@ export default function Leads({ setTab }) {
             </div>
           </div>
           <DataTable
-            key={rowsPerPage}
+            key={playerRows}
             columns={
               user.role === "Sale" ? userColumnsForSale : userColumnsForAdmin
             }
-            data={fillArrayWithEmptyRows(filteredUsers, rowsPerPage)}
+            data={fillArrayWithEmptyRows(filteredUsers, playerRows)}
             highlightOnHover
             pointerOnHover
             pagination
@@ -806,7 +820,7 @@ export default function Leads({ setTab }) {
               // rangeSeparatorText: "ok"
             }}
             paginationTotalRows={filteredUsers.length}
-            paginationPerPage={rowsPerPage}
+            paginationPerPage={playerRows}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             conditionalRowStyles={conditionalRowStyles}
             onRowClicked={(row, e) => {
@@ -863,21 +877,22 @@ export default function Leads({ setTab }) {
               className="btn btn-secondary btn-sm px-4"
               onClick={() => {
                 setIsHidden(!isHidden);
-                isHidden ? setRowsPerPage(10) : setRowsPerPage(17);
+                isHidden ? setPlayersRow(10) : setPlayersRow(17);
               }}
             >
               {isHidden ? "Show deals" : "Hide deals"}
             </button>
           </div>
           <DataTable
+            key={dealRows}
             columns={dealsColumns({
               handleEditOrder,
               handleCloseOrder,
               showColumns: showDealsColumns,
             })}
-            data={fillArrayWithEmptyRows(deals, 5)}
+            data={fillArrayWithEmptyRows(deals, dealRows)}
             pagination
-            paginationPerPage={5}
+            paginationPerPage={dealRows}
             // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             paginationComponentOptions={{
               noRowsPerPage: 1,

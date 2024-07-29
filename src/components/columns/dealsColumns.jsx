@@ -12,13 +12,13 @@ const dealsColumns = ({
   handleCloseOrder,
   showColumns = {},
 } = {}) => [
-  {
-    name: "ID",
-    selector: (row, i) => row && i + 1,
-    sortable: true,
-    width: "70px",
-    omit: !showColumns.ID,
-  },
+  // {
+  //   name: "ID",
+  //   selector: (row, i) => row && i + 1,
+  //   sortable: true,
+  //   width: "70px",
+  //   omit: !showColumns.ID,
+  // },
   {
     name: "Date",
     selector: (row) =>
