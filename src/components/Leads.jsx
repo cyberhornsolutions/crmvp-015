@@ -831,6 +831,11 @@ export default function Leads({ setTab }) {
             }}
             onRowDoubleClicked={(row) => row && setTab("Player Card")}
             customStyles={{
+              cells: {
+                style: {
+                  border: "1px solid",
+                },
+              },
               pagination: {
                 style: {
                   fontSize: "1rem",
