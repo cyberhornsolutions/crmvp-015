@@ -18,6 +18,7 @@ const ManagerRightsModal = ({ setShowModal, manager }) => {
     createTeam: Boolean(manager?.settings?.createTeam),
     createEditStatus: Boolean(manager?.settings?.createEditStatus),
     disableStatus: Boolean(manager?.settings?.disableStatus),
+    playerLogs: Boolean(manager?.settings?.playerLogs),
   });
 
   const [loading, setLoading] = useState(false);
@@ -219,7 +220,7 @@ const ManagerRightsModal = ({ setShowModal, manager }) => {
                 />
               </div>
             </Form.Group>
-            <Form.Group className="row align-items-center justify-content-center mb-3">
+            <Form.Group className="row align-items-center justify-content-center">
               <div className="col-8 text-left">
                 <Form.Label htmlFor="disable-status">Disable status</Form.Label>
               </div>
@@ -228,6 +229,19 @@ const ManagerRightsModal = ({ setShowModal, manager }) => {
                   id="disable-status"
                   name="disableStatus"
                   checked={settings.disableStatus}
+                  onChange={handleChange}
+                />
+              </div>
+            </Form.Group>
+            <Form.Group className="row align-items-center justify-content-center mb-3">
+              <div className="col-8 text-left">
+                <Form.Label htmlFor="player-logs">Player logs</Form.Label>
+              </div>
+              <div className="col-auto">
+                <Form.Check
+                  id="player-logs"
+                  name="playerLogs"
+                  checked={settings.playerLogs}
                   onChange={handleChange}
                 />
               </div>

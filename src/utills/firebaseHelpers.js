@@ -738,3 +738,21 @@ export const incrementLastAccountNo = async () => {
     lastAccountNo: +lastAccountNo + 1,
   });
 };
+
+export const getPlayerLogs = (setState) => {
+  const q = query(collection(db, "playerLogs"), orderBy("date", "desc"));
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const logs = [];
+      snapshot.forEach((snap) => {
+        logs.push({ id: snap.id, ...snap.data() });
+      });
+      setState(logs);
+    },
+    (error) => {
+      console.error("Error getting Player logs: ", error);
+    }
+  );
+  return unsubscribe;
+};

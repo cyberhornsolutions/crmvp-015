@@ -8,6 +8,7 @@ import CreatePlayerModal from "./CreatePlayerModal";
 import ReportModal from "./ReportModal";
 import TradingSettings from "./TradingSettings";
 import DelAccountModal from "./DelAccountModal";
+import LogsModal from "./LogsModal";
 
 const PlayersActionModal = ({
   closePlayersActionModal,
@@ -22,6 +23,7 @@ const PlayersActionModal = ({
   const [showChangeManagerModal, setShowChangeManagerModal] = useState(false);
   const [showDelAccountModal, setShowDelAccountModal] = useState(false);
   const [showEditAccountModal, setShowEditAccountModal] = useState(false);
+  const [showLogsModal, setShowLogsModal] = useState(false);
   const [showNewAccountModal, setShowNewAccountModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showTradingSettingsModal, setShowTradingSettingsModal] =
@@ -138,6 +140,14 @@ const PlayersActionModal = ({
           >
             Delete account
           </p>
+          <p
+            onClick={() => {
+              // setShowModal(false);
+              setShowLogsModal(true);
+            }}
+          >
+            Player logs
+          </p>
         </Modal.Body>
       </Modal>
       {showNewAccountModal && (
@@ -178,6 +188,12 @@ const PlayersActionModal = ({
         <DelAccountModal
           selectedUser={selectedUser}
           setShowModal={setShowDelAccountModal}
+        />
+      )}
+      {showLogsModal && (
+        <LogsModal
+          selectedUser={selectedUser}
+          setShowModal={setShowLogsModal}
         />
       )}
     </>
