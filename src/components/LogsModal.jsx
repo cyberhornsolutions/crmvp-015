@@ -1,10 +1,14 @@
-import { fillArrayWithEmptyRows } from "../utills/helpers";
+import { fillArrayWithEmptyRows, getManagerSettings } from "../utills/helpers";
 import { Modal } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import logColumns from "./columns/logColumns";
 
 const LogsModal = ({ selectedUser, setShowModal }) => {
+  const user = useSelector((state) => state?.user?.user);
+  const managers = useSelector((state) => state.managers);
+  const managerSettings = getManagerSettings(managers, user.id);
+
   const logs = useSelector((state) =>
     state.playerLogs.filter((l) => l.userId === selectedUser.userId)
   );
@@ -18,24 +22,28 @@ const LogsModal = ({ selectedUser, setShowModal }) => {
           <h3 className="mb-0 text-center w-100">Logs Explorer</h3>
         </Modal.Header>
         <Modal.Body>
-          <DataTable
-            columns={logColumns}
-            customStyles={{
-              headCells: {
-                style: {
-                  fontSize: "medium",
+          {managerSettings?.playerLogs ? (
+            <DataTable
+              columns={logColumns}
+              customStyles={{
+                headCells: {
+                  style: {
+                    fontSize: "medium",
+                  },
                 },
-              },
-              rows: {
-                style: {
-                  fontSize: "small",
+                rows: {
+                  style: {
+                    fontSize: "small",
+                  },
                 },
-              },
-            }}
-            data={fillArrayWithEmptyRows(logs, 10)}
-            pagination
-            paginationRowsPerPageOptions={[5, 10, 15, 20, 50]}
-          />
+              }}
+              data={fillArrayWithEmptyRows(logs, 10)}
+              pagination
+              paginationRowsPerPageOptions={[5, 10, 15, 20, 50]}
+            />
+          ) : (
+            "You do not have permission to perform this action."
+          )}
         </Modal.Body>
         <Modal.Footer>
           <button
