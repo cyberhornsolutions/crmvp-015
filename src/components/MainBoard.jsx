@@ -25,7 +25,7 @@ import EditOrder from "./EditOrder";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import AddBalanceModal from "./AddBalanceModal";
 import dealsColumns from "./columns/dealsColumns";
 import delayedColumns from "./columns/delayedColumns";
@@ -881,7 +881,7 @@ export default function MainBoard() {
         </Navbar>
         <div className="tab-content">
           {tab === "info" && (
-            <div id="menu0" className="h-100">
+            <div id="menu0" className="h-100" style={{ userSelect: "none" }}>
               <div className="b-bottom" style={{ height: "56%" }}>
                 <div className="d-flex justify-content-evenly py-4 h-100">
                   <div className="d-flex flex-column align-items-start gap-4">
@@ -911,22 +911,66 @@ export default function MainBoard() {
                       value={newUserData.surname}
                       onChange={handleUserInfoChange}
                     />
-                    <input
-                      name="email"
-                      type="email"
-                      placeholder="Email"
-                      readOnly
-                      value={newUserData.email}
-                      onChange={handleUserInfoChange}
-                    />
-                    <input
-                      name="phone"
-                      type="tel"
-                      placeholder="Phone"
-                      readOnly
-                      value={newUserData.phone}
-                      onChange={handleUserInfoChange}
-                    />
+                    <div className="position-relative">
+                      <input
+                        name="email"
+                        type="email"
+                        placeholder="Email"
+                        readOnly
+                        value={newUserData.email}
+                        onChange={handleUserInfoChange}
+                      />
+                      <FontAwesomeIcon
+                        cursor="pointer"
+                        className="position-absolute ms-1"
+                        style={{ top: 4 }}
+                        icon={faCopy}
+                        onClick={() => {
+                          navigator.clipboard
+                            .writeText(newUserData.email)
+                            .then(async () => {
+                              toast.success("Email copied to clipboard");
+                              await addManagerLogs(
+                                `Copy: Player ${selectedUser.id} Email`,
+                                user.id
+                              );
+                            })
+                            .catch((err) => {
+                              toast.error("Failed to copy Email: ", err);
+                            });
+                        }}
+                      />
+                    </div>
+                    <div className="position-relative">
+                      <input
+                        name="phone"
+                        type="tel"
+                        placeholder="Phone"
+                        readOnly
+                        value={newUserData.phone}
+                        onChange={handleUserInfoChange}
+                      />
+                      <FontAwesomeIcon
+                        cursor="pointer"
+                        className="position-absolute ms-1"
+                        style={{ top: 4 }}
+                        icon={faCopy}
+                        onClick={() => {
+                          navigator.clipboard
+                            .writeText(newUserData.phone)
+                            .then(async () => {
+                              toast.success("Phone copied to clipboard");
+                              await addManagerLogs(
+                                `Copy: Player ${selectedUser.id} Phone`,
+                                user.id
+                              );
+                            })
+                            .catch((err) => {
+                              toast.error("Failed to copy Phone: ", err);
+                            });
+                        }}
+                      />
+                    </div>
                     <div className="position-relative">
                       <input
                         name="password"
