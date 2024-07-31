@@ -23,6 +23,7 @@ import commentsSlicer from "./slicer/commentsSlicer";
 import assetGroupsSlicer from "./slicer/assetGroupsSlicer";
 import statusesSlicer from "./slicer/statusesSlicer";
 import playerLogsSlicer from "./slicer/playerLogsSlicer";
+import managerLogsSlicer from "./slicer/managerLogsSlicer";
 
 export const store = configureStore({
   reducer: {
@@ -40,6 +41,7 @@ export const store = configureStore({
     assetGroups: assetGroupsSlicer,
     statuses: statusesSlicer,
     playerLogs: playerLogsSlicer,
+    managerLogs: managerLogsSlicer,
   },
   middleware: getDefaultMiddleware({
     serializableCheck: {

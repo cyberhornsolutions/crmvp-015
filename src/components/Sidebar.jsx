@@ -2,7 +2,7 @@ import React from "react";
 import accImg from "../acc-img-placeholder.png";
 import logo from "../logo.png";
 import { useSelector } from "react-redux";
-import { updateManager } from "../utills/firebaseHelpers";
+import { addManagerLogs, updateManager } from "../utills/firebaseHelpers";
 import { serverTimestamp } from "firebase/firestore";
 
 export default function Sidebar({ setTab, tab }) {
@@ -109,6 +109,7 @@ export default function Sidebar({ setTab, tab }) {
                 onlineStatus: false,
                 lastActive: serverTimestamp(),
               });
+              await addManagerLogs("Logged out", user.id);
             } catch (error) {
               console.log(error);
             }

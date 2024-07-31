@@ -7,6 +7,7 @@ import {
   getManagerByUsernameAndRole,
   updateManager,
   saveManagerIpAddress,
+  addManagerLogs,
 } from "../utills/firebaseHelpers";
 import { getIPRange } from "../utills/helpers";
 import { serverTimestamp } from "firebase/firestore";
@@ -57,6 +58,7 @@ export default function Login() {
             lastActive: serverTimestamp(),
             ip: ipAddress,
           }),
+          addManagerLogs("Logged in", manager.id),
         ]);
         localStorage.setItem("USER", JSON.stringify(manager));
         location.href = "/";

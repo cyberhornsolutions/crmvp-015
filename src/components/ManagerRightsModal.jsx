@@ -2,6 +2,7 @@ import { Button, Form, Modal } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { updateManager } from "../utills/firebaseHelpers";
 import { useState } from "react";
+import LogsModal from "./LogsModal";
 
 const ManagerRightsModal = ({ setShowModal, manager }) => {
   const [settings, setSettings] = useState({
@@ -22,6 +23,7 @@ const ManagerRightsModal = ({ setShowModal, manager }) => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [showLogsModal, setShowLogsModal] = useState(false);
 
   const closeModal = () => setShowModal(false);
 
@@ -233,7 +235,7 @@ const ManagerRightsModal = ({ setShowModal, manager }) => {
                 />
               </div>
             </Form.Group>
-            <Form.Group className="row align-items-center justify-content-center mb-3">
+            <Form.Group className="row align-items-center justify-content-center">
               <div className="col-8 text-left">
                 <Form.Label htmlFor="player-logs">Player logs</Form.Label>
               </div>
@@ -246,8 +248,15 @@ const ManagerRightsModal = ({ setShowModal, manager }) => {
                 />
               </div>
             </Form.Group>
-            <div className="d-flex gap-3 align-items-center justify-content-center">
-              <Button variant="secondary" className="w-25" onClick={closeModal}>
+            <Button
+              className="w-50 my-2"
+              onClick={() => setShowLogsModal(true)}
+              variant="light"
+            >
+              Manager logs
+            </Button>
+            <div className="d-flex gap-2 align-items-center justify-content-center">
+              <Button className="w-25" onClick={closeModal} variant="secondary">
                 Cancel
               </Button>
               <Button
@@ -262,6 +271,13 @@ const ManagerRightsModal = ({ setShowModal, manager }) => {
           </Form>
         </Modal.Body>
       </Modal>
+      {showLogsModal && (
+        <LogsModal
+          selectedUser={manager}
+          setShowModal={setShowLogsModal}
+          type="Manager"
+        />
+      )}
     </>
   );
 };

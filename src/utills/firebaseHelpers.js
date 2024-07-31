@@ -756,3 +756,29 @@ export const getPlayerLogs = (setState) => {
   );
   return unsubscribe;
 };
+
+export const addManagerLogs = async (action, userId) => {
+  return await addDoc(collection(db, "managerLogs"), {
+    action: action,
+    date: serverTimestamp(),
+    userId: userId,
+  });
+};
+
+export const getManagerLogs = (setState) => {
+  const q = query(collection(db, "managerLogs"), orderBy("date", "desc"));
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const logs = [];
+      snapshot.forEach((snap) => {
+        logs.push({ id: snap.id, ...snap.data() });
+      });
+      setState(logs);
+    },
+    (error) => {
+      console.error("Error getting Manager logs: ", error);
+    }
+  );
+  return unsubscribe;
+};

@@ -8,6 +8,7 @@ import ipMonitorsColumns from "./columns/ipMonitorColumns";
 import teamsColumns from "./columns/teamsColumns";
 import {
   addBlockedIp,
+  addManagerLogs,
   addNewAssetGroup,
   addStatus,
   fetchBlockedIps,
@@ -317,6 +318,10 @@ export default function Users() {
           updatedAt: serverTimestamp(),
         });
         toast.success("Manager updated successfully");
+        await addManagerLogs(
+          `Manager ${originalManager.username} update`,
+          user.id
+        );
       } catch (error) {
         console.error(error);
         toast.error("Error updating manager");

@@ -4,13 +4,15 @@ import { useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import logColumns from "./columns/logColumns";
 
-const LogsModal = ({ selectedUser, setShowModal }) => {
+const LogsModal = ({ selectedUser, setShowModal, type }) => {
   const user = useSelector((state) => state?.user?.user);
   const managers = useSelector((state) => state.managers);
   const managerSettings = getManagerSettings(managers, user.id);
 
   const logs = useSelector((state) =>
-    state.playerLogs.filter((l) => l.userId === selectedUser.userId)
+    type === "Manager"
+      ? state.managerLogs.filter((l) => l.userId === selectedUser.id)
+      : state.playerLogs.filter((l) => l.userId === selectedUser.userId)
   );
 
   const onClose = () => setShowModal(false);
@@ -19,7 +21,7 @@ const LogsModal = ({ selectedUser, setShowModal }) => {
     <>
       <Modal centered fullscreen={true} onHide={onClose} show>
         <Modal.Header closeButton>
-          <h3 className="mb-0 text-center w-100">Logs Explorer</h3>
+          <h3 className="mb-0 text-center w-100">{type} logs</h3>
         </Modal.Header>
         <Modal.Body>
           {managerSettings?.playerLogs ? (

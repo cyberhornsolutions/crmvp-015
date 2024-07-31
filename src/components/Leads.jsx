@@ -10,7 +10,7 @@ import DelOrderModal from "./DelOrderModal";
 import CircleIcon from "@mui/icons-material/Circle";
 import EditOrder from "./EditOrder";
 import NewOrder from "./NewOrder";
-import { getAllSymbols } from "../utills/firebaseHelpers";
+import { addManagerLogs, getAllSymbols } from "../utills/firebaseHelpers";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../redux/slicer/userSlice";
 import AddBalanceModal from "./AddBalanceModal";
@@ -1031,7 +1031,15 @@ export default function Leads({ setTab }) {
                 selectedUserRef.current = e.target.parentElement;
               }
             }}
-            onRowDoubleClicked={(row) => row && setTab("Player Card")}
+            onRowDoubleClicked={async (row) => {
+              if (row) {
+                setTab("Player Card");
+                await addManagerLogs(
+                  `Player Card: ${selectedUser.id}`,
+                  user.id
+                );
+              }
+            }}
             customStyles={{
               cells: {
                 style: {

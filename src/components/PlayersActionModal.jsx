@@ -194,6 +194,7 @@ const PlayersActionModal = ({
         <LogsModal
           selectedUser={selectedUser}
           setShowModal={setShowLogsModal}
+          type="Player"
         />
       )}
     </>

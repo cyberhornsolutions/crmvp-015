@@ -6,6 +6,7 @@ import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { getManagerSettings } from "../utills/helpers";
+import { addManagerLogs } from "../utills/firebaseHelpers";
 
 const CreatePlayerModal = ({ playerAccount, setShowModal }) => {
   const account = playerAccount || undefined;
@@ -75,6 +76,7 @@ const CreatePlayerModal = ({ playerAccount, setShowModal }) => {
         await updateDoc(userDocRef, player);
         toast.success("Player edited successfully");
         closeModal();
+        await addManagerLogs(`Player ${playerAccount.id} update`, user.id);
       } catch {
         toast.error("Failed to edit player");
         setLoading(false);

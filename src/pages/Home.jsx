@@ -21,6 +21,7 @@ import {
   getAssetGroups,
   fetchStatuses,
   getPlayerLogs,
+  getManagerLogs,
 } from "../utills/firebaseHelpers";
 import { setOrdersState } from "../redux/slicer/orderSlicer";
 import { setDepositsState } from "../redux/slicer/transactionSlicer";
@@ -33,6 +34,7 @@ import { setCommentsState } from "../redux/slicer/commentsSlicer";
 import { setAssetGroupsState } from "../redux/slicer/assetGroupsSlicer";
 import { setStatusesState } from "../redux/slicer/statusesSlicer";
 import { setPlayerLogsState } from "../redux/slicer/playerLogsSlicer";
+import { setManagerLogsState } from "../redux/slicer/managerLogsSlicer";
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -56,6 +58,9 @@ export default function Home() {
   }, []);
   const setDeposits = useCallback((data) => {
     dispatch(setDepositsState(data));
+  }, []);
+  const setManagerLogs = useCallback((data) => {
+    dispatch(setManagerLogsState(data));
   }, []);
   const setManagers = useCallback((data) => {
     dispatch(setManagersState(data));
@@ -90,6 +95,7 @@ export default function Home() {
         ? fetchComments(setComments)
         : getCommentsByManager(user.id, setComments);
     const unsubDeposits = getAllDeposits(setDeposits);
+    const unsubManagerLogs = getManagerLogs(setManagerLogs);
     const unsubMangers = fetchManagers(setManagers);
     const unsubPlayerLogs = getPlayerLogs(setPlayerLogs);
     const unsubPlayers = fetchPlayers(setPlayers);
@@ -100,6 +106,7 @@ export default function Home() {
       unsubColumns();
       unsubComments();
       unsubDeposits();
+      unsubManagerLogs();
       unsubMangers();
       unsubPlayerLogs();
       unsubPlayers();

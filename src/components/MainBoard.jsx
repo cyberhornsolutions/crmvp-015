@@ -4,6 +4,7 @@ import { Button, Nav, Navbar, ProgressBar } from "react-bootstrap";
 import { db } from "../firebase";
 import {
   addDocument,
+  addManagerLogs,
   getCommentsByUserId,
   getRecentChangesById,
   updateUserById,
@@ -448,6 +449,10 @@ export default function MainBoard() {
       });
       closeSaveInfoModal();
       toast.success("Saved successfully");
+      await addManagerLogs(
+        `Player ${selectedUser.id} update: ${changedKey}`,
+        user.id
+      );
     } catch (error) {
       console.log("error in updating user =", error);
     }
