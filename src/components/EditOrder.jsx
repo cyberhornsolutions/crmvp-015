@@ -5,8 +5,12 @@ import { db } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import moment from "moment";
 import { makeServerDate } from "../utills/helpers";
+import { useSelector } from "react-redux";
+import { updateUserById } from "../utills/firebaseHelpers";
 
 const EditOrder = ({ onClose, selectedOrder }) => {
+  const selectedUser = useSelector((state) => state.user.selectedUser);
+  const account = selectedUser?.account;
   const [record, setRecord] = useState({
     sl: selectedOrder.sl,
     tp: selectedOrder.tp,
@@ -69,6 +73,22 @@ const EditOrder = ({ onClose, selectedOrder }) => {
       if (seconds !== createdTime.seconds)
         payload.createdTime = { ...createdTime, seconds };
       const updatedData = doc(db, "orders", selectedOrder.id);
+      if (fee !== selectedOrder.fee) {
+        const userPayload = {
+          accounts: selectedUser.accounts?.map((ac) => {
+            if (ac.account_no !== account?.account_no) return ac;
+            ac = { ...ac, ...account };
+            return {
+              ...ac,
+              totalBalance: parseFloat(
+                ac?.totalBalance -
+                  (parseFloat(selectedOrder.fee) - parseFloat(fee))
+              ),
+            };
+          }),
+        };
+        await updateUserById(selectedUser.userId, userPayload);
+      }
       await updateDoc(updatedData, payload);
       toast.success("Order updated successfully");
       onClose();
