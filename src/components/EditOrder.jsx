@@ -12,6 +12,8 @@ const EditOrder = ({ onClose, selectedOrder }) => {
     tp: selectedOrder.tp,
     volume: selectedOrder.volume,
     symbolValue: selectedOrder.symbolValue,
+    swap: selectedOrder.swap,
+    fee: selectedOrder.fee,
   });
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +27,7 @@ const EditOrder = ({ onClose, selectedOrder }) => {
       createdTime.seconds * 1000 + createdTime.nanoseconds / 1000000
     ).format("HH:mm:ss")
   );
-  const { tp, sl, volume, symbolValue } = record;
+  const { tp, sl, volume, symbolValue, swap, fee } = record;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -210,6 +212,42 @@ const EditOrder = ({ onClose, selectedOrder }) => {
                   required
                   value={symbolValue}
                   onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div className="form-group row">
+              <label className="col-4" htmlFor="swap">
+                Swap
+              </label>
+              <div className="col">
+                <input
+                  className="form-control"
+                  id="swap"
+                  name="swap"
+                  onChange={handleChange}
+                  placeholder="Swap"
+                  required
+                  step="any"
+                  type="number"
+                  value={swap}
+                />
+              </div>
+            </div>
+            <div className="form-group row">
+              <label className="col-4" htmlFor="fee">
+                Fee
+              </label>
+              <div className="col">
+                <input
+                  className="form-control"
+                  id="fee"
+                  name="fee"
+                  onChange={handleChange}
+                  placeholder="Price Opened"
+                  required
+                  step="any"
+                  type="number"
+                  value={fee}
                 />
               </div>
             </div>
