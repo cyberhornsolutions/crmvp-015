@@ -42,7 +42,7 @@ export default function Leads({ setTab }) {
   const [isOnline, setIsOnline] = useState(false);
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
   const [dealRows, setDealRows] = useState(5);
-  const [playerRows, setPlayersRow] = useState(10);
+  const [playerRows, setPlayersRow] = useState(20);
   const [searchText, setSearchText] = useState("");
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [selectedManager, setSelectedManager] = useState("");
@@ -433,7 +433,7 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.account_type"),
       omit: !showPlayersColumns.Group,
-      // width: "82px",
+      width: "85px",
     },
     {
       name: "Account",
@@ -453,7 +453,7 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.account_no"),
       omit: !showPlayersColumns.Account,
-      // width: "85px",
+      width: "85px",
     },
     {
       name: "Name",
@@ -461,7 +461,7 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("name"),
       omit: !showPlayersColumns.Name,
-      width: "120px",
+      width: "100px",
     },
     {
       name: "Leverage",
@@ -469,6 +469,7 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("settings.leverage"),
       omit: !showPlayersColumns.Leverage,
+      width: "75px",
     },
 
     {
@@ -493,7 +494,7 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Deposited,
-      width: "102px",
+      width: "75px",
     },
     {
       name: "Withdrawn",
@@ -517,7 +518,7 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Withdrawn,
-      width: "105px",
+      width: "75px",
     },
     {
       name: "Bonuses",
@@ -525,6 +526,7 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.bonus"),
       omit: !showPlayersColumns.Bonuses,
+      width: "75px",
     },
     {
       name: "Deposited-Withdrawn",
@@ -555,7 +557,7 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns["Deposited-Withdrawn"],
-      width: "165px",
+      width: "75px",
     },
     {
       name: "Orders",
@@ -597,6 +599,7 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Orders,
+      width: "75px",
     },
     {
       name: "Level",
@@ -633,6 +636,7 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Level,
+      width: "75px",
     },
     {
       name: "Bonuses Used",
@@ -640,7 +644,7 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.bonusSpent"),
       omit: !showPlayersColumns["Bonuses Used"],
-      width: "125px",
+      width: "70px",
     },
     {
       name: "Profit",
@@ -651,6 +655,7 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.activeOrdersProfit"),
       omit: !showPlayersColumns.Profit,
+      width: "80px",
     },
     {
       name: "Margin",
@@ -658,6 +663,7 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.totalMargin"),
       omit: !showPlayersColumns.Margin,
+      width: "80px",
     },
     {
       name: "Free",
@@ -718,6 +724,7 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Free,
+      width: "85px",
     },
     {
       name: "Equity",
@@ -742,6 +749,7 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Equity,
+      width: "85px",
     },
     {
       name: "Balance",
@@ -805,13 +813,14 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Balance,
+      width: "90px",
     },
     {
       name: "Own Equity",
       selector: () => "",
       sortable: true,
       omit: !showPlayersColumns["Own Equity"],
-      width: "110px",
+      width: "70px",
     },
   ];
 
@@ -873,11 +882,14 @@ export default function Leads({ setTab }) {
         leadTransactions.style.height = "4%";
       }
       setDealRows(dRows);
-      let pRows = 10;
-      if (currentHeightPercentage > 73) pRows = 12;
-      if (currentHeightPercentage > 80) pRows = 13;
-      if (currentHeightPercentage > 92) pRows = 16;
-      setPlayersRow(pRows);
+      // let pRows = 12;
+      // if (currentHeightPercentage > 70) pRows = 13;
+      // if (currentHeightPercentage > 73) pRows = 14;
+      // if (currentHeightPercentage > 80) pRows = 15;
+      // if (currentHeightPercentage > 83) pRows = 16;
+      // if (currentHeightPercentage > 85) pRows = 17;
+      // if (currentHeightPercentage > 92) pRows = 19;
+      // setPlayersRow(pRows);
     };
     const handleMouseUp = () => {
       document.removeEventListener("mousemove", handleMouseMove);
@@ -1049,8 +1061,8 @@ export default function Leads({ setTab }) {
               pagination: {
                 style: {
                   fontSize: "1rem",
-                  minHeight: 32,
-                  height: 32,
+                  minHeight: 28,
+                  height: 28,
                 },
               },
               headCells: {
@@ -1061,8 +1073,8 @@ export default function Leads({ setTab }) {
               rows: {
                 style: {
                   fontSize: "1rem",
-                  minHeight: 32,
-                  height: 32,
+                  minHeight: "28px !important",
+                  height: 28,
                 },
               },
             }}
@@ -1092,7 +1104,7 @@ export default function Leads({ setTab }) {
               className="btn btn-secondary btn-sm px-4"
               onClick={() => {
                 setIsHidden(!isHidden);
-                isHidden ? setPlayersRow(10) : setPlayersRow(17);
+                // isHidden ? setPlayersRow(12) : setPlayersRow(20);
               }}
             >
               {isHidden ? "Show deals" : "Hide deals"}
