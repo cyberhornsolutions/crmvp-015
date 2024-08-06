@@ -267,14 +267,6 @@ export default function MainBoard() {
     },
   };
 
-  const customInfoStyles = {
-    rows: {
-      style: {
-        minHeight: 30,
-      },
-    },
-  };
-
   // const handleKeyPress = (event) => {
   //   const keyCode = event.keyCode || event.which;
   //   const keyValue = String.fromCharCode(keyCode);
@@ -1075,7 +1067,7 @@ export default function MainBoard() {
                   </div>
                 </div>
               </div>
-              <div>
+              <div style={{ height: "44%", overflowX: "auto" }}>
                 <h4 className="f-s-inherit my-2">Recent Changes</h4>
                 <DataTable
                   columns={recentChangesColumns}
@@ -1092,13 +1084,19 @@ export default function MainBoard() {
                   pagination
                   paginationPerPage={5}
                   paginationTotalRows={recentChanges.length}
-                  paginationComponentOptions={{
-                    noRowsPerPage: 1,
+                  paginationRowsPerPageOptions={[5, 10, 15, 25, 50, 100]}
+                  customStyles={{
+                    headRow: {
+                      style: {
+                        minHeight: 32,
+                      },
+                    },
+                    rows: {
+                      style: {
+                        minHeight: 28,
+                      },
+                    },
                   }}
-                  // dense
-                  // paginationRowsPerPageOptions={[5, 10, 20, 50]}
-                  // responsive
-                  customStyles={customInfoStyles}
                 />
               </div>
             </div>
