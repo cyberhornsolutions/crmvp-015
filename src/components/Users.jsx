@@ -82,8 +82,8 @@ export default function Users() {
   });
 
   const setIps = useCallback((data) => {
-    if (data.length < 10)
-      for (let i = data.length; i < 10; i++)
+    if (data.length < 11)
+      for (let i = data.length; i < 11; i++)
         data.push({ id: i + 1, firstIp: "", secondIp: "" });
     dispatch(setIpsState(data));
   }, []);
@@ -152,7 +152,7 @@ export default function Users() {
     if (!status.status) return toast.error("Status value cannot be empty");
     try {
       delete status.isEdit;
-      if (status.id < 10) {
+      if (status.id < 11) {
         delete status.id;
         await addStatus(status);
         toast.success("Status added successfully");
@@ -167,7 +167,7 @@ export default function Users() {
   };
 
   const toggleDisableStatus = async (id, isActive) => {
-    if (id < 10) return;
+    if (id < 11) return;
     try {
       await updateStatus(id, {
         isActive: isActive,
@@ -206,7 +206,7 @@ export default function Users() {
     if (!group.title) return toast.error("Title value cannot be empty");
     try {
       delete group.isEdit;
-      if (group.id < 10) {
+      if (group.id < 11) {
         delete group.id;
         await addNewAssetGroup(group);
         toast.success("Asset group added successfully");
@@ -221,7 +221,7 @@ export default function Users() {
   };
 
   const toggleDisableAssetGroups = async (id, closedMarket) => {
-    if (id < 10) return;
+    if (id < 11) return;
     try {
       await updateAssetGroups(id, {
         closedMarket: closedMarket,
@@ -269,7 +269,7 @@ export default function Users() {
 
     try {
       delete ip.isEdit;
-      if (ip.id < 10) {
+      if (ip.id < 11) {
         delete ip.id;
         await addBlockedIp(ip);
         toast.success("Ip blocked successfully");
@@ -330,7 +330,7 @@ export default function Users() {
   };
 
   const toggleDisableIp = async (id, isBlocked) => {
-    if (id < 10) return;
+    if (id < 11) return;
     try {
       await updateBlockedIp(id, {
         isBlocked,
@@ -376,8 +376,8 @@ export default function Users() {
   useEffect(() => {
     if (tab !== "Statuses") return;
     let data = [...statuses];
-    if (statuses.length < 10)
-      for (let i = statuses.length; i < 10; i++)
+    if (statuses.length < 11)
+      for (let i = statuses.length; i < 11; i++)
         data.push({ id: i + 1, status: "", isActive: false });
     selectedRowRef.current = null;
     setProcessedStatuses(data);
@@ -386,8 +386,8 @@ export default function Users() {
   useEffect(() => {
     if (tab !== "Groups") return;
     let data = [...assetGroups];
-    if (assetGroups.length < 10)
-      for (let i = assetGroups.length; i < 10; i++)
+    if (assetGroups.length < 11)
+      for (let i = assetGroups.length; i < 11; i++)
         data.push({ id: i + 1, title: "", closedMarket: false });
     selectedRowRef.current = null;
     setProcessedAssetGroups(data);
@@ -445,11 +445,8 @@ export default function Users() {
 
   return (
     <>
-      <div id="users" className="active">
-        <div
-          id="users-div"
-          // className="hidden"
-        >
+      <div id="users" className="active h-100">
+        <div className="h-75" id="users-div">
           <Navbar className="nav nav-tabs p-0">
             <Nav className="me-auto" style={{ gap: "2px" }}>
               <Nav.Link
@@ -538,7 +535,7 @@ export default function Users() {
                   selectedRowRef,
                   setSelectedRow,
                 })}
-                data={fillArrayWithEmptyRows(processedIps, 10)}
+                data={fillArrayWithEmptyRows(processedIps, 11)}
                 // pagination
                 paginationTotalRows={ips.length}
                 // paginationPerPage={10}
@@ -619,7 +616,7 @@ export default function Users() {
                   toggleDisableStatus,
                   managerSettings,
                 })}
-                data={fillArrayWithEmptyRows(processedStatuses, 10)}
+                data={fillArrayWithEmptyRows(processedStatuses, 11)}
                 // pagination
                 paginationTotalRows={statuses.length}
                 // paginationPerPage={10}
@@ -643,7 +640,7 @@ export default function Users() {
                   setSelectedRow,
                   toggleDisableAssetGroups,
                 })}
-                data={fillArrayWithEmptyRows(processedAssetGroups, 10)}
+                data={fillArrayWithEmptyRows(processedAssetGroups, 11)}
                 // pagination
                 paginationTotalRows={assetGroups.length}
                 // paginationPerPage={10}
