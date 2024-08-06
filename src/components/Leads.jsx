@@ -17,6 +17,7 @@ import AddBalanceModal from "./AddBalanceModal";
 import TradingSettings from "./TradingSettings";
 import {
   convertTimestamptToDate,
+  countTrueValues,
   fillArrayWithEmptyRows,
   filterCombinedSearch,
 } from "../utills/helpers";
@@ -109,9 +110,29 @@ export default function Leads({ setTab }) {
 
   useEffect(() => {
     if (!symbols.length) getAllSymbols(setSymbols);
-
     const headers = document.querySelectorAll(".rdt_TableHead");
     if (!headers.length) return;
+    const handlePlayersRightClick = (e) => {
+      e.preventDefault();
+      setShowColumnsModal("players");
+    };
+    const handleDealsRightClick = (e) => {
+      e.preventDefault();
+      setShowColumnsModal("deals");
+    };
+    headers.item(0)?.addEventListener("contextmenu", handlePlayersRightClick);
+    headers.item(1)?.addEventListener("contextmenu", handleDealsRightClick);
+    return () => {
+      headers
+        .item(0)
+        ?.removeEventListener("contextmenu", handlePlayersRightClick);
+      headers
+        .item(1)
+        ?.removeEventListener("contextmenu", handleDealsRightClick);
+    };
+  }, []);
+
+  useEffect(() => {
     if (columns.dealsColumns) {
       setShowDealsColumns(columns.dealsColumns);
     } else {
@@ -132,25 +153,7 @@ export default function Leads({ setTab }) {
       );
       setShowPlayersColumns(playersCols);
     }
-    const handlePlayersRightClick = (e) => {
-      e.preventDefault();
-      setShowColumnsModal("players");
-    };
-    const handleDealsRightClick = (e) => {
-      e.preventDefault();
-      setShowColumnsModal("deals");
-    };
-    headers.item(0)?.addEventListener("contextmenu", handlePlayersRightClick);
-    headers.item(1)?.addEventListener("contextmenu", handleDealsRightClick);
-    return () => {
-      headers
-        .item(0)
-        ?.removeEventListener("contextmenu", handlePlayersRightClick);
-      headers
-        .item(1)
-        ?.removeEventListener("contextmenu", handleDealsRightClick);
-    };
-  }, []);
+  }, [columns]);
 
   const handleDropdownItemClick = async (val, userId) => {
     try {
@@ -435,7 +438,8 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.account_type"),
       omit: !showPlayersColumns.Group,
-      width: "85px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Account",
@@ -455,7 +459,8 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.account_no"),
       omit: !showPlayersColumns.Account,
-      width: "85px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Name",
@@ -463,7 +468,8 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("name"),
       omit: !showPlayersColumns.Name,
-      width: "100px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Leverage",
@@ -471,9 +477,9 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("settings.leverage"),
       omit: !showPlayersColumns.Leverage,
-      width: "75px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
-
     {
       name: "Deposited",
       selector: (row) => {
@@ -496,7 +502,8 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Deposited,
-      width: "75px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Withdrawn",
@@ -520,7 +527,8 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Withdrawn,
-      width: "75px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Bonuses",
@@ -528,7 +536,8 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.bonus"),
       omit: !showPlayersColumns.Bonuses,
-      width: "75px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Deposited-Withdrawn",
@@ -559,7 +568,8 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns["Deposited-Withdrawn"],
-      width: "75px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Orders",
@@ -601,7 +611,8 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Orders,
-      width: "75px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Level",
@@ -638,7 +649,8 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Level,
-      width: "75px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Bonuses Used",
@@ -646,7 +658,8 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.bonusSpent"),
       omit: !showPlayersColumns["Bonuses Used"],
-      width: "70px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Profit",
@@ -657,7 +670,8 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.activeOrdersProfit"),
       omit: !showPlayersColumns.Profit,
-      width: "80px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Margin",
@@ -665,7 +679,8 @@ export default function Leads({ setTab }) {
       sortable: true,
       sortFunction: sortFunction("account.totalMargin"),
       omit: !showPlayersColumns.Margin,
-      width: "80px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Free",
@@ -726,7 +741,8 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Free,
-      width: "85px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Equity",
@@ -751,7 +767,8 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Equity,
-      width: "85px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Balance",
@@ -815,14 +832,16 @@ export default function Leads({ setTab }) {
         }
       },
       omit: !showPlayersColumns.Balance,
-      width: "90px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
     {
       name: "Own Equity",
       selector: () => "",
       sortable: true,
       omit: !showPlayersColumns["Own Equity"],
-      width: "70px",
+      compact: true,
+      width: `${100 / countTrueValues(showPlayersColumns)}%`,
     },
   ];
 
@@ -882,6 +901,7 @@ export default function Leads({ setTab }) {
         dRows = 5;
         leadsDiv.style.height = "96%";
         leadTransactions.style.height = "4%";
+        handleMouseUp();
       }
       setDealRows(dRows);
       // let pRows = 12;
@@ -1021,6 +1041,7 @@ export default function Leads({ setTab }) {
               </button>
             </div>
           </div>
+
           <DataTable
             key={playerRows}
             columns={
@@ -1032,12 +1053,9 @@ export default function Leads({ setTab }) {
             pagination
             paginationComponentOptions={{
               noRowsPerPage: true,
-              // rowsPerPageText: "ok",
-              // rangeSeparatorText: "ok"
             }}
             paginationTotalRows={filteredUsers.length}
             paginationPerPage={playerRows}
-            // paginationRowsPerPageOptions={[5, 10, 20, 50]}
             conditionalRowStyles={conditionalRowStyles}
             onRowClicked={(row, e) => {
               if (row) {
@@ -1063,8 +1081,8 @@ export default function Leads({ setTab }) {
               pagination: {
                 style: {
                   fontSize: "1rem",
-                  minHeight: 28,
-                  height: 28,
+                  minHeight: 18,
+                  height: 18,
                 },
               },
               headCells: {
@@ -1075,16 +1093,12 @@ export default function Leads({ setTab }) {
               rows: {
                 style: {
                   fontSize: "1rem",
-                  minHeight: "28px !important",
-                  height: 28,
+                  minHeight: "17px !important",
+                  height: 17,
                 },
               },
             }}
-            // responsive
             dense
-            // style={{
-            //   fontSize: 18
-            // }}
           />
         </div>
         {!isHidden && <div id="resize-bar"></div>}

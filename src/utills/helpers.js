@@ -108,3 +108,7 @@ export const getManagerSettings = (managers, id) => {
   const manager = managers.find((manager) => manager.id === id);
   return manager ? manager.settings : null;
 };
+
+export const countTrueValues = (obj) => {
+  return Object.entries(obj).filter(([key, value]) => value === true).length;
+};
