@@ -425,7 +425,9 @@ export default function Leads({ setTab }) {
       selector: (row) =>
         row ? (
           <div className="d-flex align-items-center gap-1">
-            {row?.account?.account_type || "N/A"}
+            {managers.find((m) => m.id === row.manager)?.username ||
+              row?.account?.account_type ||
+              "N/A"}
           </div>
         ) : (
           ""
